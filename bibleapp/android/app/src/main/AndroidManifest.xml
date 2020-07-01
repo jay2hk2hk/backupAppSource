@@ -9,11 +9,14 @@
         <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:name="io.flutter.app.FlutterApplication"
-        android:label="bibleapp"
+        android:label="@string/app_name"
         android:icon="@mipmap/ic_launcher">
+        <!-- Testing -->
+		<!--<meta-data android:name="com.google.android.gms.ads.APPLICATION_ID"
+           android:value="ca-app-pub-3940256099942544~3347511713"/>-->
     <meta-data
       android:name="com.google.android.gms.ads.APPLICATION_ID"
-      android:value="ca-app-pub-3940256099942544~3347511713"/>
+      android:value="ca-app-pub-9860072337130869~8212800236"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"

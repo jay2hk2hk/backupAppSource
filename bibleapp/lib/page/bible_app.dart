@@ -1,15 +1,15 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:ffi';
+//import 'dart:ffi';
 import 'dart:io';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
-import 'package:bibleapp/page/home_page.dart';
+//import 'package:bibleapp/page/home_page.dart';
 import 'package:bibleapp/model/bible_content.dart';
 import 'package:bibleapp/model/bible_title.dart';
 import 'package:bibleapp/model/bible_bookmark.dart';
 import 'package:bibleapp/util/common_value.dart';
-import 'package:flutter/foundation.dart';
+//import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
@@ -18,26 +18,34 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bibleapp/util/sql_helper.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+//import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:speech_to_text/speech_recognition_error.dart';
+import 'package:speech_to_text/speech_recognition_result.dart';
 //import 'package:bibleappnew/util/flutter_tts.dart';
-import 'package:synchronized/synchronized.dart';
+//import 'package:synchronized/synchronized.dart';
 import 'package:share/share.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:rflutter_alert/rflutter_alert.dart';
+//import 'package:rflutter_alert/rflutter_alert.dart';
 import 'package:percent_indicator/percent_indicator.dart';
 
 //import 'package:ads/ads.dart';
 //import 'package:flutter_native_admob/flutter_native_admob.dart';
-import 'package:flutter_native_admob/native_admob_controller.dart';
-import 'package:firebase_admob/firebase_admob.dart';
+//import 'package:flutter_native_admob/native_admob_controller.dart';
+//import 'package:firebase_admob/firebase_admob.dart';
 
-import '../main.dart';
+//import '../main.dart';
+import 'package:speech_to_text/speech_to_text.dart';
 //import 'package:flutter_native_admob/native_admob_options.dart';
 //import 'package:admob_flutter/admob_flutter.dart';
 
+//stt
+  final SpeechToText speech = SpeechToText();
+  bool _hasSpeech = false;
+  String _currentLocaleId = "";
+  String lastWords = "";
 
 int timerStatus = 0;//0=init,1=stop,2=refresh,3=play
 int timerCountMins = 5000;
@@ -154,6 +162,132 @@ class _BibleAppState extends State<BibleApp> {
   //language
   static Locale currentLang;
 
+  void errorListener(SpeechRecognitionError error) {
+    print("Received error status: $error, listening: ${speech.isListening}");
+    //Navigator.pop(context);
+    stopListening();
+    setState(() {
+      //lastError = "${error.errorMsg} - ${error.permanent}";
+      
+    });
+  }
+
+  void statusListener(String status) {
+    print("Received listener status: $status, listening: ${speech.isListening}");
+    //if(!speech.isListening)
+      //Navigator.pop(context);
+    setState(() {
+      //lastStatus = "$status";
+    });
+  }
+
+  Future<void> initSpeechState() async {
+    bool hasSpeech = await speech.initialize(
+        onError: errorListener, onStatus: statusListener);
+    if (hasSpeech) {
+      //_localeNames = await speech.locales();
+
+      var systemLocale = await speech.systemLocale();
+      _currentLocaleId = prefs.getString(sharePrefSoundLanguage);//systemLocale.localeId;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _hasSpeech = hasSpeech;
+    });
+  }
+
+  void startListening() {
+    lastWords = "";
+    //lastError = "";
+    speech.listen(
+        onResult: resultListener,
+        listenFor: Duration(seconds: 10),
+        localeId: _currentLocaleId,
+        //onSoundLevelChange: soundLevelListener,
+        cancelOnError: true,
+        partialResults: true);
+    setState(() {});
+  }
+
+  void stopListening() {
+    speech.stop();
+    setState(() {
+      //level = 0.0;
+    });
+  }
+
+  void cancelListening() {
+    speech.cancel();
+    setState(() {
+      //level = 0.0;
+    });
+  }
+
+  void resultListener(SpeechRecognitionResult result) {
+    setState(() {
+      //lastWords = "${result.recognizedWords} - ${result.finalResult}";
+      if(result.finalResult)
+      {
+        if(_bibleSeletion==null) _bibleSeletion = queryBibleTitleByDefault();
+        lastWords = result.recognizedWords;
+        String titleForSTT ="";
+        for(int i=0;i<_bibleSeletion.length;i++)
+        {
+          //lastWords.contains(_bibleSeletion[i]);
+          if(i != 0 && i != 39 && i != 68 && lastWords.contains(_bibleSeletion[i]))
+          {
+            titleForSTT = getBibleTitleIdByTitle(_bibleSeletion[i]);
+            lastWords = lastWords.substring(_bibleSeletion[i].length);
+          }
+            
+        }
+        if(titleForSTT!="")
+        {
+          _titleId = titleForSTT.toString();
+          List<String> tempTitleNumList = queryTitleNum(titleForSTT);
+          String titleNum = "0";
+          for(int j = 0; j<tempTitleNumList.length; j++)
+          {
+            if(lastWords.indexOf(tempTitleNumList[j])>=0 && tempTitleNumList[j]!="")
+            {
+              titleNum = tempTitleNumList[j];
+              //break;
+            }
+              
+          }
+          //int title = tempTitleNumList.indexWhere((element) => element.toLowerCase().contains(lastWords));
+          if(titleNum!="0")
+          {
+            _titleNum = titleNum;
+            /*lastWords = lastWords.substring(titleNum.length);
+            List<String> tempContentList = queryBibleContentByTitleForSTT(_titleId,_titleNum);
+            String contentNum = "0";
+            for(int k = 0; k<tempContentList.length; k++)
+            {
+              if(lastWords.lastIndexOf(tempTitleNumList[k])>=0 && tempTitleNumList[k]!="")
+              {
+                contentNum = (k+1).toString();
+              }
+            }
+            if(contentNum!="0")
+              _contentNum = contentNum;*/
+
+          }
+          else _titleNum = "1";
+            
+        }
+        
+        //int title = _bibleSeletion.indexWhere((element) => element.toLowerCase().contains(lastWords));
+        print("lastWords="+lastWords);
+      //Navigator.pop(context);
+      }
+      
+    });
+  }
+
+
   //true ads native adv android
   //ca-app-pub-9860072337130869/2224676926
   //true ads native adv ios
@@ -175,7 +309,7 @@ class _BibleAppState extends State<BibleApp> {
       : 'ca-app-pub-3940256099942544/1712485313';
   */
   
-  static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
+  /*static const _adUnitID = "ca-app-pub-3940256099942544/2247696110";
   final _nativeAdController = NativeAdmobController();
 
 
@@ -196,7 +330,7 @@ class _BibleAppState extends State<BibleApp> {
         print("BannerAd event $event");
       },
     );
-  }
+  }*/
   /*String getBannerAdUnitId() {
   if (Platform.isIOS) {
     return 'ca-app-pub-3940256099942544/2934735716';
@@ -211,13 +345,16 @@ class _BibleAppState extends State<BibleApp> {
     
     super.initState();
     //initBibleContent();
+    
     language = prefs.getString(sharePrefSoundLanguage);
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
         
     _initTheSelectionList();
     _initTts();
     initAds();
+    initSpeechState();
     BackButtonInterceptor.add(myInterceptor);
+    
 
   }
   void initBibleContent() async
@@ -474,7 +611,7 @@ class _BibleAppState extends State<BibleApp> {
     //为了避免内存泄露，需要调用.dispose
     super.dispose();
     flutterTts.stop();
-    _bannerAd?.dispose();
+    //_bannerAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
     //appAds.dispose();
   }
@@ -798,7 +935,7 @@ loadButtonText() async {
   String copyShareReturnText()
   {
     String tempText = "";
-    tempText += "$_bibleTitleButtonText\n";
+    tempText += "$_bibleTitleButtonText \n";
     for(int i=0;i<tmepBibleList.length;i++)
     {
       if(listSelection[i])
@@ -891,6 +1028,19 @@ List<String> queryBibleTitleByDefault() {
     return tmepList;
   }
 
+  List<String> queryBibleContentByTitleForSTT(String titleId, String titleNum) {
+    /*List<BibleContent> t = jsonBibleContentResult.where((v) => v.titleId == titleId  && v.titleNum == titleNum).toList();
+    BibleContent temp;
+    if(t.length>0)
+      temp = t[0];
+    else
+      temp = jsonBibleContentResult.where((v) => v.titleId == titleId  && v.titleNum == "1").toList()[0];*/
+      String temp = FlutterI18n.translate(context, "bible.$titleId.$titleNum.content")/*bibleAll["bible"][titleId][titleNum]["content"]*/;
+    tmepBibleList = unescape.convert(temp).split("=.=");
+    
+    return tmepBibleList;
+  }
+
 //query content by title
   Future<List<String>> queryBibleContentByTitle(String titleId, String titleNum) async {
     /*List<BibleContent> t = jsonBibleContentResult.where((v) => v.titleId == titleId  && v.titleNum == titleNum).toList();
@@ -901,6 +1051,7 @@ List<String> queryBibleTitleByDefault() {
       temp = jsonBibleContentResult.where((v) => v.titleId == titleId  && v.titleNum == "1").toList()[0];*/
       String temp = FlutterI18n.translate(context, "bible.$titleId.$titleNum.content")/*bibleAll["bible"][titleId][titleNum]["content"]*/;
     tmepBibleList = unescape.convert(temp).split("=.=");
+    
     return tmepBibleList;
   }
 
@@ -1252,6 +1403,21 @@ void _insert(Map<String, dynamic> row) async {
             }
               
           }),*/
+          IconButton(icon: Icon(FontAwesomeIcons.microphone,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
+          {
+            if((_hasSpeech || !speech.isListening) && !isButtonDisable)
+            {
+              startListening();
+              /*showDialog(
+              barrierDismissible: false,
+              context: context,
+              builder: (_) {
+                return MyDialog();
+              });*/
+            }
+          }
+          ),
+          SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
           InkWell(
             child: Container(
               child: Icon(
@@ -1323,7 +1489,7 @@ void _insert(Map<String, dynamic> row) async {
       onSelected: (String value) {
         if(value!='cancel')changeLanguage(value);
       }),*/
-      SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
+      SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
           !isButtonDisable ? 
           new PopupMenuButton<String>(
             icon: FaIcon(FontAwesomeIcons.ellipsisV,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
@@ -1345,7 +1511,9 @@ void _insert(Map<String, dynamic> row) async {
                                       fontOfContent+=1;
                                   });
                                 }),
+                                SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
                                 IconButton(icon: FaIcon(FontAwesomeIcons.font,color: iconAlertDialogColor, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () {}),
+                                SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
                                 IconButton(icon: FaIcon(FontAwesomeIcons.minus,color: iconAlertDialogColor, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () 
                                 {
                                   setState(()
@@ -1377,6 +1545,7 @@ void _insert(Map<String, dynamic> row) async {
                           });
                           Navigator.pop(context);
                         }),
+                        SizedBox(width:ScreenUtil().setSp(20, allowFontScalingSelf: true),),
                         IconButton(icon: FaIcon(FontAwesomeIcons.running,color: iconAlertDialogColor, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () 
                         {
                           setState(()
@@ -1389,6 +1558,7 @@ void _insert(Map<String, dynamic> row) async {
                           });
                           Navigator.pop(context);
                         }),
+                        SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
                         IconButton(icon: FaIcon(FontAwesomeIcons.walking,color: iconAlertDialogColor, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () 
                         {
                           setState(()
@@ -1600,6 +1770,7 @@ Widget _myListView(BuildContext context) {
         builder: (context, snapshot) {
         return new ScrollablePositionedList.separated(
           //initialScrollIndex: 20,
+          physics: ClampingScrollPhysics(),
         itemScrollController: _scrollController,
         itemCount: snapshot.data==null ? 0 : snapshot.data.length,
         separatorBuilder: (context, index) =>
@@ -1791,14 +1962,15 @@ Widget _myListView(BuildContext context) {
         context: context,
         //移除抽屉菜单顶部默认留白
         removeTop: true,
+        removeBottom: true,
         child: new Scaffold(
       appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60.0), // here the desired height
+          preferredSize: Size.fromHeight(70.0), // here the desired height
           child: AppBar(
             automaticallyImplyLeading: false,
             title: Column(
               children: <Widget>[
-                Text(''),//empty row
+                //Text(''),//empty row
                 Row(children: <Widget>[
                   IconButton(
                             //alignment: Alignment.bottomCenter,

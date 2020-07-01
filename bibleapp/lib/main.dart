@@ -8,9 +8,22 @@ import 'package:bibleapp/util/common_value.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+//import 'package:catcher/catcher.dart';
 
 void main() async {
   
+  /// STEP 1. Create catcher configuration. 
+  /// Debug configuration with dialog report mode and console handler. It will show dialog and once user accepts it, error will be shown   /// in console.
+  /*CatcherOptions debugOptions =
+      CatcherOptions(DialogReportMode(), [ConsoleHandler()]);
+      
+  /// Release configuration. Same as above, but once user accepts dialog, user will be prompted to send email with crash to support.
+  CatcherOptions releaseOptions = CatcherOptions(DialogReportMode(), [
+    EmailManualHandler(["jay2hk2hk@gmail.com"])
+  ]);*/
+
+  
+
   final FlutterI18nDelegate flutterI18nDelegate = FlutterI18nDelegate(
     translationLoader: FileTranslationLoader(
         useCountryCode: true,
@@ -22,6 +35,9 @@ void main() async {
   //prefs = await SharedPreferences.getInstance();
   await flutterI18nDelegate.load(null);
   runApp(MyApp(flutterI18nDelegate));
+
+  /// STEP 2. Pass your root widget (MyApp) along with Catcher configuration:
+  //Catcher(MyApp(flutterI18nDelegate), debugConfig: debugOptions, releaseConfig: releaseOptions);
 
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations(
@@ -55,6 +71,9 @@ class MyApp extends StatelessWidget {
     return new RestartWidget(
         child: /*FlutterEasyLoading(
       child: */MaterialApp(
+        /// STEP 3. Add navigator key from Catcher. It will be used to navigate user to report page or to show dialog.
+          //navigatorKey: Catcher.navigatorKey,
+        debugShowCheckedModeBanner: false,
         /*theme: new ThemeData(
           primaryColor: themeColor,
         ),*///theme:lightDark==0 ? ThemeData.light(): ThemeData.dark(),

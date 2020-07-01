@@ -51,29 +51,26 @@ class _NotesPageState extends State<NotesPage>
   static final TextEditingController _controller = new TextEditingController();
   static final TextEditingController _controller2 = new TextEditingController();
 
+  //stt
   final SpeechToText speech = SpeechToText();
   bool _hasSpeech = false;
   String _currentLocaleId = "";
   String lastWords = "";
+
   double sizeOfIcon = 50.0;
 
   void errorListener(SpeechRecognitionError error) {
     print("Received error status: $error, listening: ${speech.isListening}");
     //Navigator.pop(context);
     stopListening();
-    setState(() {
-      //lastError = "${error.errorMsg} - ${error.permanent}";
-      
-    });
+    //setState(() {});
   }
 
   void statusListener(String status) {
     print("Received listener status: $status, listening: ${speech.isListening}");
     //if(!speech.isListening)
       //Navigator.pop(context);
-    setState(() {
-      //lastStatus = "$status";
-    });
+    //setState(() {});
   }
 
   Future<void> initSpeechState() async {
@@ -81,9 +78,11 @@ class _NotesPageState extends State<NotesPage>
         onError: errorListener, onStatus: statusListener);
     if (hasSpeech) {
       //_localeNames = await speech.locales();
-
+    Future.delayed(Duration(milliseconds: 200), () async{
       var systemLocale = await speech.systemLocale();
       _currentLocaleId = systemLocale.localeId;
+    });
+      
     }
 
     if (!mounted) return;
@@ -103,21 +102,17 @@ class _NotesPageState extends State<NotesPage>
         //onSoundLevelChange: soundLevelListener,
         cancelOnError: true,
         partialResults: true);
-    setState(() {});
+    //setState(() {});
   }
 
   void stopListening() {
     speech.stop();
-    setState(() {
-      //level = 0.0;
-    });
+    //setState(() {});
   }
 
   void cancelListening() {
     speech.cancel();
-    setState(() {
-      //level = 0.0;
-    });
+    //setState(() {});
   }
 
   void resultListener(SpeechRecognitionResult result) {
@@ -179,9 +174,26 @@ class _NotesPageState extends State<NotesPage>
     //print("BACK BUTTON!"); // Do some stuff.
     if(page!=0)
     {
-      setState(() {
+      if(page==2)
+      {
+        if(_controller.text!="" || _controller2.text!="")
+            {
+              _saveNote();
+            }
+            else
+            {
+              setState(() {
+                page = 1;
+              });
+            }
+      }
+      else
+      {
+        setState(() {
         page-=1;
-      });
+        });
+      }
+      
     }
     else
       SystemChannels.platform.invokeMethod('SystemNavigator.pop');
@@ -257,7 +269,7 @@ class _NotesPageState extends State<NotesPage>
   }
 
   void _onDaySelected(DateTime day, List events) {
-    //print('CALLBACK: _onDaySelected');
+    print('CALLBACK: _onDaySelected');
     setState(() {
       eventNoteTitle = DateTime.parse(dateFormat.format(day));
       _selectedEvents = events;
@@ -266,7 +278,7 @@ class _NotesPageState extends State<NotesPage>
   }
 
   void _onVisibleDaysChanged(DateTime first, DateTime last, CalendarFormat format) {
-    //print('CALLBACK: _onVisibleDaysChanged ' + first.toString());
+    print('CALLBACK: _onVisibleDaysChanged ' + first.toString());
     setInitEventInCal(first,last);
     setState(() {
     //_events = getMonthEvent(first,last);
@@ -288,9 +300,10 @@ class _NotesPageState extends State<NotesPage>
     setState(() {
       //_events = getMonthEvent(first,last);
       //print(_events);
+      
       eventNoteTitle = DateTime.parse(dateFormat.format(DateTime.now()));
       _selectedEvents = events[eventNoteTitle] ?? [];
-    });
+    })  ;
   }
 
   Widget _buildEventList(List<dynamic> selectedEvents) {
@@ -379,7 +392,7 @@ class _NotesPageState extends State<NotesPage>
       TableCalendar(
                   locale: prefs.getString(sharePrefDisplayLanguage),
                   calendarController: _calendarController,
-                  rowHeight: ScreenUtil().setSp(120.0, allowFontScalingSelf: true),
+                  rowHeight: ScreenUtil().setSp(110.0, allowFontScalingSelf: true),
                   events: events,
                   //holidays: _holidays,
                   startingDayOfWeek: StartingDayOfWeek.sunday,
@@ -445,7 +458,7 @@ class _NotesPageState extends State<NotesPage>
       home: */Scaffold(
         appBar: AppBar(
           title: Text(FlutterI18n.translate(context, "bottomBarNotes")
-          ,style: TextStyle(color: buttonTextColor,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+          ,style: TextStyle(color: buttonTextColor,fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
         ),
         body: Center(
           child: new Container(
@@ -458,6 +471,16 @@ class _NotesPageState extends State<NotesPage>
     );
   }
 
+  void _saveNote() async
+  {
+    editCurrentNotes = BibleNotes(id:editCurrentNotes.id,title: _controller.text,content: _controller2.text,date: eventNoteTitle.toString());
+              int id = await dbHelper.insertNotes(editCurrentNotes);
+              editCurrentNotes = BibleNotes(id:id,title: _controller.text,content: _controller2.text,date: eventNoteTitle.toString());
+              setState(() {
+                page = 1;
+              });
+  }
+
   Widget getNotesPage(BuildContext context)
   {
     return Scaffold(
@@ -465,29 +488,34 @@ class _NotesPageState extends State<NotesPage>
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, /*color: Colors.black*/size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
-          onPressed: () => {
-            setState(() {
-                page = 1;
-              })
-          },
-        ), 
-        title: Text(dateFormat.format(eventNoteTitle).toString(),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
-        ,color:buttonTextColor),),
-        actions: <Widget>[
-          IconButton(icon: Icon(FontAwesomeIcons.save,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () async
-          {
-              editCurrentNotes = BibleNotes(id:editCurrentNotes.id,title: _controller.text,content: _controller2.text,date: eventNoteTitle.toString());
-              int id = await dbHelper.insertNotes(editCurrentNotes);
-              editCurrentNotes = BibleNotes(id:id,title: _controller.text,content: _controller2.text,date: eventNoteTitle.toString());
+          onPressed: () {
+            if(_controller.text!="" || _controller2.text!="")
+            {
+              _saveNote();
+            }
+            else
+            {
               setState(() {
                 page = 1;
               });
+            }
+            
+          },
+        ), 
+        title: Text(dateFormat.format(eventNoteTitle).toString(),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true)
+        ,color:buttonTextColor),),
+        actions: <Widget>[
+          IconButton(icon: Icon(FontAwesomeIcons.save,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
+          {
+              _saveNote();
           }),
+          SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
           IconButton(icon: Icon(FontAwesomeIcons.trash,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () //async
           {
             _showConfirm(context,"");
               
           }),
+          SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
           IconButton(icon: Icon(FontAwesomeIcons.microphone,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
           {
             if(_hasSpeech || !speech.isListening)
@@ -502,6 +530,7 @@ class _NotesPageState extends State<NotesPage>
             }
           }
           ),
+          SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
         ],
       ),
       body: Container(
@@ -544,10 +573,10 @@ class _NotesPageState extends State<NotesPage>
       appBar: AppBar(
         leading: IconButton(
           icon: Icon(Icons.arrow_back, /*color: Colors.black*/size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
-          onPressed: () => {
+          onPressed: () {
             setState(() {
                 page = 0;
-              })
+              });
           },
         ), 
         title: Text(dateFormat.format(eventNoteTitle).toString(),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)

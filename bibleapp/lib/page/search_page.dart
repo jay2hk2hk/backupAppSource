@@ -5,10 +5,13 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:html_unescape/html_unescape.dart';
 
 double fontOfContent = 60.0;//px
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 int displayListNum = 0;
+
 
 void main() {
     runApp(SearchPage(globalKey));
@@ -27,11 +30,24 @@ class _SearchPageState extends State<SearchPage>{
   static int page = 0; //0 = seach page 1 = content page
   static ItemScrollController _scrollController = ItemScrollController();//the scroll controller of jump to
   double sizeOfIcon = 50.0;
+  static var bibleTitleTotalNum = [50,40,27,36,34,24,21,4,31,24,22,25,29
+                ,36,10,13,10,42,150,31,12,8,66,52,5,48
+                ,12,14,3,9,1,4,7,3,3,3,2,14,4
+                ,28,16,24,21,28,16,16,13,6
+                ,6,4,4,5,3,6,4,3,1
+                ,13,5,5,3,5,1,1,1,22];
+  List<List<List<String>>> searchList = new List<List<List<String>>>();  
+  static final TextEditingController _controller = new TextEditingController();    
+  List<String> searchResult = new List<String>();
+  var unescape = new HtmlUnescape();//decode th html chinese word
   
 @override
   void initState() {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
+    
+
+
   }
 @override
   void dispose() {
@@ -53,12 +69,65 @@ class _SearchPageState extends State<SearchPage>{
 
   Widget getSearch(BuildContext context)
   {
+    searchList = new List<List<List<String>>>(); 
+    List<List<String>> tempSearchList = new List<List<String>>();
+    int i1 = 1;
+    int j1 = 1;
+    for(int i=0;i<bibleTitleTotalNum.length;i++)
+    {
+      tempSearchList = new List<List<String>>();
+      i1 = i+1;
+      for(int j=0; j<bibleTitleTotalNum[i];j++)
+      {
+        j1 = j+1;
+        List<String> tempList = unescape.convert(FlutterI18n.translate(context, "bible.$i1.$j1.content")).split("=.=");
+        tempSearchList.add(tempList);
+      }
+      searchList.add(tempSearchList);
+        
+    }
     return /*MaterialApp(
       title: FlutterI18n.translate(context, "appName"),
       home: */Scaffold(
         appBar: AppBar(
-          title: Text(FlutterI18n.translate(context, "bottomBarSearch")
-          ,style: TextStyle(/*color: buttonTextColor,*/fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+          title: TextFormField(
+              style:TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-10, allowFontScalingSelf: true),),
+              controller: _controller,
+              decoration: InputDecoration(
+                labelText: FlutterI18n.translate(context, "searchInput")
+              ),
+            ),
+          //Text(FlutterI18n.translate(context, "bottomBarSearch"),
+          //style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
+          actions: <Widget>[
+            
+            IconButton(icon: Icon(FontAwesomeIcons.search,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
+            {
+              if(_controller.text.trim()!="")
+              {
+                searchResult = new List<String>();
+                for(int x=0;x<searchList.length;x++)
+                {
+                  for(int y=0;y<searchList[x].length;y++)
+                  {
+                    for(int z=0;z<searchList[x][y].length;z++)
+                    {
+                      if(searchList[x][y][z].contains(_controller.text))
+                      {
+                        searchResult.add((x+1).toString()+":"+(y+1).toString()+":"+(z+1).toString());
+                      }
+                    }
+                  }
+                }
+                displayListNum = -1;
+                setState(() {
+                  page = 1;
+                });
+              }
+              
+            }),
+            SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
+          ],
         ),
         body: Center(
           child: new Container(
@@ -121,7 +190,10 @@ class _SearchPageState extends State<SearchPage>{
               })
           },
         ), 
-        title: Text(FlutterI18n.translate(context, "searchButtonList.$displayListNum"),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
+        title: displayListNum>=0 ? Text(FlutterI18n.translate(context, "searchButtonList.$displayListNum"),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true)
+        ,color:buttonTextColor
+        ),) : 
+        Text(_controller.text,style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true)
         ,color:buttonTextColor
         ),),
       ),
@@ -139,10 +211,8 @@ class _SearchPageState extends State<SearchPage>{
                   String titleButtonText = snapshot.data.length!=0 ? temp.substring(0,temp.indexOf(':')) : "";
                   String tempTitle = snapshot.data.length!=0 ? temp.substring(temp.indexOf(':')+1,temp.indexOf('+')) : "";
                   String contentText = snapshot.data.length!=0 ? temp.substring(temp.indexOf('+')+1) : "";
+                if(snapshot.data.length!=0)
                 return Container(
-                    /*color: _selectedIndex != null && _selectedIndex == index
-                          ? Colors.red
-                          : Colors.white,*/
                     
                     child:ListTile(
                       title: RaisedButton(
@@ -180,7 +250,7 @@ class _SearchPageState extends State<SearchPage>{
                     onTap: () => null,
                     ),
                   );
-            
+                  else return Container(child: Text(''),);
             
                 
             
@@ -238,14 +308,15 @@ class _SearchPageState extends State<SearchPage>{
 
   Future<List<String>>loadQueryToList(BuildContext context)async
   {
-    //int titleNum = new Random().nextInt(saveAllBibleSentence.length-1);
-    //int contentNum = new Random().nextInt(saveAllBibleSentence[titleNum].length-1);
-    //String temp = saveAllBibleSentence[titleNum][contentNum];
     
+    List<String> tempList = new List<String>();
+    if(displayListNum<0)
+      tempList = searchResult;
+    else tempList  = saveAllBibleSentence[displayListNum];
     List<String> returnList = new List<String>();
-    for(int y=0;y<saveAllBibleSentence[displayListNum].length;y++)
+    for(int y=0;y<tempList.length;y++)
     {
-      String temp = saveAllBibleSentence[displayListNum][y];
+      String temp = tempList[y];
       List<String> tempTitleList = temp.split(':');
       List<String> tempContentList = tempTitleList[2].split('-');
       String tempDisplayContent = FlutterI18n.translate(context, "bibleTitle."+tempTitleList[0]+".title")+" " + tempTitleList[1] + ":";
@@ -256,7 +327,7 @@ class _SearchPageState extends State<SearchPage>{
       for(int i=0;i<tempContentList.length;i++)
       {
         String temp1 = FlutterI18n.translate(context, "bible."+tempTitleList[0]+"."+tempTitleList[1]+".content").split('=.=')[int.parse(tempContentList[i])-1];
-        tempDisplayContent+=temp1.substring(temp1.indexOf('.')+1).trim();
+        tempDisplayContent+=unescape.convert(temp1).substring(temp1.indexOf('.')+1).trim();
       }   
       returnList.add(tempDisplayContent);
 

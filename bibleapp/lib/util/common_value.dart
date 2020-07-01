@@ -79,6 +79,22 @@ import 'package:shared_preferences/shared_preferences.dart';
     "46:10:13","18:42:3","47:12:9","66:7:17","40:14:14","19:11:5","18:2:10","19:143:8","40:11:28"
   ,"19:46:1","43:16:33","19:34:9","45:8:18","59:1:2-4","19:119:71","46:10:13","19:32:7","40:5:10","19:17:7","19:18:18","19:20:9"
   ];//苦難
+  List<String> bibleGoodSentenceConfidence = [
+    "40:8:13","40:9:2","40:15:28","40:17:20","40:21:21","41:9:23","42:17:6","45:4:19","45:9:32"
+  ,"45:12:3","45:12:6","45:14:22","45:14:23","47:1:24","47:3:4","47:5:7","47:10:15","47:13:15","48:5:5","48:5:6"
+  ,"51:2:2","52:3:7","52:3:10","53:1:4","54:1:5","54:1:14","54:1:19","54:6:11","55:1:13","56:2:2"
+  ,"57:1:6","58:3:14","58:4:2","58:6:12","58:10:22","58:10:39","58:11:13","58:12:2","58:13:7","59:1:3-4","59:1:6"
+  ,"59:2:14","59:2:17","59:2:18","59:2:20","59:2:22","59:2:26","59:5:15","60:1:9","60:1:21"/*,"61:1:5-7","62:5:4","62:13:10"*/
+  ];//信心
+  List<String> bibleGoodSentenceJoy = [
+    "20:17:22","19:4:7","18:22:26","20:15:13","20:10:28","19:34:2","50:4:4","45:12:12","59:1:2"
+  ,"19:64:10","48:5:22","19:16:9","43:16:24","19:16:11","43:16:22","60:4:13","19:97:11-12","60:1:8","42:15:7","23:55:12"
+  ];//喜樂
+  List<String> bibleGoodSentenceHope = [
+    "61:3:13","19:62:5","19:71:5","19:71:14","19:119:49","60:1:3","60:1:13","60:1:21","60:3:15"
+  ,"47:1:7","61:3:14","48:5:5","20:10:28","45:5:2","19:147:11","45:8:24-25","49:1:12","53:2:16","56:1:2","56:2:13"
+  ,"56:3:6-7","58:3:6"
+  ];//盼望
 
    List<List<String>> saveAllBibleSentence = [
     bibleGoodSentenceExhortation,bibleGoodSentenceFalse,bibleGoodSentenceEvilWords
@@ -87,7 +103,8 @@ import 'package:shared_preferences/shared_preferences.dart';
     ,bibleGoodSentenceJealous,bibleGoodSentenceLazy,bibleGoodSentenceHatred
     ,bibleGoodSentenceErotic,bibleGoodSentenceInferiority,bibleGoodSentenceFear
     ,bibleGoodSentenceConcern,bibleGoodSentenceDefeat,bibleGoodSentencePrayer
-    ,bibleGoodSentenceSuffering
+    ,bibleGoodSentenceSuffering,bibleGoodSentenceConfidence,bibleGoodSentenceJoy
+    ,bibleGoodSentenceHope
   ];
 
   List<String> date1 = [

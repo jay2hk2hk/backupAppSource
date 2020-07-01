@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:bibleapp/model/bible_notes.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'package:flutter/material.dart';
@@ -38,6 +40,10 @@ class _HomePageState extends State<HomePage> {
   List<Widget> list = List();
   final dateFormat = new DateFormat('yyyy-MM-dd');
   double fontOfContent = 50.0;
+  //String bannerAdsId = BannerAd.testAdUnitId;
+  //String firebaseAdId = FirebaseAdMob.testAppId;
+  String bannerAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5088892533" : "ca-app-pub-9860072337130869/8724092620";
+  String firebaseAdId = Platform.isAndroid ? "ca-app-pub-9860072337130869~8212800236" : "ca-app-pub-9860072337130869~3480731194";
 
   static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     //testDevices: testDevice != null ? <String>[testDevice] : null,
@@ -45,11 +51,12 @@ class _HomePageState extends State<HomePage> {
     //contentUrl: 'http://foo.com/bar.html',
     childDirected: true,
     nonPersonalizedAds: true,
+    testDevices: <String>[],
   );
   BannerAd _bannerAd;
   BannerAd createBannerAd() {
     return BannerAd(
-      adUnitId: BannerAd.testAdUnitId,
+      adUnitId: bannerAdsId,
       size: AdSize.banner,
       targetingInfo: targetingInfo,
       listener: (MobileAdEvent event) {
@@ -68,17 +75,27 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
-    _bannerAd = createBannerAd()..load();
-    
+    FirebaseAdMob.instance.initialize(appId: firebaseAdId);
+    //_bannerAd = createBannerAd()..load();
     
     Future.delayed(Duration.zero, () async {
-      
       prefs = await SharedPreferences.getInstance();
       
       await _setPref();
       //currentLang = Locale('en','US');
       //prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
+      
+      
+      _bannerAd ??= createBannerAd();
+                      _bannerAd
+                        ..load()
+                        ..show(anchorOffset: ScreenUtil.screenHeight<=480 ? ScreenUtil().setHeight(195) : ScreenUtil().setHeight(160),anchorType: AnchorType.bottom);  
+    });
+    
+    Future.delayed(Duration.zero, () async {
+      
+      prefs = await SharedPreferences.getInstance();
+
       var now = DateTime.parse(dateFormat.format(DateTime.now()));
       
       //print(now.difference(now.subtract(Duration(hours: 5))).inDays);
@@ -162,7 +179,6 @@ class _HomePageState extends State<HomePage> {
         prefs.setInt(sharePrefLightDark, 0); 
       }
       
-        
       await FlutterI18n.refresh(context, currentLang);
       setState(() {
         currentLang = FlutterI18n.currentLocale(context);
@@ -249,10 +265,7 @@ class _HomePageState extends State<HomePage> {
     //ScreenUtil.init(context, width: 750, height: 1334, allowFontScaling: true);
     ScreenUtil.init(context/*, allowFontScaling: true*/);
     //RestartWidget.restartApp(context);
-    _bannerAd ??= createBannerAd();
-                      _bannerAd
-                        ..load()
-                        ..show(anchorOffset: ScreenUtil().setHeight(205),anchorType: AnchorType.bottom);
+    
                         
     return 
     //Column(

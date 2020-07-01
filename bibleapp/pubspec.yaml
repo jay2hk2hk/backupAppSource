@@ -61,15 +61,24 @@ dependencies:
   flutter_native_admob: ^2.1.0
   firebase_admob: ^0.9.3+2
   back_button_interceptor: ^4.2.4
-  
+  flutter_launcher_icons: ^0.7.5
+  flutter_native_splash: ^0.1.9
+  catcher: ^0.3.14
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   
-
+flutter_icons:
+  image_path: "assets/images/CrownBibleIcon.png"
+  android: true # can specify file name here e.g. "ic_launcher"
+  ios: true # can specify file name here e.g. "My-Launcher-Icon"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
+
+flutter_native_splash:
+  image: assets/images/CrownBibleIcon.png
+  color: "42a5f5"
 
 # The following section is specific to Flutter.
 flutter:

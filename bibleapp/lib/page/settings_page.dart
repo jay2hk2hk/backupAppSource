@@ -7,6 +7,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:html_unescape/html_unescape.dart';
 import '../main.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
@@ -31,6 +32,7 @@ class _SettingsPageState extends State<SettingsPage> {
   static int bibleTitleNew = 40;
   static int bibleTitleOld = 39;
   static int titleId = 0;
+  var unescape = new HtmlUnescape();//decode th html chinese word
 
   @override
   void initState() {
@@ -44,16 +46,16 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   bool myInterceptor(bool stopDefaultButtonEvent) {
     //print("BACK BUTTON!"); // Do some stuff.
-    if(page==1 || page==2 || /*page==3 ||*/ page==4 || page==5)
+    if(page==1 || /*page==2 ||*/ page==3 || page==4 || page==5)
     {
       setState(() {
         page=0;
       });
     }
-    else if(page==3)
+    else if(page==2)
     {
       setState(() {
-        page=2;
+        page=1;
       });
     }
     else
@@ -77,7 +79,7 @@ Widget _myListViewMore(BuildContext context) {
       , FlutterI18n.translate(context, "moreMenuFAQ"), FlutterI18n.translate(context, "moreMenuAboutUs")];
       return new Scaffold(
       appBar: AppBar( 
-        title: Text(FlutterI18n.translate(context, "bottomBarMore"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+        title: Text(FlutterI18n.translate(context, "bottomBarMore"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
       ),
       body: new Center(
         child: ListView.separated(
@@ -131,7 +133,7 @@ Widget _myListViewMore(BuildContext context) {
               })
           },
         ), 
-        title: Text(FlutterI18n.translate(context, "moreMenuThemeStyle"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+        title: Text(FlutterI18n.translate(context, "moreMenuThemeStyle"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
       ),
       body: new Center(
         child:ListView.separated(
@@ -172,7 +174,8 @@ Widget _myListViewMore(BuildContext context) {
       // backing data
       var europeanCountries = [FlutterI18n.translate(context, "questionNoSound"), FlutterI18n.translate(context, "answerNoSound")
       ,FlutterI18n.translate(context, "questionIfDeleteKeepData"), FlutterI18n.translate(context, "answerIfDeleteKeepData")
-      ,FlutterI18n.translate(context, "questionCanGetBackCrown"), FlutterI18n.translate(context, "answerCanGetBackCrown")];
+      ,FlutterI18n.translate(context, "questionCanGetBackCrown"), FlutterI18n.translate(context, "answerCanGetBackCrown")
+      ,FlutterI18n.translate(context, "questionCannotUseSaid"), FlutterI18n.translate(context, "answerCannotUseSaid")];
 
       return 
       new Scaffold(
@@ -185,7 +188,7 @@ Widget _myListViewMore(BuildContext context) {
               })
           },
         ), 
-        title: Text(FlutterI18n.translate(context, "moreMenuFAQ"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+        title: Text(FlutterI18n.translate(context, "moreMenuFAQ"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
       ),
       body: new Center(
         child:ListView.separated(
@@ -223,7 +226,7 @@ Widget _myListViewMore(BuildContext context) {
               })
           },
         ), 
-        title: Text(FlutterI18n.translate(context, "moreMenuFAQ"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+        title: Text(FlutterI18n.translate(context, "moreMenuFAQ"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
       ),
       body: new Center(
         child:ListView.separated(
@@ -261,7 +264,7 @@ Widget _myListViewMore(BuildContext context) {
               })
           },
         ), 
-        title: Text(FlutterI18n.translate(context, "moreMenuBookmark"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+        title: Text(FlutterI18n.translate(context, "moreMenuBookmark"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
       ),
       body: new Center(
         child:ListView.separated(
@@ -305,7 +308,7 @@ Widget _myListViewMore(BuildContext context) {
               })
           },
         ), 
-        title: Text(FlutterI18n.translate(context, "moreMenuBookmark"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+        title: Text(FlutterI18n.translate(context, "moreMenuBookmark"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
       ),
       body: new Center(
         child:FutureBuilder<List>(
@@ -416,7 +419,7 @@ Widget _myListViewMore(BuildContext context) {
             String temp1 = FlutterI18n.translate(context, "bible."+tempTitleList[0]+"."+tempTitleList[1]+".content").split('=.=')[int.parse(tempContentList[i])-1];
             tempDisplayContent+=temp1.substring(temp1.indexOf('.')+1).trim();
           }   
-          tmepList.add(tempDisplayContent);
+          tmepList.add(unescape.convert(tempDisplayContent));
           //tmepList.add(titleId.toString() + ":"+ tempBookmark.content.toString()+":"+tempBookmark.text.toString());
         }
       }

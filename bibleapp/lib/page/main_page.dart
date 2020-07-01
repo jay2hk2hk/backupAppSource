@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:math';
 
 import 'package:bibleapp/model/bible_crown.dart';
@@ -7,6 +8,7 @@ import 'package:bibleapp/util/common_value.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bibleapp/util/sql_helper.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 
@@ -39,13 +41,18 @@ class _MainPageState extends State<MainPage>{
   static int crownNum = 0;
   static double sizeOfIcon = 50.0;
   static String displayLanguage = languageTextValue[0];
+  var unescape = new HtmlUnescape();//decode th html chinese word
+  //String rewardedVideoAdsId = RewardedVideoAd.testAdUnitId;
+  //String firebaseAdId = FirebaseAdMob.testAppId;
+  String rewardedVideoAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5350932207" : "ca-app-pub-9860072337130869/7088766690";
+  String firebaseAdId = Platform.isAndroid ? "ca-app-pub-9860072337130869~8212800236" : "ca-app-pub-9860072337130869~3480731194";
 
   @override
   void initState()
   {
     super.initState();
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
-    FirebaseAdMob.instance.initialize(appId: FirebaseAdMob.testAppId);
+    FirebaseAdMob.instance.initialize(appId: firebaseAdId);
     //_bannerAd = createBannerAd()..load();
     RewardedVideoAd.instance.listener =
         (RewardedVideoAdEvent event, {String rewardType, int rewardAmount}) {
@@ -62,7 +69,7 @@ class _MainPageState extends State<MainPage>{
       }
     };
     RewardedVideoAd.instance.load(
-                        adUnitId: RewardedVideoAd.testAdUnitId,
+                        adUnitId: rewardedVideoAdsId,
                         targetingInfo: targetingInfo);
     
     totalOfCrown();
@@ -134,7 +141,7 @@ class _MainPageState extends State<MainPage>{
       home: */Scaffold(
         appBar: AppBar(
           title: Text(FlutterI18n.translate(context, "appName")
-          ,style: TextStyle(/*color: buttonTextColor,*/fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+          ,style: TextStyle(/*color: buttonTextColor,*/fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
         actions: <Widget>[
           new PopupMenuButton<String>(
             //offset: Offset(500, 500),
@@ -157,12 +164,14 @@ class _MainPageState extends State<MainPage>{
                   ),)),
                 ),
                 
-            /*new PopupMenuDivider(height: 1.0),
+            new PopupMenuDivider(height: 1.0),
             new PopupMenuItem<String>(
                 value: languageTextValue[2], child: new Container(
+                  width: double.infinity,
                   alignment: Alignment.center,
-                  child: new Text(chnageLanguageList[2],style: TextStyle(color: fontTextColor),)),
-                ),*/
+                  child: new Text(chnageLanguageList[2],style: TextStyle(/*color: fontTextColor,*/ fontSize: ScreenUtil().setSp(sizeOfIcon-10, allowFontScalingSelf: true),
+                  ),)),
+                ),
             new PopupMenuDivider(height: 1.0),
             new PopupMenuItem<String>(
                 value: languageTextValue[3], child: new Container(
@@ -180,11 +189,13 @@ class _MainPageState extends State<MainPage>{
                   child: new Text(FlutterI18n.translate(context, "cancel"),style: TextStyle(/*color: fontTextColor,*/ fontSize: ScreenUtil().setSp(sizeOfIcon-10, allowFontScalingSelf: true),
                   ),)),
                 ),
+                
           ],
       
       onSelected: (String value) {
         if(value!='cancel')changeLanguage(value);
       }),
+      SizedBox(width:20),
         ],
         ),
         body: Center(
@@ -300,7 +311,7 @@ class _MainPageState extends State<MainPage>{
           }
         }
         if(!haveTts) language = languageVolumeValue[2];*/
-        language = languageVolumeValue[1];
+        Platform.isAndroid ? language = languageVolumeValue[1] : language = languageTextValue[1];
       }
         
       else if(languageTextValue[2]==value)
@@ -308,7 +319,7 @@ class _MainPageState extends State<MainPage>{
       else if(languageTextValue[3]==value)
         language = languageVolumeValue[3];
       prefs.setString(sharePrefSoundLanguage, language);  
-      //RestartWidget.restartApp(context);
+      RestartWidget.restartApp(context);
     });
   }
 
@@ -346,7 +357,7 @@ class _MainPageState extends State<MainPage>{
     tempList.add(
       Row(
           children: <Widget>[
-        Icon(FontAwesomeIcons.crown,color: Colors.yellowAccent[700],),
+        Icon(FontAwesomeIcons.crown,color: Colors.yellowAccent[700],size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
         new Text("  "+FlutterI18n.translate(context, "totalCrownCount") +" "+crownNum.toString(),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
                             ,//color: fontTextColor
                             ),),
@@ -387,7 +398,7 @@ class _MainPageState extends State<MainPage>{
     for(int i=0;i<tempContentList.length;i++)
     {
       String temp1 = FlutterI18n.translate(context, "bible."+tempTitleList[0]+"."+tempTitleList[1]+".content").split('=.=')[int.parse(tempContentList[i])-1];
-      tempDisplayContent+=temp1.substring(temp1.indexOf('.')+1).trim();
+      tempDisplayContent+=unescape.convert(temp1).substring(temp1.indexOf('.')+1).trim();
     }
     tempList.add(
       RaisedButton(
@@ -541,7 +552,7 @@ class _MainPageState extends State<MainPage>{
       tempList.add(
         Row(
           children: <Widget>[
-        Icon(FontAwesomeIcons.crown,color: Colors.yellowAccent[700],),
+        Icon(FontAwesomeIcons.crown,color: Colors.yellowAccent[700],size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
         new Text("  "+FlutterI18n.translate(context, "gotCrownText"),style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
                             ,//color: fontTextColor
                             ),),
