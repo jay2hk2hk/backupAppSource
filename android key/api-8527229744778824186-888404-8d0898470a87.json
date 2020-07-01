@@ -1,0 +1,12 @@
+{
+  "type": "service_account",
+  "project_id": "api-8527229744778824186-888404",
+  "private_key_id": "8d0898470a875704b2b5f1817a416ebdd592f8ba",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQDILMNi5OHeWIgw\nWGEklyAK9d2JZSdy7RcJvFkhnVpgpl1P0klyGYkAYNAJtt/j4AAVuWHVwO9VZv38\newNlqQ8bLiq6aj3mXwKmZikut4RHAXtGzS62D9Y2zAeo7XvajXnM2FBi9sX5Cwbl\nV5NPsFaPtDHiijbl1yGwyjA3QnJ2Dmbou1aXEPs43qYL9LbyzhZti+XJIgKqR0Z9\ngXMbEiKWe1rrVF2ymLY2m3youegZ2Q0iKtOvwsTusogzEtvNmfMHEEp9v7i7CKZB\nMoYs8BDA4eeaJ0PQkATMajGgdlZLpcLeTLgpQO6lbVF6fy1QlllZ5f3y9M9t4mKg\n+VWUcUmbAgMBAAECggEACMb7CPK+ULCTGtjqkYnVjDAnDFI/fj4/0gZ3O2PEmxOl\nvc1GY9a+IiJx8isZpXVPVk8wUgjJYHZJUXEsv0rAGydVak0kSl4E0LpkDeSwISjt\nzeH2AreuY0K5B0LlOQ/BCnwQXPaIdxjGWaITFzMakzyJ1MQjZMVKeI+1DjHqBkZx\ngvtkrQnYM9iUtK/HCukB8UH8u/MSy4UpiZTySJpMlW6KsKp6bSBL0WMzZkgnSWWo\n9rwDAPaNyXtj42ss/IihjUrYOkvFYxCRsYmAoRiww40Zd8Nd/7aRS+YVVdPi/WbZ\n4zgEWcYmTiKKcQgKb9/oKBoFAiJbi+oJM7xjD9OyMQKBgQDueinoVV+WvuCvIMlQ\nnTEGABf/FwSSBX/2VdwQMn0gxwkazp9GpWp7IDD9iEXpMhGKs0gDBT7r8QU4QhG7\nQzeCjfuWRCE5uZSq8AkJFC9C4lNSZDyOCUE3Y05ggyf1K8rUOH2pTVG+IgFxsLP4\nH42EmksoqIUdYd0ZBGGyVhmT6QKBgQDW4h6Z5j7eC6KiFgkgT9kmcANE3TCWGHGy\njpW/xmkhjGnlMoxAVT7Gn14LLzi7vuyBxkAraoCiFPEpcbJPdGonA7iLQ2OM269d\nCJmSe6sM3EhaR0X72fcVK9+iUry99Gz5zodxSWeYa5cPAvkTDMaq/yLisv0//oRX\nf+JePj7S4wKBgQCzJIP8qr1e0U6ZYAi6jQq5ljJwhosBYi5JDyB77mF+0OVvBM4z\nVKmTipAitE7IKbtxtNGgqz0kIm8oXsFRKeI2KZBXxiAra9RZQG2ZK1eBZ+DtoKy4\nig06nVfQOlY230nDeBg1qQaBzKvHCtV2y8UUWo+hIE62zsA3PcpiHDmkmQKBgQCo\nTswxNwqe2PY1hpT3XhNz6+Bjm+xmZBcKCGx6nWnTASwgfYslCJ/26vS6Re5l/5E3\nxJSWbQD78vNBxvAnE8PhcySkz8+1kIy2jfnbpkm/9Pom3BSQw5SoXIj5l1yGXGDO\n+VlU/m3KENtswqNcrHEfll84uYFrEmuOLXic4JxMiQKBgQDn9hXm0+ttd6LSU0WP\nnHLhEriKXy3wqW07hSycrSqUQbUp7esjZot1R8M+fz2EVOSV8bOEXP2ikt7JtBVD\n2Cm2nESq7iTErcu2RVpQjdYvAqCZO6jSm0NGf/tTTKg9UOI9wC4ZnwutRA9hkSW2\nugAr2VNpOHKR0gFD8DPiqjP2Vw==\n-----END PRIVATE KEY-----\n",
+  "client_email": "bibleapp@api-8527229744778824186-888404.iam.gserviceaccount.com",
+  "client_id": "116653727801565846123",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/bibleapp%40api-8527229744778824186-888404.iam.gserviceaccount.com"
+}
