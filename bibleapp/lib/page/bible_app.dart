@@ -119,15 +119,18 @@ class _BibleAppState extends State<BibleApp> {
   double volume = 1.0;
   double pitch = 1.0;
   double rate = 0.5;
-  static double volumeMax = 1.0;
-  static double pitchMax = 2.0;
-  static double rateMax = 1.5;
-  static double volumeMin = 0.0;
-  static double pitchMin = 0.5;
-  static double rateMin = 0.5;
-  static double volumeNormal = 0.5;
-  static double pitchNormal = 1.0;
-  static double rateNormal = 1.0;
+  //static double volumeMax = 1.0;
+  //static double pitchMax = 2.0;
+  //static double volumeMin = 0.0;
+  //static double pitchMin = 0.5;
+  //static double volumeNormal = 0.5;
+  //static double pitchNormal = 1.0;
+  static double rateMaxAnd = 1.5;
+  static double rateMaxIos = 0.8;
+  static double rateMinAnd = 0.5;
+  static double rateMinIos = 0.3;
+  static double rateNormalAnd = 1.0;
+  static double rateNormalIos = 0.5;
   TtsState ttsState = TtsState.stopped;
   get isPlaying => ttsState == TtsState.playing;
   get isStopped => ttsState == TtsState.stopped;
@@ -1581,7 +1584,9 @@ void _insert(Map<String, dynamic> row) async {
                         {
                           setState(()
                           {
-                            rate=rateMax;
+                            if(Platform.isAndroid)
+                              rate=rateMaxAnd;
+                            else rate=rateMaxIos;
                           });
                           Navigator.pop(context);
                         }),
@@ -1594,7 +1599,9 @@ void _insert(Map<String, dynamic> row) async {
                               prefs.setInt(sharePrefLightDark, 1);
                             else prefs.setInt(sharePrefLightDark, 0);  
                             RestartWidget.restartApp(context);*/
-                            rate=rateNormal;
+                            if(Platform.isAndroid)
+                              rate=rateNormalAnd;
+                            else rate=rateNormalIos;
                           });
                           Navigator.pop(context);
                         }),
@@ -1603,7 +1610,9 @@ void _insert(Map<String, dynamic> row) async {
                         {
                           setState(()
                           {
-                            rate=rateMin;
+                            if(Platform.isAndroid)
+                              rate=rateMinAnd;
+                            else rate=rateMinIos;  
                           });
                           Navigator.pop(context);
                         }),
