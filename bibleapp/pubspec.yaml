@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 2.0.0+23
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -45,7 +45,7 @@ dependencies:
   html_unescape: ^1.0.1+3
   flutter_widgets: ^0.1.12
   flutter_webview_plugin: ^0.3.10+2
-  flutter_tts: ^0.9.1
+  flutter_tts: ^1.2.6
   synchronized: ^2.2.0
   share: ^0.6.3+6
   modal_progress_hud: ^0.1.3
@@ -64,13 +64,16 @@ dependencies:
   flutter_launcher_icons: ^0.7.5
   flutter_native_splash: ^0.1.9
   catcher: ^0.3.14
+  hardware_buttons: ^1.0.0
+  translator: ^0.1.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
   
 flutter_icons:
-  image_path: "assets/images/CrownBibleIcon.png"
+  image_path_android: "assets/images/CrownBibleIconAnd.png"
+  image_path_ios: "assets/images/CrownBibleIconIOS.png"
   android: true # can specify file name here e.g. "ic_launcher"
   ios: true # can specify file name here e.g. "My-Launcher-Icon"
 # For information on the generic Dart part of this file, see the
