@@ -16,6 +16,10 @@ import 'package:bibleapp/util/sql_helper.dart';
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:speech_to_text/speech_to_text.dart';
 import 'package:flutter/services.dart';
+import 'dart:async';
+import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
+
+import '../main.dart';
 
 
 double fontOfContent = 60.0;//px
@@ -59,6 +63,8 @@ class _NotesPageState extends State<NotesPage>
 
   double sizeOfIcon = 50.0;
 
+  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
+
   void errorListener(SpeechRecognitionError error) {
     print("Received error status: $error, listening: ${speech.isListening}");
     //Navigator.pop(context);
@@ -97,7 +103,7 @@ class _NotesPageState extends State<NotesPage>
     //lastError = "";
     speech.listen(
         onResult: resultListener,
-        listenFor: Duration(seconds: 10),
+        listenFor: Duration(seconds: 5),
         localeId: _currentLocaleId,
         //onSoundLevelChange: soundLevelListener,
         cancelOnError: true,
@@ -131,6 +137,12 @@ class _NotesPageState extends State<NotesPage>
 
   @override
   void initState() {
+    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
+      setState(() {
+        if(page==0)
+          RestartWidget.restartApp(context);
+      });
+    });
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
     initSpeechState();
@@ -168,6 +180,7 @@ class _NotesPageState extends State<NotesPage>
     _calendarController.dispose();
     super.dispose();
     BackButtonInterceptor.remove(myInterceptor);
+    _homeButtonSubscription?.cancel();
   }
 
   bool myInterceptor(bool stopDefaultButtonEvent) {
@@ -483,7 +496,14 @@ class _NotesPageState extends State<NotesPage>
 
   Widget getNotesPage(BuildContext context)
   {
-    return Scaffold(
+    return GestureDetector(
+      onTap: () {
+        FocusScopeNode currentFocus = FocusScope.of(context);
+        if (!currentFocus.hasPrimaryFocus) {
+          currentFocus.unfocus();
+        }
+      },
+      child:Scaffold(
       //resizeToAvoidBottomInset: false,
       appBar: AppBar(
         leading: IconButton(
@@ -564,7 +584,9 @@ class _NotesPageState extends State<NotesPage>
         )
         ),
       ),
+    )
     );
+    
   }
 
   Widget getNotesListPage(BuildContext context)

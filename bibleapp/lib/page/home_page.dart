@@ -141,6 +141,11 @@ class _HomePageState extends State<HomePage> {
         }
       }
 
+      if(prefs.getInt(sharePrefBibleTodaysGotCrownTotal) == null)
+      {
+        prefs.setInt(sharePrefBibleTodaysGotCrownTotal, 0); 
+      }
+
       if(prefs.getString(sharePrefDisplayLanguage) == null)
       {
         currentLang = Localizations.localeOf(context);
@@ -167,11 +172,6 @@ class _HomePageState extends State<HomePage> {
             prefs.setString(sharePrefSoundLanguage, languageVolumeValue[1]); 
           else prefs.setString(sharePrefSoundLanguage, temp); 
         } 
-      }
-
-      if(prefs.getInt(sharePrefBibleTodaysGotCrownTotal) == null)
-      {
-        prefs.setInt(sharePrefBibleTodaysGotCrownTotal, 0); 
       }
 
       if(prefs.getInt(sharePrefLightDark) == null)

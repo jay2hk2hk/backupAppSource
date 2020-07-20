@@ -23,9 +23,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string></string>
+	<string>Use the microphone to start voice detection</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
-	<string></string>
+	<string>Use the microphone to start voice detection</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

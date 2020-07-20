@@ -1,2 +1,4 @@
 CFBundleDisplayName = "Crown Bible";
+NSMicrophoneUsageDescription  = "Use the microphone to start voice detection";
+NSSpeechRecognitionUsageDescription  = "Use the microphone to start voice detection";
 

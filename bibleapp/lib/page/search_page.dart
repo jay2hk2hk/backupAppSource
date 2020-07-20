@@ -7,6 +7,10 @@ import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'dart:async';
+import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
+
+import '../main.dart';
 
 double fontOfContent = 60.0;//px
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
@@ -40,9 +44,17 @@ class _SearchPageState extends State<SearchPage>{
   static final TextEditingController _controller = new TextEditingController();    
   List<String> searchResult = new List<String>();
   var unescape = new HtmlUnescape();//decode th html chinese word
+
+  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
   
 @override
   void initState() {
+    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
+      setState(() {
+        if(page==0)
+          RestartWidget.restartApp(context);
+      });
+    });
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
     
@@ -53,6 +65,7 @@ class _SearchPageState extends State<SearchPage>{
   void dispose() {
     super.dispose();
     BackButtonInterceptor.remove(myInterceptor);
+    _homeButtonSubscription?.cancel();
   }
   bool myInterceptor(bool stopDefaultButtonEvent) {
     //print("BACK BUTTON!"); // Do some stuff.
@@ -88,92 +101,103 @@ class _SearchPageState extends State<SearchPage>{
     }
     return /*MaterialApp(
       title: FlutterI18n.translate(context, "appName"),
-      home: */Scaffold(
-        appBar: AppBar(
-          title: TextFormField(
-              style:TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-10, allowFontScalingSelf: true),),
-              controller: _controller,
-              decoration: InputDecoration(
-                labelText: FlutterI18n.translate(context, "searchInput")
+      home: */
+      GestureDetector(
+        onTap: () {
+          FocusScopeNode currentFocus = FocusScope.of(context);
+
+          if (!currentFocus.hasPrimaryFocus) {
+            currentFocus.unfocus();
+          }
+        },
+        child: Scaffold(
+          appBar: AppBar(
+            title: TextFormField(
+                style:TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-10, allowFontScalingSelf: true),),
+                controller: _controller,
+                decoration: InputDecoration(
+                  labelText: FlutterI18n.translate(context, "searchInput")
+                ),
               ),
-            ),
-          //Text(FlutterI18n.translate(context, "bottomBarSearch"),
-          //style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
-          actions: <Widget>[
-            
-            IconButton(icon: Icon(FontAwesomeIcons.search,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
-            {
-              if(_controller.text.trim()!="")
+            //Text(FlutterI18n.translate(context, "bottomBarSearch"),
+            //style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
+            actions: <Widget>[
+              
+              IconButton(icon: Icon(FontAwesomeIcons.search,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
               {
-                searchResult = new List<String>();
-                for(int x=0;x<searchList.length;x++)
+                if(_controller.text.trim()!="")
                 {
-                  for(int y=0;y<searchList[x].length;y++)
+                  searchResult = new List<String>();
+                  for(int x=0;x<searchList.length;x++)
                   {
-                    for(int z=0;z<searchList[x][y].length;z++)
+                    for(int y=0;y<searchList[x].length;y++)
                     {
-                      if(searchList[x][y][z].contains(_controller.text))
+                      for(int z=0;z<searchList[x][y].length;z++)
                       {
-                        searchResult.add((x+1).toString()+":"+(y+1).toString()+":"+(z+1).toString());
+                        if(searchList[x][y][z].contains(_controller.text))
+                        {
+                          searchResult.add((x+1).toString()+":"+(y+1).toString()+":"+(z+1).toString());
+                        }
                       }
                     }
                   }
+                  displayListNum = -1;
+                  setState(() {
+                    page = 1;
+                  });
                 }
-                displayListNum = -1;
-                setState(() {
-                  page = 1;
-                });
-              }
-              
-            }),
-            SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
-          ],
-        ),
-        body: Center(
-          child: new Container(
-              margin: new EdgeInsets.all(4.0),
-              constraints: new BoxConstraints.expand(),
-              child: ListView(
-                children: <Widget>[
-                  new Column(
-                    children: <Widget>[
-                      new Container(height: 5.0),
-                      new Container(
-                        padding: const EdgeInsets.symmetric(vertical: 14.0,horizontal: 14.0),
-                        //height: 100.0,
-                        width: MediaQuery.of(context).size.width,//screen size
-                        /*decoration: BoxDecoration(
-                          color: backgroundColor,
-                          shape: BoxShape.rectangle,
-                          borderRadius: new BorderRadius.circular(8.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: boxShadowColor,
-                              blurRadius: 10.0,
-                            offset: new Offset(0.0, 10.0),
-                            ),
-                          ]
-                        ),*/
-                        child: new Wrap(
-                          spacing: ScreenUtil().setSp(20.0, allowFontScalingSelf: true), // gap between adjacent chips
-                          runSpacing: ScreenUtil().setSp(20.0, allowFontScalingSelf: true), // gap between lines
-                          children: listOfSearchButton(context),
-                        ),
-                      ),
-                      //new box style
-                      new Container(height: 5.0),
-                      
-                    ],
-                  ),
-                ],
-              ),
-              
+                
+              }),
+              SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
+            ],
           ),
-          
-          
-        ),
-      //),
-    );
+          body: Center(
+            child: new Container(
+                margin: new EdgeInsets.all(4.0),
+                constraints: new BoxConstraints.expand(),
+                child: ListView(
+                  children: <Widget>[
+                    new Column(
+                      children: <Widget>[
+                        new Container(height: 5.0),
+                        new Container(
+                          padding: const EdgeInsets.symmetric(vertical: 14.0,horizontal: 14.0),
+                          //height: 100.0,
+                          width: MediaQuery.of(context).size.width,//screen size
+                          /*decoration: BoxDecoration(
+                            color: backgroundColor,
+                            shape: BoxShape.rectangle,
+                            borderRadius: new BorderRadius.circular(8.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: boxShadowColor,
+                                blurRadius: 10.0,
+                              offset: new Offset(0.0, 10.0),
+                              ),
+                            ]
+                          ),*/
+                          child: new Wrap(
+                            spacing: ScreenUtil().setSp(20.0, allowFontScalingSelf: true), // gap between adjacent chips
+                            runSpacing: ScreenUtil().setSp(20.0, allowFontScalingSelf: true), // gap between lines
+                            children: listOfSearchButton(context),
+                          ),
+                        ),
+                        //new box style
+                        new Container(height: 5.0),
+                        
+                      ],
+                    ),
+                  ],
+                ),
+                
+            ),
+            
+            
+          ),
+        //),
+      ),
+      );
+      
   }
 
   Widget getSearchResult(BuildContext context)

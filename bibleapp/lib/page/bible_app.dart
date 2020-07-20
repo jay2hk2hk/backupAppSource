@@ -41,6 +41,13 @@ import 'package:speech_to_text/speech_to_text.dart';
 //import 'package:flutter_native_admob/native_admob_options.dart';
 //import 'package:admob_flutter/admob_flutter.dart';
 
+import 'dart:async';
+import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
+
+import '../main.dart';
+
+import 'package:translator/translator.dart';
+
 //stt
   final SpeechToText speech = SpeechToText();
   bool _hasSpeech = false;
@@ -114,13 +121,13 @@ class _BibleAppState extends State<BibleApp> {
   double rate = 0.5;
   static double volumeMax = 1.0;
   static double pitchMax = 2.0;
-  static double rateMax = 0.8;
+  static double rateMax = 1.5;
   static double volumeMin = 0.0;
   static double pitchMin = 0.5;
-  static double rateMin = 0.3;
+  static double rateMin = 0.5;
   static double volumeNormal = 0.5;
   static double pitchNormal = 1.0;
-  static double rateNormal = 0.5;
+  static double rateNormal = 1.0;
   TtsState ttsState = TtsState.stopped;
   get isPlaying => ttsState == TtsState.playing;
   get isStopped => ttsState == TtsState.stopped;
@@ -153,6 +160,10 @@ class _BibleAppState extends State<BibleApp> {
 
   //save the temp bible by each title
   static List<String> tmepBibleList = new List<String>(); 
+
+  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
+
+  final translator = new GoogleTranslator();
 
   //timer
   Timer _timer;
@@ -203,7 +214,7 @@ class _BibleAppState extends State<BibleApp> {
     //lastError = "";
     speech.listen(
         onResult: resultListener,
-        listenFor: Duration(seconds: 10),
+        listenFor: Duration(seconds: 5),
         localeId: _currentLocaleId,
         //onSoundLevelChange: soundLevelListener,
         cancelOnError: true,
@@ -227,6 +238,8 @@ class _BibleAppState extends State<BibleApp> {
 
   void resultListener(SpeechRecognitionResult result) {
     setState(() {
+      //var translation = await translator.translate('馬太福音2',from:'zh-tw', to: 'en');
+      //print(translation);
       //lastWords = "${result.recognizedWords} - ${result.finalResult}";
       if(result.finalResult)
       {
@@ -238,7 +251,12 @@ class _BibleAppState extends State<BibleApp> {
           //lastWords.contains(_bibleSeletion[i]);
           if(i != 0 && i != 39 && i != 68 && lastWords.contains(_bibleSeletion[i]))
           {
+            
             titleForSTT = getBibleTitleIdByTitle(_bibleSeletion[i]);
+            if(double.tryParse(titleForSTT) != null)
+            {
+
+            }
             lastWords = lastWords.substring(_bibleSeletion[i].length);
           }
             
@@ -343,6 +361,12 @@ class _BibleAppState extends State<BibleApp> {
 @override
   void initState() {
     
+    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
+      setState(() {
+        RestartWidget.restartApp(context);
+      });
+    });
+
     super.initState();
     //initBibleContent();
     
@@ -353,9 +377,23 @@ class _BibleAppState extends State<BibleApp> {
     _initTts();
     initAds();
     initSpeechState();
+    initIosTtsSetting();
     BackButtonInterceptor.add(myInterceptor);
     
 
+  }
+
+
+  void initIosTtsSetting() async
+  {
+    //await flutterTts.setSharedInstance(true);
+    await flutterTts
+        .setIosAudioCategory(IosTextToSpeechAudioCategory.playback, [
+      IosTextToSpeechAudioCategoryOptions.allowBluetooth,
+      IosTextToSpeechAudioCategoryOptions.allowBluetoothA2DP,
+      IosTextToSpeechAudioCategoryOptions.mixWithOthers,
+      IosTextToSpeechAudioCategoryOptions.defaultToSpeaker
+    ]);
   }
   void initBibleContent() async
   {
@@ -465,6 +503,7 @@ class _BibleAppState extends State<BibleApp> {
       flutterTts = FlutterTts();
 
       _getLanguages();
+      
 
       flutterTts.setStartHandler(() {
         setState(() {
@@ -613,6 +652,7 @@ class _BibleAppState extends State<BibleApp> {
     flutterTts.stop();
     //_bannerAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
+    _homeButtonSubscription?.cancel();
     //appAds.dispose();
   }
 
@@ -1972,11 +2012,21 @@ Widget _myListView(BuildContext context) {
               children: <Widget>[
                 //Text(''),//empty row
                 Row(children: <Widget>[
-                  IconButton(
+                  InkWell(
+            child: Container(
+              child: Icon(
+                Icons.arrow_back,
+                color: iconColor,
+                size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),
+              ),
+            ),
+            onTap: () => !isButtonDisable ? _onBackSelectedListTitle(context) : null,),
+                  /*IconButton(
                             //alignment: Alignment.bottomCenter,
                             icon: Icon(Icons.arrow_back, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
                             onPressed: () => !isButtonDisable ? _onBackSelectedListTitle(context) : null,
-                          ),
+                          ),*/
+                  SizedBox(width:ScreenUtil().setSp(10, allowFontScalingSelf: true),),
                   Text(
                       _bibleListTitle, 
                       style: new TextStyle(

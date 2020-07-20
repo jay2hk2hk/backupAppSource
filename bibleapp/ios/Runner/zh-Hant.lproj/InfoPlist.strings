@@ -1,1 +1,3 @@
 CFBundleDisplayName = "冠冕聖經";
+NSMicrophoneUsageDescription  = "使用麥克風開始語音檢測";
+NSSpeechRecognitionUsageDescription  = "使用麥克風開始語音檢測";
