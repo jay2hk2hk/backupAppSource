@@ -126,7 +126,7 @@ class _BibleAppState extends State<BibleApp> {
   //static double volumeNormal = 0.5;
   //static double pitchNormal = 1.0;
   static double rateMaxAnd = 1.5;
-  static double rateMaxIos = 0.8;
+  static double rateMaxIos = 0.7;
   static double rateMinAnd = 0.5;
   static double rateMinIos = 0.3;
   static double rateNormalAnd = 1.0;
