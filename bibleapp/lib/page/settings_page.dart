@@ -10,7 +10,6 @@ import 'package:flutter/services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import '../main.dart';
 import 'dart:async';
-import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -36,16 +35,9 @@ class _SettingsPageState extends State<SettingsPage> {
   static int titleId = 0;
   var unescape = new HtmlUnescape();//decode th html chinese word
 
-  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
 
   @override
   void initState() {
-    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
-      setState(() {
-        if(page==0)
-          RestartWidget.restartApp(context);
-      });
-    });
     BackButtonInterceptor.add(myInterceptor);
     super.initState();
     }
@@ -53,7 +45,6 @@ class _SettingsPageState extends State<SettingsPage> {
   void dispose() {
     super.dispose();
     BackButtonInterceptor.remove(myInterceptor);
-    _homeButtonSubscription?.cancel();
   }
   bool myInterceptor(bool stopDefaultButtonEvent) {
     //print("BACK BUTTON!"); // Do some stuff.

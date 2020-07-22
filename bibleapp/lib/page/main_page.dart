@@ -12,7 +12,7 @@ import 'package:html_unescape/html_unescape.dart';
 import 'package:intl/intl.dart';
 import 'package:firebase_admob/firebase_admob.dart';
 import 'dart:async';
-import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
+
 
 import '../main.dart';
 
@@ -49,16 +49,11 @@ class _MainPageState extends State<MainPage>{
   String rewardedVideoAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5350932207" : "ca-app-pub-9860072337130869/7088766690";
   String firebaseAdId = Platform.isAndroid ? "ca-app-pub-9860072337130869~8212800236" : "ca-app-pub-9860072337130869~3480731194";
 
-  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
+  
 
   @override
   void initState()
   {
-    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
-      setState(() {
-        RestartWidget.restartApp(context);
-      });
-    });
     super.initState();
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
     FirebaseAdMob.instance.initialize(appId: firebaseAdId);
@@ -90,7 +85,6 @@ class _MainPageState extends State<MainPage>{
   void dispose() {
     //为了避免内存泄露，需要调用.dispose
     super.dispose();
-    _homeButtonSubscription?.cancel();
     /*_bannerAd?.dispose();
     _nativeAd?.dispose();
     _interstitialAd?.dispose();*/

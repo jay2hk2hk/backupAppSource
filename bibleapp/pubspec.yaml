@@ -64,7 +64,6 @@ dependencies:
   flutter_launcher_icons: ^0.7.5
   flutter_native_splash: ^0.1.9
   catcher: ^0.3.14
-  hardware_buttons: ^1.0.0
   translator: ^0.1.4
 
 dev_dependencies:

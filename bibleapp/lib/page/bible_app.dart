@@ -42,7 +42,6 @@ import 'package:speech_to_text/speech_to_text.dart';
 //import 'package:admob_flutter/admob_flutter.dart';
 
 import 'dart:async';
-import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 
 import '../main.dart';
 
@@ -164,7 +163,6 @@ class _BibleAppState extends State<BibleApp> {
   //save the temp bible by each title
   static List<String> tmepBibleList = new List<String>(); 
 
-  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
 
   final translator = new GoogleTranslator();
 
@@ -363,12 +361,7 @@ class _BibleAppState extends State<BibleApp> {
 
 @override
   void initState() {
-    
-    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
-      setState(() {
-        RestartWidget.restartApp(context);
-      });
-    });
+  
 
     super.initState();
     //initBibleContent();
@@ -655,7 +648,6 @@ class _BibleAppState extends State<BibleApp> {
     flutterTts.stop();
     //_bannerAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
-    _homeButtonSubscription?.cancel();
     //appAds.dispose();
   }
 

@@ -39,7 +39,7 @@ class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
   List<Widget> list = List();
   final dateFormat = new DateFormat('yyyy-MM-dd');
-  double fontOfContent = 50.0;
+  double fontOfContent = 40.0;
   //String bannerAdsId = BannerAd.testAdUnitId;
   //String firebaseAdId = FirebaseAdMob.testAppId;
   String bannerAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5088892533" : "ca-app-pub-9860072337130869/8724092620";

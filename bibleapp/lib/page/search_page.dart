@@ -8,7 +8,6 @@ import 'package:flutter/services.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'dart:async';
-import 'package:hardware_buttons/hardware_buttons.dart' as HardwareButtons;
 
 import '../main.dart';
 
@@ -45,16 +44,9 @@ class _SearchPageState extends State<SearchPage>{
   List<String> searchResult = new List<String>();
   var unescape = new HtmlUnescape();//decode th html chinese word
 
-  StreamSubscription<HardwareButtons.HomeButtonEvent> _homeButtonSubscription;
   
 @override
   void initState() {
-    _homeButtonSubscription = HardwareButtons.homeButtonEvents.listen((event) {
-      setState(() {
-        if(page==0)
-          RestartWidget.restartApp(context);
-      });
-    });
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
     
@@ -65,7 +57,6 @@ class _SearchPageState extends State<SearchPage>{
   void dispose() {
     super.dispose();
     BackButtonInterceptor.remove(myInterceptor);
-    _homeButtonSubscription?.cancel();
   }
   bool myInterceptor(bool stopDefaultButtonEvent) {
     //print("BACK BUTTON!"); // Do some stuff.
