@@ -77,19 +77,41 @@ class _HomePageState extends State<HomePage> {
     
     FirebaseAdMob.instance.initialize(appId: firebaseAdId);
     //_bannerAd = createBannerAd()..load();
-    
+      
     Future.delayed(Duration.zero, () async {
       prefs = await SharedPreferences.getInstance();
       
       await _setPref();
       //currentLang = Locale('en','US');
       //prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
+    int tempBannerPosition = 160;
+    if(Platform.isAndroid)
+    {
+      if(ScreenUtil.screenHeight<=480)
+        tempBannerPosition = 195;
+    }
+    else {
+    if(ScreenUtil.screenHeight<=480)
+      tempBannerPosition = 195;
+    else if(ScreenUtil.screenHeight<=960)
+      tempBannerPosition = 290;  
+    else if(ScreenUtil.screenHeight<=1136)
+      tempBannerPosition = 240;  
+    else if(ScreenUtil.screenHeight<=1334)
+      tempBannerPosition = 210;  
+    else if(ScreenUtil.screenHeight<=1776)
+      tempBannerPosition = 200; 
+    else if(ScreenUtil.screenHeight<=2488)
+      tempBannerPosition = 160;   
+    else if(ScreenUtil.screenHeight<=2688)
+      tempBannerPosition = 140; 
+    }
       
       
       _bannerAd ??= createBannerAd();
                       _bannerAd
                         ..load()
-                        ..show(anchorOffset: ScreenUtil.screenHeight<=480 ? ScreenUtil().setHeight(195) : ScreenUtil().setHeight(160),anchorType: AnchorType.bottom);  
+                        ..show(anchorOffset: ScreenUtil().setHeight(tempBannerPosition),anchorType: AnchorType.bottom);  
     });
     
     Future.delayed(Duration.zero, () async {
