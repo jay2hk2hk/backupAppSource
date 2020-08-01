@@ -55,6 +55,7 @@ import 'package:translator/translator.dart';
 
 int timerStatus = 0;//0=init,1=stop,2=refresh,3=play
 int timerCountMins = 5000;
+
 GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
 
 class BibleApp extends StatefulWidget {
@@ -173,6 +174,8 @@ class _BibleAppState extends State<BibleApp> {
 
   //language
   static Locale currentLang;
+
+  
 
   void errorListener(SpeechRecognitionError error) {
     print("Received error status: $error, listening: ${speech.isListening}");
@@ -569,15 +572,28 @@ class _BibleAppState extends State<BibleApp> {
     flutterTts.setLanguage(language);
     tempBible = new List<String>();
     tempBibleIndexList = new List<int>();
+    int firstCount = -1;
+    int lastCount = -1;
     for(int i=0; i<tmepBibleList.length;i++)
     {
-      if(listSelection[i])
+      if(listSelection[i] && firstCount==-1)
       {
-        tempBibleIndexList.add(i);
-        tempBible.add(tmepBibleList[i]);
+        firstCount = i;
+      }
+      else if(listSelection[i])
+      {
+        lastCount = i;
       }
         
     }
+    if(lastCount<=-1) lastCount = firstCount;
+    for(int j=firstCount; j<=lastCount;j++)
+    {
+      tempBibleIndexList.add(j);
+      tempBible.add(tmepBibleList[j]);
+    }
+
+    
     _scrollController.scrollTo(index: tempBibleIndexList[tempCountSound], duration: Duration(milliseconds: 1));
     setState(() {
       isButtonDisable = true;
@@ -588,6 +604,7 @@ class _BibleAppState extends State<BibleApp> {
   void stopSelectList() async
   {
     setState(() {
+        
         tempCountSound=0;
         tempBibleIndexList = new List<int>();
         //_scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
@@ -598,6 +615,7 @@ class _BibleAppState extends State<BibleApp> {
 
   void playAllContent() async
   {
+    
     await flutterTts.setVolume(volume);
     await flutterTts.setSpeechRate(rate);
     await flutterTts.setPitch(pitch);
@@ -1470,7 +1488,7 @@ void _insert(Map<String, dynamic> row) async {
               }
               else
               {
-                setState((){playStopButton=FontAwesomeIcons.play;});
+                setState((){playStopButton=FontAwesomeIcons.play;playStopButtonInSelectionList = FontAwesomeIcons.play;});
                 stopPlayAll();
               }
             }),
