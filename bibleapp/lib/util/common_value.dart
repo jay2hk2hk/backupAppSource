@@ -34,10 +34,12 @@ import 'package:shared_preferences/shared_preferences.dart';
    String sharePrefSoundLanguage = '_soundLang';
    String sharePrefBibleTodaysDate = '_bibleTodaysDate';
    String sharePrefBibleTodaysString = '_bibleTodaysString';
+   String sharePrefBibleTodaysReadString = '_bibleTodaysReadString';
    String sharePrefBibleTodaysGotCrown = '_bibleTodaysGotCrown';
    String sharePrefBibleTodaysGotCrownTotal = '_bibleTodaysGotCrownTotal';
    String sharePrefBibleTodaysGotCrownLoadedReward = '_bibleTodaysGotCrownLoadedReward';
    String sharePrefLightDark = '_lightDark';
+   String sharePrefReadBibleLevel = '_readBibleLevel';
    
    String cuvBibleContentFile = 'assets/json/bible_cuv.json';
    String cuvBibleTitleFile = 'assets/json/bible_title_cuv.json';
@@ -404,7 +406,7 @@ import 'package:shared_preferences/shared_preferences.dart';
             ,"19:87,"+"42:8,"+"24:13"
             ,"19:88,"+"42:9,"+"24:23,"+"24:24"
             ,"19:89,"+"42:10,"+"12:22,"+"12:23"
-            ,"19:90,"+"42:11,"+"14:36,"+"14:8"
+            ,"19:90,"+"42:11,"+"14:36,"
             ,"19:91,"+"42:12,"+"27:1,"+"27:2"
   ];
 
@@ -415,7 +417,7 @@ import 'package:shared_preferences/shared_preferences.dart';
             ,"19:95,"+"42:16,"+"27:9,"+"27:10"
             ,"19:96,"+"42:17,"+"27:11,"+"27:12"
             ,"19:97,"+"42:18,"+"12:24,"+"12:25"
-            ,"19:98,"+"42:19,"+"14:36,"+"14:10,"+"26:1"
+            ,"19:98,"+"42:19,"+"14:36,"+"26:1"
             ,"19:99,"+"42:20,"+"26:2,"+"26:3"
             ,"19:100,"+"42:21,"+"26:4,"+"26:5,"+"26:6"
             ,"19:101,"+"42:22,"+"26:7,"+"26:8"
