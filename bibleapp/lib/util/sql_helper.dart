@@ -256,7 +256,7 @@ Future<int> insertNotes(BibleNotes bibleNotes) async {
   return List.generate(maps.length, (i) {
     return BibleNotes(
       id: maps[i]['id'],
-      title: maps[i]['title'],
+      title: maps[i]['title'].toString(),
       content: maps[i]['content'],
       date: maps[i]['date'],
     );

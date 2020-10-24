@@ -17,7 +17,7 @@ import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:bibleapp/util/sql_helper.dart';
 import 'package:html_unescape/html_unescape.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
+//import 'package:flutter_widgets/flutter_widgets.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -41,11 +41,17 @@ import 'package:speech_to_text/speech_to_text.dart';
 //import 'package:flutter_native_admob/native_admob_options.dart';
 //import 'package:admob_flutter/admob_flutter.dart';
 
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+
 import 'dart:async';
 
 import '../main.dart';
 
 import 'package:translator/translator.dart';
+//import 'package:flutter/scheduler.dart';
+
+import 'package:flutter/material.dart';
 
 //stt
   final SpeechToText speech = SpeechToText();
@@ -99,8 +105,8 @@ class _BibleAppState extends State<BibleApp> {
   static String _titleSelection;//save title selection for back button
   static String _bibleListTitle = "";
   var unescape = new HtmlUnescape();//decode th html chinese word
-  static ItemScrollController _scrollController = ItemScrollController();//the scroll controller of jump to
-  static ItemScrollController _scrollControllerForTitlePage = ItemScrollController();//the scroll controller of jump to
+  static /*spl.*/ItemScrollController _scrollController = /*spl.*/ItemScrollController();//the scroll controller of jump to
+  static /*spl.*/ItemScrollController _scrollControllerForTitlePage = /*spl.*/ItemScrollController();//the scroll controller of jump to
   static int listViewInitIndex = 1;
   static int bibleTitleTotal = 66;
   static int bibleTitleNew = 40;
@@ -250,6 +256,7 @@ class _BibleAppState extends State<BibleApp> {
         if(_bibleSeletion==null) _bibleSeletion = queryBibleTitleByDefault();
         lastWords = result.recognizedWords;
         String titleForSTT ="";
+        //print("lastWords="+lastWords);
         for(int i=0;i<_bibleSeletion.length;i++)
         {
           //lastWords.contains(_bibleSeletion[i]);
@@ -265,6 +272,25 @@ class _BibleAppState extends State<BibleApp> {
           }
             
         }
+        if(titleForSTT=="")
+        {
+          List<String> tempList = queryBibleWrong();
+          for(int y=0;y<tempList.length;y++)
+          {
+            if(lastWords.contains(tempList[y]))
+            {
+              int tempNum = 0;
+              if(y==0)
+              {
+                tempNum=13;
+              }
+              else tempNum=14;
+              titleForSTT = getBibleTitleIdByTitle(_bibleSeletion[tempNum]);
+              lastWords = lastWords.substring(_bibleSeletion[tempNum].length);
+            }
+          }
+        }
+        //print("titleForSTT="+titleForSTT);
         if(titleForSTT!="")
         {
           _titleId = titleForSTT.toString();
@@ -272,17 +298,21 @@ class _BibleAppState extends State<BibleApp> {
           String titleNum = "0";
           for(int j = 0; j<tempTitleNumList.length; j++)
           {
+            
             if(lastWords.indexOf(tempTitleNumList[j])>=0 && tempTitleNumList[j]!="")
             {
               titleNum = tempTitleNumList[j];
+              //print(lastWords);
               //break;
             }
               
           }
+          
           //int title = tempTitleNumList.indexWhere((element) => element.toLowerCase().contains(lastWords));
           if(titleNum!="0")
           {
             _titleNum = titleNum;
+            
             /*lastWords = lastWords.substring(titleNum.length);
             List<String> tempContentList = queryBibleContentByTitleForSTT(_titleId,_titleNum);
             String contentNum = "0";
@@ -297,12 +327,22 @@ class _BibleAppState extends State<BibleApp> {
               _contentNum = contentNum;*/
 
           }
-          else _titleNum = "1";
+          else 
+          {
+            List<String> tmepNumMic = queryNumberMic();
+            for(int x = 0;x<tmepNumMic.length; x++)
+              if(tmepNumMic[x] == lastWords)
+                titleNum = (x+1).toString();
+            if(titleNum=="0")    
+              _titleNum = "1";
+            else _titleNum = titleNum.toString();
+          }
+          
             
         }
         
         //int title = _bibleSeletion.indexWhere((element) => element.toLowerCase().contains(lastWords));
-        print("lastWords="+lastWords);
+        //print("lastWords="+lastWords);
       //Navigator.pop(context);
       }
       
@@ -528,6 +568,7 @@ class _BibleAppState extends State<BibleApp> {
             ttsState = TtsState.stopped;
             if(isPlayAll)
             {
+              //print("isPlayAll");
               startTimer();
               showDialog(
               barrierDismissible: false,
@@ -572,7 +613,7 @@ class _BibleAppState extends State<BibleApp> {
     flutterTts.setLanguage(language);
     tempBible = new List<String>();
     tempBibleIndexList = new List<int>();
-    int firstCount = -1;
+    /*int firstCount = -1;
     int lastCount = -1;
     for(int i=0; i<tmepBibleList.length;i++)
     {
@@ -587,11 +628,44 @@ class _BibleAppState extends State<BibleApp> {
         
     }
     if(lastCount<=-1) lastCount = firstCount;
-    for(int j=firstCount; j<=lastCount;j++)
+    for(int j=firstCount; j<=lastCount;j++)*/
+    for(int j=0; j<tmepBibleList.length;j++)
     {
-      tempBibleIndexList.add(j);
-      tempBible.add(tmepBibleList[j]);
+      if(listSelection[j])
+      {
+        tempBibleIndexList.add(j);
+        tempBible.add(tmepBibleList[j]);
+      }
+      
     }
+
+    
+    _scrollController.scrollTo(index: tempBibleIndexList[tempCountSound], duration: Duration(milliseconds: 1));
+    setState(() {
+      isButtonDisable = true;
+    });
+    _startSpeak(_bibleTitleButtonText);
+  }
+
+  void playStartEnd(String start,String end) async
+  {
+    await flutterTts.setVolume(volume);
+    await flutterTts.setSpeechRate(rate);
+    await flutterTts.setPitch(pitch);
+    flutterTts.setLanguage(language);
+    tempBible = new List<String>();
+    tempBibleIndexList = new List<int>();
+    int startInt = int.parse(start)-1;
+    int endInt = int.parse(end)-1;
+    for(int j=startInt; j<=endInt;j++)
+    {
+        tempBibleIndexList.add(j);
+        tempBible.add(tmepBibleList[j]);
+      
+    }
+    if(start=='1' && end ==(tmepBibleList.length-1).toString())
+      isPlayAll = true;
+    else isPlayAll = false; 
 
     
     _scrollController.scrollTo(index: tempBibleIndexList[tempCountSound], duration: Duration(milliseconds: 1));
@@ -607,7 +681,7 @@ class _BibleAppState extends State<BibleApp> {
         
         tempCountSound=0;
         tempBibleIndexList = new List<int>();
-        //_scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
+        
         isButtonDisable = false;
       });
       _stopSpeak();
@@ -662,14 +736,15 @@ class _BibleAppState extends State<BibleApp> {
 @override
   void dispose() {
     //为了避免内存泄露，需要调用.dispose
-    super.dispose();
+    
     flutterTts.stop();
     //_bannerAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
     //appAds.dispose();
+    super.dispose();
   }
 
-  bool myInterceptor(bool stopDefaultButtonEvent) {
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
     if(ttsState == TtsState.playing)
       _stopSpeak();
@@ -838,7 +913,7 @@ loadButtonText() async {
     String tempNewBibleTodaysText = "";
     if(!prefs.getBool(sharePrefBibleTodaysGotCrown))
     {
-      String tempBibleTodaysText = prefs.getString(sharePrefBibleTodaysString);
+      String tempBibleTodaysText = prefs.getString(sharePrefBibleTodaysReadString);
       List<String> tempTodaysList = tempBibleTodaysText.split(',');
       
       for(int i=0; i< tempTodaysList.length; i++)
@@ -852,11 +927,12 @@ loadButtonText() async {
       if(tempNewBibleTodaysText!="")
       {
         tempNewBibleTodaysText = tempNewBibleTodaysText.substring(0,tempNewBibleTodaysText.lastIndexOf(','));
+        
       }
       //else prefs.setBool(sharePrefBibleTodaysGotCrown, true);
         
-      prefs.setString(sharePrefBibleTodaysString, tempNewBibleTodaysText);
-      //print(tempNewBibleTodaysText);
+      prefs.setString(sharePrefBibleTodaysReadString, tempNewBibleTodaysText);
+      //print(prefs.getString(sharePrefBibleTodaysReadString));
     }
     
   }
@@ -874,8 +950,9 @@ loadButtonText() async {
             setState(() {
                     
                     _showLoading = false;
-                    WidgetsBinding.instance
-                      .addPostFrameCallback((_) => _updateContentNum());
+                    
+                    //bug ifx about scroll 20201023
+                    WidgetsBinding.instance.addPostFrameCallback((_) => _updateContentNum());
                   });});
       });
       
@@ -900,7 +977,8 @@ loadButtonText() async {
 
   void _updateContentNum()
     {
-      _scrollController.scrollTo(index: int.parse(_contentNum)-1, duration: Duration(milliseconds: 1));
+      if(_contentNum!="1")
+        _scrollController.scrollTo(index: int.parse(_contentNum)-1, duration: Duration(milliseconds: 1));
       prefs.setString(sharePrefContentNum, "1");
     }
 
@@ -910,17 +988,9 @@ loadButtonText() async {
     if(_state==1)
     {
       _bibleSeletion = queryBibleTitleByDefault();
-      //scrollTitleListWithTitleId();
+      
     }
-    /*else if(_state==1)
-    {
-      _bibleSeletion = queryBibleTitleByDefault();
-    }    
-    else if(_state==2)
-    {
-      //_scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
-      listViewInitIndex = 0;
-    }*/
+    
 
     
       return _bibleSeletion;
@@ -1081,6 +1151,26 @@ List<String> queryBibleTitleByDefault() {
     return tmepList;
   }
 
+  List<String> queryNumberMic()
+  {
+    List<String> tmepList = new List<String>();
+    for(int i=1; i <= 10; i++)
+    {
+      tmepList.add(FlutterI18n.translate(context, "numberForMic.$i"));
+    }
+    return tmepList;
+  }
+
+  List<String> queryBibleWrong()
+  {
+    List<String> tmepList = new List<String>();
+    for(int i=1; i <= 2; i++)
+    {
+      tmepList.add(FlutterI18n.translate(context, "bibleTitleWrongFix.$i"));
+    }
+    return tmepList;
+  }
+
   List<String> queryBibleContentByTitleForSTT(String titleId, String titleNum) {
     /*List<BibleContent> t = jsonBibleContentResult.where((v) => v.titleId == titleId  && v.titleNum == titleNum).toList();
     BibleContent temp;
@@ -1234,30 +1324,7 @@ String getBibleTitleByTitleId(String titleId)
     // when select the list
   _onSelectedListTitle(String text,BuildContext content) {
     
-      /*if(_state==0)
-      {
-        //setState(() {_selectedIndex = index;});_scrollControllerForTitlePage
-        setState(() 
-        {
-          _titleSelection = text;
-          _bibleListTitle = text;
-          _bibleSeletion = queryBibleContentAllTitleBySelection(text);
-          //String temp = getBibleTitleByTitleId(_titleId);
-          //for(int i=0;i<_bibleSeletion.length;i++)
-          //{
-          //  if(temp==_bibleSeletion[i])
-          //  {
-          //    if(_scrollControllerForTitlePage.isAttached)
-          //      _scrollControllerForTitlePage.scrollTo(index: i, duration: Duration(milliseconds: 1));
-          //  }
-          //    
-          //}
-          _scrollControllerForTitlePage.scrollTo(index: 0, duration: Duration(milliseconds: 1));
-          _state = 1;
-        }
-        );
-      }
-      else */if(_state==1)
+      if(_state==1)
       {
         setState(() 
         {
@@ -1306,7 +1373,7 @@ String getBibleTitleByTitleId(String titleId)
           _state = 0;
           _bibleListTitle = "";
           _bibleSeletion = queryBibleTitleByDefault();
-          _scrollControllerForTitlePage.scrollTo(index: 0, duration: Duration(milliseconds: 1));
+          
         }
         );*/
       }
@@ -1374,6 +1441,13 @@ void _insert(Map<String, dynamic> row) async {
   }
 */
 
+  _updatePlayFunction(String start,String end) {
+      resetSelection();
+      setState((){playStopButton=FontAwesomeIcons.stop;});
+      //playAllContent();
+      playStartEnd(start,end);
+    }
+
   Widget _buildWidget()
   {
       return new Scaffold(
@@ -1387,8 +1461,8 @@ void _insert(Map<String, dynamic> row) async {
               _scaffoldKey.currentState.openDrawer();
               resetSelection();
               _resetSelectList();
-              WidgetsBinding.instance
-              .addPostFrameCallback((_) => scrollTitleListWithTitleId());
+              //bug fix about scroll 20201023
+              //WidgetsBinding.instance.addPostFrameCallback((_) => scrollTitleListWithTitleId());
               
             }
         },
@@ -1480,14 +1554,21 @@ void _insert(Map<String, dynamic> row) async {
               ),
             ),
             onTap: () {
-              resetSelection();
+              
               if(playStopButton == FontAwesomeIcons.play)
               {
-                setState((){playStopButton=FontAwesomeIcons.stop;});
-                playAllContent();
+                showMaterialModalBottomSheet(
+                              expand: false,
+                              context: context,
+                              backgroundColor: Colors.transparent,
+                              builder: (context, scrollController) =>
+                                  ModalFit(end:(tmepBibleList.length-1).toString(),parentAction:_updatePlayFunction),
+                            );
+                
               }
               else
               {
+                resetSelection();
                 setState((){playStopButton=FontAwesomeIcons.play;playStopButtonInSelectionList = FontAwesomeIcons.play;});
                 stopPlayAll();
               }
@@ -1827,7 +1908,7 @@ Widget _myListView(BuildContext context) {
         future: loadQueryToList()/*.whenComplete(()=>{setBookmarkList()})*/,
         initialData: List(),
         builder: (context, snapshot) {
-        return new ScrollablePositionedList.separated(
+        return new /*spl.*/ScrollablePositionedList.separated(
           //initialScrollIndex: 20,
           physics: ClampingScrollPhysics(),
         itemScrollController: _scrollController,
@@ -1967,7 +2048,7 @@ Widget _myListView(BuildContext context) {
           future: loadQueryToTitleList(),
           initialData: List(),
           builder: (context, snapshot) {
-          return new ScrollablePositionedList.separated(
+          return new /*spl.*/ScrollablePositionedList.separated(
           itemScrollController: _scrollControllerForTitlePage,
           itemCount: snapshot.data==null ? 0 : snapshot.data.length,
           separatorBuilder: (context, index) =>
@@ -2184,4 +2265,96 @@ Widget _myListView(BuildContext context) {
       );
     }
   }
+
+class ModalFit extends StatefulWidget {
+  final String end;
+  final void Function(String value,String value2) parentAction;
+
+  const ModalFit({
+    Key key,
+    this.end,
+    this.parentAction
+  }) : super(key: key);
+
+  @override
+  ModalFitState createState() => ModalFitState();
+}
+  class ModalFitState extends State<ModalFit> {
+  //const ModalFit({Key key}) : super(key: key);
+  static double sizeOfIcon = 50.0;
+  
+  String _selectedStart = '1';
+  String _selectedEnd = '1';
+  List<String> listOfDropDown = new List<String>();
+
+  @override
+  void initState() {
+    _selectedEnd = (int.parse(widget.end)).toString();
+    for(int i=1; i<=int.parse(_selectedEnd);i++)
+      listOfDropDown.add(i.toString());
+    //listOfDropDown.removeAt(0);  
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    
+    
+    return SafeArea(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 20,vertical: (ScreenUtil.screenHeight/10)),
+        child: Material(
+          color: backgroundColor,
+          clipBehavior: Clip.antiAlias,
+          borderRadius: BorderRadius.circular(12),
+          child: Material(
+        child: SafeArea(
+      top: false,
+      child: Container(
+          padding: EdgeInsets.symmetric(vertical: 5.0),
+          child: Row(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(FlutterI18n.translate(context, "buttonFrom")),
+          SizedBox(width:ScreenUtil().setSp(20, allowFontScalingSelf: true),),
+          DropdownButton(
+            value: _selectedStart,
+            items: listOfDropDown.map((item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (selectedItem) => setState(() => _selectedStart = selectedItem,
+          )),
+          Text(FlutterI18n.translate(context, "buttonTo")),
+          SizedBox(width:ScreenUtil().setSp(20, allowFontScalingSelf: true),),
+          DropdownButton(
+            value: _selectedEnd,
+            items: listOfDropDown.map((item) {
+              return DropdownMenuItem(
+                value: item,
+                child: Text(item),
+              );
+            }).toList(),
+            onChanged: (selectedItem) => setState(() => _selectedEnd = selectedItem,
+          )),
+          IconButton(icon: FaIcon(FontAwesomeIcons.play, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () 
+                                {
+                                  widget.parentAction(_selectedStart,_selectedEnd);
+                                  Navigator.of(context).pop();
+                                }),
+          IconButton(icon: FaIcon(FontAwesomeIcons.times, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () 
+                                {
+                                  Navigator.of(context).pop();
+                                }),
+          
+        ],
+      )),
+    )),
+        ),
+      ),
+    );
+  }
+}
   

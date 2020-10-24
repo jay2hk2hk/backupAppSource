@@ -174,7 +174,7 @@ class _NotesPageState extends State<NotesPage>
     BackButtonInterceptor.remove(myInterceptor);
   }
 
-  bool myInterceptor(bool stopDefaultButtonEvent) {
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
     if(page!=0)
     {
@@ -272,7 +272,7 @@ class _NotesPageState extends State<NotesPage>
       return getMonthEvent(firstDayDateTime,lastDayDateTime/*,eventNoteTitle*/);
   }
 
-  void _onDaySelected(DateTime day, List events) {
+  void _onDaySelected(DateTime day, List events, List holidays) {
     print('CALLBACK: _onDaySelected');
     setState(() {
       eventNoteTitle = DateTime.parse(dateFormat.format(day));
@@ -526,21 +526,21 @@ class _NotesPageState extends State<NotesPage>
             _showConfirm(context,"");
               
           }),
-          SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
+          /*SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
           IconButton(icon: Icon(FontAwesomeIcons.microphone,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
           {
             if(_hasSpeech || !speech.isListening)
             {
               startListening();
-              /*showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return MyDialog();
-              });*/
+              //showDialog(
+              //barrierDismissible: false,
+              //context: context,
+              //builder: (_) {
+              //  return MyDialog();
+              //});
             }
           }
-          ),
+          ),*/
           SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
         ],
       ),

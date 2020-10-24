@@ -5,11 +5,12 @@ import 'package:bibleapp/util/sql_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
-import 'package:flutter_widgets/flutter_widgets.dart';
+//import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:flutter/services.dart';
 import 'package:html_unescape/html_unescape.dart';
 import '../main.dart';
 import 'dart:async';
+import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -28,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage> {
   final dbHelper = SQLHelper.instance;
   static double fontOfContent = 60.0;//px
   double sizeOfIcon = 50.0;
-  static int page = 0; //0 = more 1 = bookmark title, 2 = bookmark, 3 = style, 4 = FAQ, 5 = about
+  static int page = 0; //0 = more 1 = bookmark title, 2 = bookmark, 3 = style, 4 = FAQ, 5 = about, 6 = about
   static int bibleTitleTotal = 66;
   static int bibleTitleNew = 40;
   static int bibleTitleOld = 39;
@@ -46,9 +47,9 @@ class _SettingsPageState extends State<SettingsPage> {
     super.dispose();
     BackButtonInterceptor.remove(myInterceptor);
   }
-  bool myInterceptor(bool stopDefaultButtonEvent) {
+  bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
-    if(page==1 || /*page==2 ||*/ page==3 || page==4 || page==5)
+    if(page==1 || /*page==2 ||*/ page==3 || page==4 || page==5 || page==6)
     {
       setState(() {
         page=0;
@@ -73,12 +74,13 @@ class _SettingsPageState extends State<SettingsPage> {
       else if(page==3) tempList = _myListViewStyle(context);
       else if(page==4) tempList = _myListViewFAQ(context);
       else if(page==5) tempList = _myListViewAboutUs(context);
+      else if(page==6) tempList = _myListBibleLevel(context);
       return tempList;
     }
 
 Widget _myListViewMore(BuildContext context) {
       final europeanCountries = [FlutterI18n.translate(context, "moreMenuBookmark"), FlutterI18n.translate(context, "moreMenuThemeStyle")
-      , FlutterI18n.translate(context, "moreMenuFAQ"), FlutterI18n.translate(context, "moreMenuAboutUs")];
+      , FlutterI18n.translate(context, "moreMenuFAQ"),FlutterI18n.translate(context, "moreMenuBibleTodaysLevel"), FlutterI18n.translate(context, "moreMenuAboutUs")];
       return new Scaffold(
       appBar: AppBar( 
         title: Text(FlutterI18n.translate(context, "bottomBarMore"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
@@ -100,6 +102,8 @@ Widget _myListViewMore(BuildContext context) {
                 else if(index==2)
                   page = 4;
                 else if(index==3)
+                  page = 6;  
+                else if(index==4)
                   page = 5;  
               });
             }
@@ -238,6 +242,58 @@ Widget _myListViewMore(BuildContext context) {
             child:ListTile(
             title: Text(europeanCountries[index],style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
             ),
+          );
+           
+        }, //itemBuilder
+        separatorBuilder: (context, index) {
+        return Divider();
+        }, //separatorBuilder
+      ),
+      )
+      );
+
+    }
+
+    Widget _myListBibleLevel(BuildContext context) {
+
+      // backing data
+      final europeanCountries = [FlutterI18n.translate(context, "basic"), FlutterI18n.translate(context, "advanced")];
+
+      return 
+      new Scaffold(
+      appBar: AppBar( 
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
+          onPressed: () => {
+            setState(() {
+                page = 0;
+              })
+          },
+        ), 
+        title: Text(FlutterI18n.translate(context, "bibleTodaysLevelTitle"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
+      ),
+      body: new Center(
+        child:ListView.separated(
+        itemCount: europeanCountries.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            child:ListTile(
+            title: Text(europeanCountries[index],style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+            ),
+            onTap: () {
+              setState(() {
+                page = 0;
+              });
+              if(index==0)
+              {
+                prefs.setInt(sharePrefReadBibleLevel, 0);             
+              }
+              else 
+              {
+                prefs.setInt(sharePrefReadBibleLevel, 1); 
+              }
+              RestartWidget.restartApp(context);
+            }
           );
            
         }, //itemBuilder

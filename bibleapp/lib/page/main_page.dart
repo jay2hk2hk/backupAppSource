@@ -385,13 +385,18 @@ class _MainPageState extends State<MainPage>{
     
     
     tempList.add(
-      Text(FlutterI18n.translate(context, "mainPageBibleSentenceTitle"),
+      Row(children: [
+        Text(FlutterI18n.translate(context, "mainPageBibleSentenceTitle"),
                                   style: new TextStyle(fontWeight: FontWeight.bold
                                   ,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
                                   //,color: fontTextColor
                                   )
                               ),
+        IconButton(icon: FaIcon(FontAwesomeIcons.redo, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: () {setState(() {});}),
+      ],),
+      
     );
+    
     String tempDisplayContent = "";
     String tempTitle = "";
     if(tempContentList.length>1)
@@ -404,6 +409,7 @@ class _MainPageState extends State<MainPage>{
       String temp1 = FlutterI18n.translate(context, "bible."+tempTitleList[0]+"."+tempTitleList[1]+".content").split('=.=')[int.parse(tempContentList[i])-1];
       tempDisplayContent+=unescape.convert(temp1).substring(temp1.indexOf('.')+1).trim();
     }
+    
     tempList.add(
       RaisedButton(
             shape: RoundedRectangleBorder(
@@ -471,10 +477,12 @@ class _MainPageState extends State<MainPage>{
     int todayDay = todayDate.day;
     int todayMonth = todayDate.month;*/
     String temp = prefs.getString(sharePrefBibleTodaysString);
+    String temp2 = prefs.getString(sharePrefBibleTodaysReadString);
     //String temp = "19:1,"+"40:1,"+"1:1,"+"1:2";
     //String temp = saveAllBibleTodaysSentence[todayMonth-1][todayDay-1];
     //String temp = "19:30,"+"52:2,"+"23:13-14";
     List<String> tempTodaysList = temp.split(',');
+    List<String> tempTodaysList2 = temp2.split(',');
     String tempDisplayContent = "";
 
     tempList.add(
@@ -486,7 +494,7 @@ class _MainPageState extends State<MainPage>{
                               ),
     );
     //print(prefs.getBool(sharePrefBibleTodaysGotCrown));
-    if(tempTodaysList.length>0 && tempTodaysList[0]!="")
+    if(tempTodaysList.length>0)
     {
       for(int i=0;i<tempTodaysList.length;i++)
       {
@@ -497,6 +505,11 @@ class _MainPageState extends State<MainPage>{
         for(int j=0;j<tempContentTitleList.length;j++)
         {
           tempList.add(
+            !temp2.contains(tempTodaysList[i]) ?
+            Text(FlutterI18n.translate(context, "bibleTitle."+tempTitleList[0]+".title")+" " + tempContentTitleList[j]
+              ,style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
+              ,//color: buttonTextColor
+              ),) :
               RaisedButton(
                 color:bottomNavigationColor,
             textColor: buttonTextColor,
@@ -527,7 +540,7 @@ class _MainPageState extends State<MainPage>{
         }
       }
     }
-    else if(!prefs.getBool(sharePrefBibleTodaysGotCrown) && tempTodaysList.length<=1)
+    if(!prefs.getBool(sharePrefBibleTodaysGotCrown) && tempTodaysList2.length<=1 && tempTodaysList2[0]=="")
     {
       tempList.add(
               RaisedButton(
@@ -551,7 +564,7 @@ class _MainPageState extends State<MainPage>{
             ),
           );
     }
-    else
+    else if(prefs.getBool(sharePrefBibleTodaysGotCrown))
     {
       tempList.add(
         Row(

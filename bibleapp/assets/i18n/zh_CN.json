@@ -27,6 +27,12 @@
     "moreMenuThemeStyle":"主题风格",
     "standardStyle":"标准风格",
     "darkStyle":"黑暗风格",
+    "moreMenuBibleTodaysLevel":"读经任务等级",
+    "basic":"基础",
+    "advanced":"进阶",
+    "bibleTodaysLevelTitle":"更改将于明天生效",
+    "buttonFrom":"从",
+    "buttonTo":"到",
 
     "questionNoSound":"Q.为什么我播放读经没有声音?",
     "answerNoSound":"A.请确保手机没有设定为静音",
@@ -37,7 +43,7 @@
     "questionCannotUseSaid":"Q.为什么用不到语音功能?",
     "answerCannotUseSaid":"A.请确保手机网路畅通。",
 
-    "aboutUsText":"弟兄姊妹们平安!\n本人以一人之力制作了此圣经,目的是鼓励弟兄姊妹们多读神的话语,透过快速搜寻经文,聆听经文和记录经文等功能协助弟兄姊妹们养成每天读经的习惯!\n「因为出於神的话，没有一句不带能力的。」﹝路加福音1:37﹞\n每日读经表由基督徒灵命成长之七大习惯提供。",
+    "aboutUsText":"弟兄姊妹们平安!\n本人靠着圣灵感动制作了此圣经,目的是鼓励弟兄姊妹们多读神的话语,透过快速搜寻经文,聆听经文和记录经文等功能协助弟兄姊妹们养成每天读经的习惯!\n「因为出於神的话，没有一句不带能力的。」﹝路加福音1:37﹞\n每日读经表由基督徒灵命成长之七大习惯提供。",
     "searchInput":"输入搜寻文字",
 
 
@@ -68,6 +74,24 @@
     },
     "pleaseSelect":"请选择",
 
+    "numberForMic":
+    {
+        "1":"一",
+        "2":"二",
+        "3":"三",
+        "4":"四",
+        "5":"五",
+        "6":"六",
+        "7":"七",
+        "8":"八",
+        "9":"九",
+        "10":"十"
+    },
+    "bibleTitleWrongFix":
+    {
+        "1":"历代志上",
+        "2":"历代志下"
+    },
     "bibleTitleSelection":
     {
         "1":{"selection":"旧约"},

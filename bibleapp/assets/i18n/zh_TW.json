@@ -27,6 +27,12 @@
     "moreMenuThemeStyle":"主題風格",
     "standardStyle":"標準風格",
     "darkStyle":"黑暗風格",
+    "moreMenuBibleTodaysLevel":"讀經任務等級",
+    "basic":"基礎",
+    "advanced":"進階",
+    "bibleTodaysLevelTitle":"更改將於明天生效",
+    "buttonFrom":"從",
+    "buttonTo":"到",
 
     "questionNoSound":"Q.為什麼我播放讀經沒有聲音?",
     "answerNoSound":"A.請確保手機沒有設定為靜音。",
@@ -37,7 +43,7 @@
     "questionCannotUseSaid":"Q.為什麼用不到語音功能?",
     "answerCannotUseSaid":"A.請確保手機網路暢通。",
 
-    "aboutUsText":"弟兄姊妹們平安!\n本人以一人之力製作了此聖經,目的是鼓勵弟兄姊妹們多讀神的話語,透過快速搜尋經文,聆聽經文和記錄經文等功能協助弟兄姊妹們養成每天讀經的習慣!\n「因為出於神的話，沒有一句不帶能力的。」﹝路加福音1:37﹞\n每日讀經表由基督徒靈命成長之七大習慣提供。",
+    "aboutUsText":"弟兄姊妹們平安!\n本人靠着聖靈感動製作了此聖經,目的是鼓勵弟兄姊妹們多讀神的話語,透過快速搜尋經文,聆聽經文和記錄經文等功能協助弟兄姊妹們養成每天讀經的習慣!\n「因為出於神的話，沒有一句不帶能力的。」﹝路加福音1:37﹞\n每日讀經表由基督徒靈命成長之七大習慣提供。",
     "searchInput":"輸入搜尋文字",
 
 
@@ -68,7 +74,24 @@
     },
     "pleaseSelect":"請選擇",
 
-
+    "numberForMic":
+    {
+        "1":"一",
+        "2":"二",
+        "3":"三",
+        "4":"四",
+        "5":"五",
+        "6":"六",
+        "7":"七",
+        "8":"八",
+        "9":"九",
+        "10":"十"
+    },
+    "bibleTitleWrongFix":
+    {
+        "1":"歷代誌上",
+        "2":"歷代誌下"
+    },
     "bibleTitleSelection":
     {
         "1":{"selection":"舊約"},

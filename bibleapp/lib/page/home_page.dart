@@ -128,6 +128,11 @@ class _HomePageState extends State<HomePage> {
         prefs.setBool(sharePrefBibleTodaysGotCrownLoadedReward, false); 
       }
 
+      if(prefs.getInt(sharePrefReadBibleLevel) == null)
+      {
+        prefs.setInt(sharePrefReadBibleLevel, 0); 
+      }
+
       if(prefs.getString(sharePrefBibleTodaysString) == null)
       {
         prefs.setString(sharePrefBibleTodaysString, saveAllBibleTodaysSentence[now.month-1][now.day-1]); 
@@ -138,7 +143,30 @@ class _HomePageState extends State<HomePage> {
         if(DateTime.parse(prefs.getString(sharePrefBibleTodaysDate)).difference(now).inDays<0)
         {
           prefs.setString(sharePrefBibleTodaysString, saveAllBibleTodaysSentence[now.month-1][now.day-1]); 
+          if(prefs.getInt(sharePrefReadBibleLevel)>0)
+          {
+            prefs.setString(sharePrefBibleTodaysString, prefs.getString(sharePrefBibleTodaysString)+",20:"+now.day.toString());
+          }
         }
+        
+      }
+
+      if(prefs.getString(sharePrefBibleTodaysReadString) == null)
+      {
+        prefs.setString(sharePrefBibleTodaysReadString, saveAllBibleTodaysSentence[now.month-1][now.day-1]); 
+      }
+      else
+      {
+        //print(DateTime.parse(prefs.getString(sharePrefBibleTodaysDate)).difference(DateTime.now()).inDays);
+        if(DateTime.parse(prefs.getString(sharePrefBibleTodaysDate)).difference(now).inDays<0)
+        {
+          prefs.setString(sharePrefBibleTodaysReadString, saveAllBibleTodaysSentence[now.month-1][now.day-1]); 
+          if(prefs.getInt(sharePrefReadBibleLevel)>0)
+          {
+            prefs.setString(sharePrefBibleTodaysReadString, prefs.getString(sharePrefBibleTodaysReadString)+",20:"+now.day.toString());
+          }
+        }
+        
       }
 
       if(prefs.getString(sharePrefBibleTodaysDate) != null)
@@ -200,6 +228,8 @@ class _HomePageState extends State<HomePage> {
       {
         prefs.setInt(sharePrefLightDark, 0); 
       }
+
+      
       
       await FlutterI18n.refresh(context, currentLang);
       setState(() {
