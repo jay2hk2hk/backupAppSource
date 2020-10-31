@@ -7,7 +7,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 //import 'package:flutter_widgets/flutter_widgets.dart';
 import 'package:flutter/services.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:html_unescape/html_unescape.dart';
+import 'package:share/share.dart';
 import '../main.dart';
 import 'dart:async';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
@@ -49,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
   }
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
-    if(page==1 || /*page==2 ||*/ page==3 || page==4 || page==5 || page==6)
+    if(page==1 || /*page==2 ||*/ page==3 || page==4 || page==5 || page==6 || page==7)
     {
       setState(() {
         page=0;
@@ -75,12 +77,14 @@ class _SettingsPageState extends State<SettingsPage> {
       else if(page==4) tempList = _myListViewFAQ(context);
       else if(page==5) tempList = _myListViewAboutUs(context);
       else if(page==6) tempList = _myListBibleLevel(context);
+      else if(page==7) tempList = _myListViewSupportForUs(context);
       return tempList;
     }
 
 Widget _myListViewMore(BuildContext context) {
       final europeanCountries = [FlutterI18n.translate(context, "moreMenuBookmark"), FlutterI18n.translate(context, "moreMenuThemeStyle")
-      , FlutterI18n.translate(context, "moreMenuFAQ"),FlutterI18n.translate(context, "moreMenuBibleTodaysLevel"), FlutterI18n.translate(context, "moreMenuAboutUs")];
+      , FlutterI18n.translate(context, "moreMenuFAQ"),FlutterI18n.translate(context, "moreMenuBibleTodaysLevel")
+      ,FlutterI18n.translate(context, "moreMenuSupportForUs"), FlutterI18n.translate(context, "moreMenuAboutUs")];
       return new Scaffold(
       appBar: AppBar( 
         title: Text(FlutterI18n.translate(context, "bottomBarMore"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
@@ -104,6 +108,8 @@ Widget _myListViewMore(BuildContext context) {
                 else if(index==3)
                   page = 6;  
                 else if(index==4)
+                  page = 7;  
+                else if(index==5)
                   page = 5;  
               });
             }
@@ -304,6 +310,63 @@ Widget _myListViewMore(BuildContext context) {
       )
       );
 
+    }
+
+    Widget _myListViewSupportForUs(BuildContext context) {
+
+      // backing data
+      var europeanCountries = [FlutterI18n.translate(context, "supportForUsText")];
+
+      return 
+      new Scaffold(
+      appBar: AppBar( 
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
+          onPressed: () => {
+            setState(() {
+                page = 0;
+              })
+          },
+        ), 
+        title: Text(FlutterI18n.translate(context, "moreMenuSupportForUs"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
+        actions: <Widget>[
+          IconButton(icon: Icon(FontAwesomeIcons.share,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
+          {
+              shareToOther();
+          }),
+          SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
+        ],
+      ),
+      body: new Center(
+        child:ListView.separated(
+        itemCount: europeanCountries.length,
+        itemBuilder: (context, index) {
+          return GestureDetector(
+            child:ListTile(
+            title: Text(europeanCountries[index],style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),),
+            ),
+          );
+           
+        }, //itemBuilder
+        separatorBuilder: (context, index) {
+        return Divider();
+        }, //separatorBuilder
+      ),
+      )
+      );
+
+    }
+
+    void shareToOther()
+    {
+      Share.share(copyShareReturnText());
+    }
+
+    String copyShareReturnText()
+    {
+      String tempText = FlutterI18n.translate(context, "shareAppText");
+      
+      return tempText;
     }
 
     Widget _myListViewBookmarkTitle(BuildContext context) {

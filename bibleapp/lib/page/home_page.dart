@@ -145,7 +145,10 @@ class _HomePageState extends State<HomePage> {
           prefs.setString(sharePrefBibleTodaysString, saveAllBibleTodaysSentence[now.month-1][now.day-1]); 
           if(prefs.getInt(sharePrefReadBibleLevel)>0)
           {
-            prefs.setString(sharePrefBibleTodaysString, prefs.getString(sharePrefBibleTodaysString)+",20:"+now.day.toString());
+            String tempString = "20:";
+            if(prefs.getString(sharePrefBibleTodaysString).contains(tempString))
+              tempString = "19:";
+            prefs.setString(sharePrefBibleTodaysString, prefs.getString(sharePrefBibleTodaysString)+","+tempString+now.day.toString());
           }
         }
         
@@ -163,7 +166,10 @@ class _HomePageState extends State<HomePage> {
           prefs.setString(sharePrefBibleTodaysReadString, saveAllBibleTodaysSentence[now.month-1][now.day-1]); 
           if(prefs.getInt(sharePrefReadBibleLevel)>0)
           {
-            prefs.setString(sharePrefBibleTodaysReadString, prefs.getString(sharePrefBibleTodaysReadString)+",20:"+now.day.toString());
+            String tempString = "20:";
+            if(prefs.getString(sharePrefBibleTodaysReadString).contains(tempString))
+              tempString = "19:";
+            prefs.setString(sharePrefBibleTodaysReadString, prefs.getString(sharePrefBibleTodaysReadString)+","+tempString+now.day.toString());
           }
         }
         
