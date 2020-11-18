@@ -105,6 +105,7 @@ class _HomePageState extends State<HomePage> {
       tempBannerPosition = 160;   
     else if(ScreenUtil.screenHeight<=2688)
       tempBannerPosition = 140; 
+    else if (ScreenUtil.screenHeight < 2788) tempBannerPosition = 130;
     }
       
       
