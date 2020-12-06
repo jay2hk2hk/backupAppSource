@@ -229,26 +229,54 @@ class _HomePageState extends State<HomePage> {
       if(prefs.getString(sharePrefDisplayLanguage) == null)
       {
         String lc = Platform.localeName;
-        if(lc.contains('TW'))
+        if(Platform.isAndroid)
         {
-          currentLang = Locale('zh','TW');
-          prefs.setString(sharePrefDisplayLanguage, languageTextValue[2]); 
+          if(lc.contains('TW'))
+          {
+            currentLang = Locale('zh','TW');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[2]); 
+          }
+          else if(lc.contains('HK'))
+          {
+            currentLang = Locale('zh','HK');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[1]); 
+          }
+          else if(lc.contains('CN'))
+          {
+            currentLang = Locale('zh','CN');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[3]); 
+          }
+          else 
+          {
+            currentLang = Locale('en','US');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
+          }
         }
-        else if(lc.contains('HK'))
+        else
         {
-          currentLang = Locale('zh','HK');
-          prefs.setString(sharePrefDisplayLanguage, languageTextValue[1]); 
-        }
-        else if(lc.contains('CN'))
-        {
-          currentLang = Locale('zh','CN');
-          prefs.setString(sharePrefDisplayLanguage, languageTextValue[3]); 
-        }
-        else 
-        {
-          currentLang = Locale('en','US');
-          prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
-        }
+          if(lc.contains('Hant_HK'))
+          {
+            currentLang = Locale('zh','HK');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[1]); 
+          }
+          else if(lc.contains('Hant'))
+          {
+            currentLang = Locale('zh','TW');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[2]); 
+          }
+          
+          else if(lc.contains('Hans'))
+          {
+            currentLang = Locale('zh','CN');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[3]); 
+          }
+          else 
+          {
+            currentLang = Locale('en','US');
+            prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
+          }
+        } 
+        
         /*currentLang = Localizations.localeOf(context);
         if(!currentLang.languageCode.contains('en_US') && !currentLang.languageCode.contains('zh'))
           currentLang = Locale('en','US');
@@ -264,22 +292,45 @@ class _HomePageState extends State<HomePage> {
       if(prefs.getString(sharePrefSoundLanguage) == null)
       {
         String lc = Platform.localeName;
-        if(lc.contains('TW'))
+        if(Platform.isAndroid)
         {
-          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[2]); 
+          if(lc.contains('TW'))
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[2]); 
+          }
+          else if(lc.contains('HK'))
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[1]); 
+          }
+          else if(lc.contains('CN'))
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[3]); 
+          }
+          else 
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[0]); 
+          }
         }
-        else if(lc.contains('HK'))
+        else
         {
-          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[1]); 
+          if(lc.contains('Hant_HK'))
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[1]); 
+          }
+          else if(lc.contains('Hant'))
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[2]); 
+          }
+          else if(lc.contains('Hans'))
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[3]); 
+          }
+          else 
+          {
+            prefs.setString(sharePrefSoundLanguage, languageVolumeValue[0]); 
+          }
         }
-        else if(lc.contains('CN'))
-        {
-          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[3]); 
-        }
-        else 
-        {
-          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[0]); 
-        }
+        
         /*Locale tempLocale = Localizations.localeOf(context);
         if(!tempLocale.languageCode.contains('en') && !tempLocale.languageCode.contains('zh'))
           prefs.setString(sharePrefSoundLanguage, languageVolumeValue[0]); 
