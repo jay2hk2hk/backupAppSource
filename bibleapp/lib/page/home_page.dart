@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wakelock/wakelock.dart';
 
 import '../main.dart';
+import 'game_page.dart';
 
 Locale currentLang;
 
@@ -122,6 +123,14 @@ class _HomePageState extends State<HomePage> {
       var now = DateTime.parse(dateFormat.format(DateTime.now()));
       
       //print(now.difference(now.subtract(Duration(hours: 5))).inDays);
+
+    if(prefs.getInt(sharePrefCorrectQuestionNum) == null)
+    {
+      prefs.setInt(sharePrefCorrectQuestionNum, 0); 
+      prefs.setInt(sharePrefTotalAnsweredNum, 0); 
+      prefs.setInt(sharePrefGameLevel, 1); 
+    }
+
       DateTime tempTime = now; 
       if(prefs.getString(sharePrefBibleTodaysDate) == null)
       {
@@ -189,12 +198,26 @@ class _HomePageState extends State<HomePage> {
       if(prefs.getBool(sharePrefBibleTodaysGotCrown)== null)
       {
         prefs.setBool(sharePrefBibleTodaysGotCrown, false); 
+        
       }
       else
       {
         if(tempTime.isBefore(now))
         {
           prefs.setBool(sharePrefBibleTodaysGotCrown, false); 
+        }
+      }
+
+      if(prefs.getInt(sharePrefTodayRewardAdsGameMC)== null)
+      {
+        prefs.setInt(sharePrefTodayRewardAdsGameMC, 0);
+        
+      }
+      else
+      {
+        if(tempTime.isBefore(now))
+        {
+          prefs.setInt(sharePrefTodayRewardAdsGameMC, 0);
         }
       }
 
@@ -205,10 +228,31 @@ class _HomePageState extends State<HomePage> {
 
       if(prefs.getString(sharePrefDisplayLanguage) == null)
       {
-        currentLang = Localizations.localeOf(context);
+        String lc = Platform.localeName;
+        if(lc.contains('TW'))
+        {
+          currentLang = Locale('zh','TW');
+          prefs.setString(sharePrefDisplayLanguage, languageTextValue[2]); 
+        }
+        else if(lc.contains('HK'))
+        {
+          currentLang = Locale('zh','HK');
+          prefs.setString(sharePrefDisplayLanguage, languageTextValue[1]); 
+        }
+        else if(lc.contains('CN'))
+        {
+          currentLang = Locale('zh','CN');
+          prefs.setString(sharePrefDisplayLanguage, languageTextValue[3]); 
+        }
+        else 
+        {
+          currentLang = Locale('en','US');
+          prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
+        }
+        /*currentLang = Localizations.localeOf(context);
         if(!currentLang.languageCode.contains('en_US') && !currentLang.languageCode.contains('zh'))
           currentLang = Locale('en','US');
-        prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]);  
+        prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); */ 
       }
       else
       {
@@ -219,7 +263,24 @@ class _HomePageState extends State<HomePage> {
       
       if(prefs.getString(sharePrefSoundLanguage) == null)
       {
-        Locale tempLocale = Localizations.localeOf(context);
+        String lc = Platform.localeName;
+        if(lc.contains('TW'))
+        {
+          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[2]); 
+        }
+        else if(lc.contains('HK'))
+        {
+          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[1]); 
+        }
+        else if(lc.contains('CN'))
+        {
+          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[3]); 
+        }
+        else 
+        {
+          prefs.setString(sharePrefSoundLanguage, languageVolumeValue[0]); 
+        }
+        /*Locale tempLocale = Localizations.localeOf(context);
         if(!tempLocale.languageCode.contains('en') && !tempLocale.languageCode.contains('zh'))
           prefs.setString(sharePrefSoundLanguage, languageVolumeValue[0]); 
         else
@@ -228,7 +289,7 @@ class _HomePageState extends State<HomePage> {
           if(languageTextValue[1]==temp)
             prefs.setString(sharePrefSoundLanguage, languageVolumeValue[1]); 
           else prefs.setString(sharePrefSoundLanguage, temp); 
-        } 
+        } */
       }
 
       if(prefs.getInt(sharePrefLightDark) == null)
@@ -246,6 +307,7 @@ class _HomePageState extends State<HomePage> {
       list
       ..add(MainPage(globalKey))
       ..add(BibleApp(_scaffoldKey))
+      ..add(GamePage(globalKey))
       ..add(SearchPage(globalKey))
       ..add(NotesPage(globalKey))
       ..add(SettingsPage(globalKey))
@@ -275,10 +337,10 @@ class _HomePageState extends State<HomePage> {
           await prefs.setDouble(sharePrefFontSize, 60.0);
         }
 
-        if(prefs.getDouble(sharePrefSpeechRate) == null)
+        /*if(prefs.getDouble(sharePrefSpeechRate) == null)
         {
           await prefs.setDouble(sharePrefSpeechRate, 0.5);
-        } 
+        } */
 
         if(prefs.getString(sharePrefContentNum) == null)
         {
@@ -376,6 +438,12 @@ class _HomePageState extends State<HomePage> {
                       icon: FaIcon(FontAwesomeIcons.bible,color: _bottomNavigationColor,size: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),
                       title: Text(
                         FlutterI18n.translate(context, "bottomBarBible"),
+                        style: TextStyle(color: _bottomNavigationColor,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),
+                      )),
+                  BottomNavigationBarItem(
+                      icon: FaIcon(FontAwesomeIcons.gamepad,color: _bottomNavigationColor,size: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),
+                      title: Text(
+                        FlutterI18n.translate(context, "bottomBarGame"),
                         style: TextStyle(color: _bottomNavigationColor,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),),
                       )),
                   BottomNavigationBarItem(

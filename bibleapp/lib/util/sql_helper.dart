@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'package:bibleapp/model/bible_game.dart';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
@@ -15,6 +16,7 @@ class SQLHelper
   static String bible_bookmark = 'bible_bookmark';
   static String bible_notes = 'bible_notes';
   static String bible_crown = 'bible_crown';
+  static String bible_game = 'bible_game';
 
 static final bible_content = new BibleContent(0,"","","");
 
@@ -67,6 +69,10 @@ static final _databaseName = "bible.db3";
     await db.execute(
       "CREATE TABLE bible_crown(id INTEGER PRIMARY KEY AUTOINCREMENT, type INTEGER, date DATETIME);"
       ,);
+      //20201206
+    /*await db.execute(
+      "CREATE TABLE bible_game(id INTEGER PRIMARY KEY AUTOINCREMENT, type INTEGER, correctQuestionNum INTEGER, totalAnsweredNum INTEGER, level INTEGER, date DATETIME);"
+      ,);*/
 
 
 /*
@@ -81,6 +87,41 @@ static final _databaseName = "bible.db3";
       });
 */
 
+  }
+
+  Future<int> insertBibleGame(BibleGame bibleGame) async {
+    Database db = await instance.database;
+    if(bibleGame.id==null)
+    {
+        return await db.insert(
+          bible_game,
+          bibleGame.toMap(),
+          conflictAlgorithm: ConflictAlgorithm.replace,
+
+      );
+    }
+    else
+    {
+        return await db.update(
+          bible_game,
+          bibleGame.toMap(),
+          where: 'id = ?',
+        whereArgs: [bibleGame.id],
+        );
+    }
+  }
+
+  Future<BibleGame> getBibleGameByType(BibleGame bibleGame) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+    bible_game,
+    where: 'type = ?',
+    whereArgs: [bibleGame.type],
+    //orderBy:'title,content,text,id',
+    );
+    if(maps.length!=0)
+      return BibleGame(id: maps[0]['id'],type:maps[0]['type'],correctQuestionNum:maps[0]['correctQuestionNum'],totalAnsweredNum:maps[0]['totalAnsweredNum'],date: maps[0]['date']);
+    return null;  
   }
 
 

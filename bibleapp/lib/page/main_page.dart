@@ -78,7 +78,8 @@ class _MainPageState extends State<MainPage>{
     
     totalOfCrown();
     crownNum = prefs.getInt(sharePrefBibleTodaysGotCrownTotal);
-
+    
+    
   }
 
   @override

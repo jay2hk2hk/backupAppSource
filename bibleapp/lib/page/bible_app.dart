@@ -541,7 +541,7 @@ class _BibleAppState extends State<BibleApp> {
   _initTts() {
       flutterTts = FlutterTts();
 
-      _getLanguages();
+      //_getLanguages();
       
 
       flutterTts.setStartHandler(() {
@@ -600,6 +600,7 @@ class _BibleAppState extends State<BibleApp> {
 
   Future _getLanguages() async {
     languages = await flutterTts.getLanguages;
+    bool a = await flutterTts.isLanguageAvailable("zh-TW");
     if (languages != null) 
     setState(() => languages);
   }
@@ -800,7 +801,9 @@ class _BibleAppState extends State<BibleApp> {
 
     if(prefs.getDouble(sharePrefSpeechRate) == null)
     {
-      rate = 0.5;
+      if(Platform.isAndroid)
+        rate=rateNormalAnd;
+      else rate=rateNormalIos;
       await prefs.setDouble(sharePrefSpeechRate, rate);
     }
     else 
@@ -1461,9 +1464,15 @@ void _insert(Map<String, dynamic> row) async {
               _scaffoldKey.currentState.openDrawer();
               resetSelection();
               _resetSelectList();
+              
               //bug fix about scroll 20201023
               //WidgetsBinding.instance.addPostFrameCallback((_) => scrollTitleListWithTitleId());
+              /*try{
+                Future.delayed(Duration(milliseconds: 10), () => scrollTitleListWithTitleId());
+              }
+              catch(e){}*/
               
+              //Timer.run(() => scrollTitleListWithTitleId());
             }
         },
         child: _buttonTitle(),
@@ -2094,6 +2103,7 @@ Widget _myListView(BuildContext context) {
         );
       },
           );
+          
       }
 
     Widget myDrawer(BuildContext context) {
@@ -2157,8 +2167,10 @@ Widget _myListView(BuildContext context) {
       ),
         body:_myListViewForTitle(context)
         ),
-      )
+      ),
+      
     );
+    
   }
 
   Widget myDrawer2(BuildContext context) {

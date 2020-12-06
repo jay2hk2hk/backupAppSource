@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
    Color lightlineListColor = Color(0xFFFFFD180);//orange
    Color fontTextColor = Color(0xFF000000);//black
    Color weekEndTextColor = Color(0xFFFF5252);//red
+   Color correctAnswerColor = Color(0xFF33cc33);//green
    
    Locale currentLang;
    SharedPreferences prefs;//save the user data
@@ -40,6 +41,10 @@ import 'package:shared_preferences/shared_preferences.dart';
    String sharePrefBibleTodaysGotCrownLoadedReward = '_bibleTodaysGotCrownLoadedReward';
    String sharePrefLightDark = '_lightDark';
    String sharePrefReadBibleLevel = '_readBibleLevel';
+   String sharePrefCorrectQuestionNum = '_correctQuestionNum';
+   String sharePrefTotalAnsweredNum = '_totalAnsweredNum';
+   String sharePrefGameLevel = '_gameLevel';
+   String sharePrefTodayRewardAdsGameMC = '_todayRewardAdsGameMC';
    
    String cuvBibleContentFile = 'assets/json/bible_cuv.json';
    String cuvBibleTitleFile = 'assets/json/bible_title_cuv.json';

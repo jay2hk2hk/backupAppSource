@@ -2,6 +2,7 @@
     "appName": "冠冕聖經",
     "bottomBarHome":"首頁",
     "bottomBarBible":"聖經",
+    "bottomBarGame":"遊戲",
     "bottomBarSearch":"搜尋",
     "bottomBarNotes":"筆記",
     "bottomBarSettings":"設定",
@@ -33,6 +34,14 @@
     "bibleTodaysLevelTitle":"更改將於明天生效",
     "buttonFrom":"從",
     "buttonTo":"到",
+    "gameMenuChapterMC":"章節選擇題",
+    "gameMenuGameRules":"遊戲規則",
+    "questionText":"題目",
+    "adsToQuestionButton":"觀看廣告並繼續玩遊戲",
+    "displayCurrectLevel":"等级:",
+    "nextLevelText":"經驗值:",
+    "buttonNext":"下一個",
+    "buttonOutToday":"今天次數用完",
 
     "questionNoSound":"Q.為什麼我播放讀經沒有聲音?",
     "answerNoSound":"A.請確保手機沒有設定為靜音。",
@@ -48,6 +57,8 @@
     "moreMenuSupportForUs":"對我們的支持",
     "supportForUsText":"弟兄姊妹們的支持,分享,使用,五星好評就是對我們的支持!!\n\n有適合的廣告請按一次和完成讀經任務看廣告拿冠冕就是對我們的捐贈!!\n\n願主耶穌的恩惠常與弟兄姊妹們同在,神的話和福音廣傳!!\n\n好施捨的，必得豐裕；滋潤人的，必得滋潤。 （箴言11:25）\n",
     "shareAppText":"冠冕聖經\n\nGoogle Play\nhttps://play.google.com/store/apps/details?id=com.companyname.BibleApp\n\nApp Store\nhttps://apps.apple.com/us/app/crown-bible-kjv/id1492558806?ls=1",  
+    "gameRulesText":"請從四個選項當中，選出一個作為正確的答案。\n答對加一分，答錯沒有分。\n當分數到達指定數目時可以升等級。\n每天題目有限，請好好答題。\n", 
+    
     "searchButtonList":
     {
         "0":"勸勉"
