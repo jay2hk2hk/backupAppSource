@@ -42,6 +42,7 @@
     "nextLevelText":"經驗值:",
     "buttonNext":"下一個",
     "buttonOutToday":"今天次數用完",
+    "todayScoreText":"今天成績: ",
 
     "questionNoSound":"Q.為什麼我播放讀經沒有聲音?",
     "answerNoSound":"A.請確保手機沒有設定為靜音。",
@@ -85,6 +86,8 @@
         ,"21":"盼望"
     },
     "pleaseSelect":"請選擇",
+    "latestUpdates":"最新更新",
+    "latestUpdatesText":"-增加了章節選擇題遊戲\n-增加了讀經任務等級",
 
     "numberForMic":
     {

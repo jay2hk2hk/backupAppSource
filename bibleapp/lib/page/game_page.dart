@@ -68,8 +68,12 @@ class _GamePageState extends State<GamePage> {
   static String nextButtonText = "";
   //String rewardedVideoAdsId = RewardedVideoAd.testAdUnitId;
   String rewardedVideoAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5350932207" : "ca-app-pub-9860072337130869/7088766690";
-  static int maxAdsRewards = 10;
+  static int maxAdsRewards = 9;
   static int todayAdsRewards = 0;
+  static bool todayCanAd = true;
+  static int totalTodayAnswerNumMax = 100;
+  static int totalTodayCorrectAnswerNum = 0;
+  static int todayNextButtonStatus = 0;//0 = next, 1 = ads, 2 = end
 
   @override
   void initState() {
@@ -156,12 +160,24 @@ Widget _myListViewGame(BuildContext context) {
       return tempText;
     }
 
+    void nextButtonFun()
+    {
+      if(todayNextButtonStatus==0)
+        nextButtonText = FlutterI18n.translate(context,"buttonNext");
+      else if(todayNextButtonStatus==1)
+        nextButtonText = FlutterI18n.translate(context,"adsToQuestionButton");
+      else if(todayNextButtonStatus==2)
+        nextButtonText = FlutterI18n.translate(context,"buttonOutToday");
+    }
+
     Widget _myListViewChapterMC(BuildContext context) {
 
       // backing data
       //var europeanCountries = queryBibleTitleByDefault();
       nowLevel = FlutterI18n.translate(context,"displayCurrectLevel")+" "+prefs.getInt(sharePrefGameLevel).toString()+"\n"+FlutterI18n.translate(context,"nextLevelText")+" "+expStart.toString()+"/"+expEnd.toString();
-      if(todayAdsRewards<maxAdsRewards) nextButtonText = isPlayAds ? FlutterI18n.translate(context,"adsToQuestionButton") : FlutterI18n.translate(context,"buttonNext");
+      if(todayAdsRewards<maxAdsRewards) todayNextButtonStatus = isPlayAds ? 1 : 0;
+      prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
+      nextButtonFun();
       return 
       new Scaffold(
       appBar: AppBar( 
@@ -197,6 +213,7 @@ Widget _myListViewGame(BuildContext context) {
                             valueColor: new AlwaysStoppedAnimation<Color>(Colors.green[300]),
                             value: (expStart/expEnd),
                           ),
+                          Text(FlutterI18n.translate(context, "todayScoreText") + totalTodayCorrectAnswerNum.toString()+'/'+totalTodayAnswerNumMax.toString(),style: new TextStyle(fontWeight: FontWeight.bold,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true))),
                           ],
                         ),
                       ),
@@ -315,7 +332,8 @@ Widget _myListViewGame(BuildContext context) {
                         if(!isAnswered && !isPlayAds)
                         {
                           setState(() {
-                          nextButtonText = FlutterI18n.translate(context,"buttonNext");
+                          todayNextButtonStatus = 0;
+                          prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
                           isAnswered = true;
                           if(displayItem[6]==displayItem[i])
                           {
@@ -327,6 +345,8 @@ Widget _myListViewGame(BuildContext context) {
                               prefs.setInt(sharePrefGameLevel, prefs.getInt(sharePrefGameLevel)+1);
                               prefs.setInt(sharePrefCorrectQuestionNum, 0);
                             }
+                            totalTodayCorrectAnswerNum++;
+                            prefs.setInt(sharePrefTodayCorrectAnswerNum, totalTodayCorrectAnswerNum);
                             
                             
                           }
@@ -348,12 +368,21 @@ Widget _myListViewGame(BuildContext context) {
                           prefs.setInt(sharePrefTotalAnsweredNum, tempInt2);
                           if(tempInt2%10==0)
                           {
-                            if(todayAdsRewards>maxAdsRewards)
+                            if(todayAdsRewards>=maxAdsRewards)
                             {
-                              nextButtonText = FlutterI18n.translate(context,"buttonOutToday");
+                              todayCanAd = false;
+                              prefs.setBool(sharePrefTodayCanRewardAdsGameMC,todayCanAd);
+                              todayNextButtonStatus = 2;
                             }
-                            else nextButtonText = FlutterI18n.translate(context,"adsToQuestionButton");
+                            else 
+                            {
+                              todayAdsRewards = prefs.getInt(sharePrefTodayRewardAdsGameMC)+1;
+                              prefs.setInt(sharePrefTodayRewardAdsGameMC, todayAdsRewards);
+                              todayNextButtonStatus = 1;
+                            }
+                            prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
                             isPlayAds = true;
+                            prefs.setBool(sharePrefTodayPlayAds,isPlayAds);
                           }
                           
                           
@@ -390,7 +419,7 @@ Widget _myListViewGame(BuildContext context) {
                             
                         }*/
                         setState(() {
-                          if(isPlayAds && todayAdsRewards<=maxAdsRewards)
+                          if(isPlayAds && todayAdsRewards<=maxAdsRewards && todayCanAd)
                           {
                             RewardedVideoAd.instance.show().catchError((e) => print("error in loading 1st time"));
                           }
@@ -415,9 +444,19 @@ Widget _myListViewGame(BuildContext context) {
 
   void reSetTheQuestion()
   {
+    todayNextButtonStatus = prefs.getInt(sharePrefTodayNextButtonStatus);
     todayAdsRewards = prefs.getInt(sharePrefTodayRewardAdsGameMC);
-    if(todayAdsRewards==0)
+    todayCanAd = prefs.getBool(sharePrefTodayCanRewardAdsGameMC);
+    isPlayAds = prefs.getBool(sharePrefTodayPlayAds);
+    totalTodayCorrectAnswerNum = prefs.getInt(sharePrefTodayCorrectAnswerNum);
+
+    if(todayAdsRewards==0 && todayCanAd)
+    {
       isPlayAds = false;
+      prefs.setBool(sharePrefTodayPlayAds,isPlayAds);
+      
+    }
+      
     isPressNext = true;
     isAnswered = false;
     displayColorMC = [bottomNavigationColor,bottomNavigationColor,bottomNavigationColor,bottomNavigationColor];
@@ -430,10 +469,10 @@ Widget _myListViewGame(BuildContext context) {
       print("RewardedVideoAd event $event");
       if (event == RewardedVideoAdEvent.rewarded) {
         setState(() {
-          todayAdsRewards = prefs.getInt(sharePrefTodayRewardAdsGameMC)+1;
-          prefs.setInt(sharePrefTodayRewardAdsGameMC, todayAdsRewards);
-          nextButtonText = FlutterI18n.translate(context,"buttonNext");
+          todayNextButtonStatus = 0;
+          prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
           isPlayAds = false;
+          prefs.setBool(sharePrefTodayPlayAds,isPlayAds);
           reSetTheQuestion();
           
         });
@@ -448,11 +487,18 @@ Widget _myListViewGame(BuildContext context) {
     RewardedVideoAd.instance.load(
                         adUnitId: rewardedVideoAdsId,
                         targetingInfo: targetingInfo).catchError((e) => print("error in loading again"));
-    //prefs.setInt(sharePrefCorrectQuestionNum, 9); 
-    //prefs.setInt(sharePrefTotalAnsweredNum, 9); 
-    //prefs.setInt(sharePrefGameLevel, 1);
+    //prefs.setInt(sharePrefCorrectQuestionNum, 20); 
+    //prefs.setInt(sharePrefTotalAnsweredNum, 90); 
+    //prefs.setInt(sharePrefGameLevel, 4);
     //prefs.setInt(sharePrefTodayRewardAdsGameMC, 9);
+    //prefs.setBool(sharePrefTodayPlayAds, false);
+    //prefs.setInt(sharePrefTodayCorrectAnswerNum, 90);
+    
+    //prefs.setBool(sharePrefTodayCanRewardAdsGameMC, true);
+    //todayNextButtonStatus = 2;
+    //prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
     reSetTheQuestion();
+    //todayNextButtonStatus = 0;
     
     setLevelExp();
     
@@ -524,9 +570,9 @@ Widget _myListViewGame(BuildContext context) {
       titleNumCharNumMC = new Random().nextInt(tempBibleList.length-1);
       //titleNumCharNumMC = 14;
       theQuestion = tempBibleList[titleNumCharNumMC].substring(tempBibleList[titleNumCharNumMC].indexOf('.')+1);
-    }while(theQuestion == "");
+    }while(theQuestion == "" || theQuestion =="見上節" || theQuestion =="见上节");//bug checking
 
-    theQuestion =  /*FlutterI18n.translate(context, "bibleTitle.$titleIdMC.title")+" "+titleNumMC.toString() + " " + */tempBibleList[titleNumCharNumMC];
+    theQuestion =  /*FlutterI18n.translate(context, "bibleTitle.$titleIdMC.title")+" "+titleNumMC.toString() + " " +*/ tempBibleList[titleNumCharNumMC];
 
     List<String> tempAnswer = [
       FlutterI18n.translate(context, "bibleTitle.$titleIdMC.title")+" "+titleNumMC.toString()

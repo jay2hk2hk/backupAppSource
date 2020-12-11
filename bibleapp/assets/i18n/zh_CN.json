@@ -42,6 +42,7 @@
     "nextLevelText":"经验值:",
     "buttonNext":"下一个",
     "buttonOutToday":"今天次数用完",
+    "todayScoreText":"今天成绩: ",
 
     "questionNoSound":"Q.为什么我播放读经没有声音?",
     "answerNoSound":"A.请确保手机没有设定为静音",
@@ -85,6 +86,8 @@
         ,"21":"盼望"
     },
     "pleaseSelect":"请选择",
+    "latestUpdates":"最新更新",
+    "latestUpdatesText":"-增加了章节选择题游戏\n-增加了读经任务等级",
 
     "numberForMic":
     {

@@ -41,10 +41,18 @@ import 'package:shared_preferences/shared_preferences.dart';
    String sharePrefBibleTodaysGotCrownLoadedReward = '_bibleTodaysGotCrownLoadedReward';
    String sharePrefLightDark = '_lightDark';
    String sharePrefReadBibleLevel = '_readBibleLevel';
+   //for game char MC
    String sharePrefCorrectQuestionNum = '_correctQuestionNum';
    String sharePrefTotalAnsweredNum = '_totalAnsweredNum';
    String sharePrefGameLevel = '_gameLevel';
    String sharePrefTodayRewardAdsGameMC = '_todayRewardAdsGameMC';
+   String sharePrefTodayCanRewardAdsGameMC = '_todayCanRewardAdsGameMC';
+   String sharePrefUpdateVersionNum = '_updateVersionNum';
+   String sharePrefTodayNextButtonStatus = '_todayNextButtonStatus';
+   String sharePrefTodayPlayAds = '_todayPlayAds';
+   String sharePrefTodayCorrectAnswerNum = '_todayCorrectAnswerNum';
+   
+   //
    
    String cuvBibleContentFile = 'assets/json/bible_cuv.json';
    String cuvBibleTitleFile = 'assets/json/bible_title_cuv.json';

@@ -29,7 +29,8 @@ void main() async {
         useCountryCode: true,
         //fallbackFile: 'zh_HK',
         basePath: 'assets/i18n',
-        forcedLocale: Locale('en','US')),
+        //forcedLocale: Locale('en','US'),
+        ),
   );
   WidgetsFlutterBinding.ensureInitialized();
   //prefs = await SharedPreferences.getInstance();

@@ -127,7 +127,7 @@ class _HomePageState extends State<HomePage> {
     if(prefs.getInt(sharePrefCorrectQuestionNum) == null)
     {
       prefs.setInt(sharePrefCorrectQuestionNum, 0); 
-      prefs.setInt(sharePrefTotalAnsweredNum, 0); 
+      
       prefs.setInt(sharePrefGameLevel, 1); 
     }
 
@@ -211,6 +211,13 @@ class _HomePageState extends State<HomePage> {
       if(prefs.getInt(sharePrefTodayRewardAdsGameMC)== null)
       {
         prefs.setInt(sharePrefTodayRewardAdsGameMC, 0);
+        prefs.setBool(sharePrefTodayCanRewardAdsGameMC, true);
+        prefs.setInt(sharePrefTotalAnsweredNum, 0); 
+        prefs.setInt(sharePrefTodayNextButtonStatus, 0); 
+        prefs.setBool(sharePrefTodayPlayAds, false);
+        prefs.setInt(sharePrefTodayCorrectAnswerNum, 0); 
+        
+        
         
       }
       else
@@ -218,6 +225,11 @@ class _HomePageState extends State<HomePage> {
         if(tempTime.isBefore(now))
         {
           prefs.setInt(sharePrefTodayRewardAdsGameMC, 0);
+          prefs.setBool(sharePrefTodayCanRewardAdsGameMC, true);
+          prefs.setInt(sharePrefTotalAnsweredNum, 0); 
+          prefs.setInt(sharePrefTodayNextButtonStatus, 0); 
+          prefs.setBool(sharePrefTodayPlayAds, false);
+          prefs.setInt(sharePrefTodayCorrectAnswerNum, 0); 
         }
       }
 
@@ -347,6 +359,13 @@ class _HomePageState extends State<HomePage> {
       {
         prefs.setInt(sharePrefLightDark, 0); 
       }
+
+      if(prefs.getInt(sharePrefUpdateVersionNum) == null)
+      {
+        prefs.setInt(sharePrefUpdateVersionNum, 0); 
+      }
+
+      
 
       
       

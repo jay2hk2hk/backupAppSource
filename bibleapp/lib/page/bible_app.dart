@@ -1078,7 +1078,9 @@ loadButtonText() async {
   void shareToOther()
   {
     Share.share(copyShareReturnText());
+    //Share.shareFiles([''],text:'hihi');
   }
+  
 
   void bookmarkSelection()
   {

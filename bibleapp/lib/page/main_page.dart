@@ -48,7 +48,7 @@ class _MainPageState extends State<MainPage>{
   //String firebaseAdId = FirebaseAdMob.testAppId;
   String rewardedVideoAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5350932207" : "ca-app-pub-9860072337130869/7088766690";
   String firebaseAdId = Platform.isAndroid ? "ca-app-pub-9860072337130869~8212800236" : "ca-app-pub-9860072337130869~3480731194";
-
+  int latestUpdateVersionNum = 1;//check is display the latest update box or not
   
 
   @override
@@ -78,6 +78,19 @@ class _MainPageState extends State<MainPage>{
     
     totalOfCrown();
     crownNum = prefs.getInt(sharePrefBibleTodaysGotCrownTotal);
+
+    if(prefs.getInt(sharePrefUpdateVersionNum)<latestUpdateVersionNum)
+    {
+      prefs.setInt(sharePrefUpdateVersionNum, latestUpdateVersionNum); 
+      WidgetsBinding.instance.addPostFrameCallback((_) => 
+      showDialog(
+                barrierDismissible: true,
+                context: context,
+                builder: (_) {
+                  return MyDialog();
+                })
+      );
+    }
     
     
   }
@@ -606,4 +619,45 @@ class _MainPageState extends State<MainPage>{
   }
   */
 }
+
+class MyDialog extends StatefulWidget {
+    @override
+    _MyDialogState createState() => new _MyDialogState();
+  }
+
+  class _MyDialogState extends State<MyDialog> {
+    @override
+    void initState() {
+      super.initState();
+      
+    }
+
+
+
+    @override
+    Widget build(BuildContext context) {
+      return ButtonBarTheme(
+      data: ButtonBarThemeData(alignment: MainAxisAlignment.center),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(//Alert Dialog with Rounded corners in flutter
+          borderRadius: BorderRadius.all(Radius.circular(20.0))
+      ),
+        title: Text(FlutterI18n.translate(context, "latestUpdates"),textAlign: TextAlign.center,
+        style: TextStyle(/*color: iconAlertDialogColor,*/fontWeight: FontWeight.bold),),
+        content: Text(FlutterI18n.translate(context,"latestUpdatesText")),
+        actions: <Widget>[
+          Row (
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: <Widget>[
+                IconButton(icon: FaIcon(FontAwesomeIcons.times,/*color: iconAlertDialogColor,*/), onPressed: () {
+                  Navigator.pop(context);
+                }),
+                
+            ]
+        ),
+        ],
+      ),
+      );
+    }
+  }
 
