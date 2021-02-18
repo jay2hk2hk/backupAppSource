@@ -86,28 +86,43 @@ class _HomePageState extends State<HomePage> {
       //currentLang = Locale('en','US');
       //prefs.setString(sharePrefDisplayLanguage, languageTextValue[0]); 
     int tempBannerPosition = 160;
-    if(Platform.isAndroid)
-    {
-      if(ScreenUtil.screenHeight<=480)
-        tempBannerPosition = 195;
-    }
-    else {
-    if(ScreenUtil.screenHeight<=480)
-      tempBannerPosition = 195;
-    else if(ScreenUtil.screenHeight<=960)
-      tempBannerPosition = 290;  
-    else if(ScreenUtil.screenHeight<=1136)
-      tempBannerPosition = 240;  
-    else if(ScreenUtil.screenHeight<=1334)
-      tempBannerPosition = 210;  
-    else if(ScreenUtil.screenHeight<=1776)
-      tempBannerPosition = 200; 
-    else if(ScreenUtil.screenHeight<=2488)
-      tempBannerPosition = 160;   
-    else if(ScreenUtil.screenHeight<=2688)
-      tempBannerPosition = 140; 
-    else if (ScreenUtil.screenHeight < 2788) tempBannerPosition = 130;
-    }
+    if (Platform.isAndroid) {
+
+        if (ScreenUtil.screenHeight <= 480) tempBannerPosition = 195;
+
+      } else {
+
+        if (ScreenUtil.screenHeight <= 480)
+
+          tempBannerPosition = 185;
+
+        else if (ScreenUtil.screenHeight <= 960)
+
+          tempBannerPosition = 290;
+
+        else if (ScreenUtil.screenHeight <= 1136)
+
+          tempBannerPosition = 210;
+
+        else if (ScreenUtil.screenHeight <= 1334)
+
+          tempBannerPosition = 210;
+
+        else if (ScreenUtil.screenHeight <= 1776)
+
+          tempBannerPosition = 200;
+
+        else if (ScreenUtil.screenHeight <= 2488)
+
+          tempBannerPosition = 160;
+
+        else if (ScreenUtil.screenHeight <= 2688)
+
+          tempBannerPosition = 140;
+
+        else if (ScreenUtil.screenHeight < 2788) tempBannerPosition = 120;
+
+      }
       
       
       _bannerAd ??= createBannerAd();
