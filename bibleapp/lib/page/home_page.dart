@@ -138,12 +138,19 @@ class _HomePageState extends State<HomePage> {
       var now = DateTime.parse(dateFormat.format(DateTime.now()));
       
       //print(now.difference(now.subtract(Duration(hours: 5))).inDays);
-
+    //game mc
     if(prefs.getInt(sharePrefCorrectQuestionNum) == null)
     {
       prefs.setInt(sharePrefCorrectQuestionNum, 0); 
       
       prefs.setInt(sharePrefGameLevel, 1); 
+    }
+    //bqa
+    if(prefs.getInt(sharePrefCorrectBQAQuestionNum) == null)
+    {
+      prefs.setInt(sharePrefCorrectBQAQuestionNum, 0); 
+      
+      prefs.setInt(sharePrefGameBQALevel, 1); 
     }
 
       DateTime tempTime = now; 
@@ -223,6 +230,7 @@ class _HomePageState extends State<HomePage> {
         }
       }
 
+      //game MC
       if(prefs.getInt(sharePrefTodayRewardAdsGameMC)== null)
       {
         prefs.setInt(sharePrefTodayRewardAdsGameMC, 0);
@@ -245,6 +253,32 @@ class _HomePageState extends State<HomePage> {
           prefs.setInt(sharePrefTodayNextButtonStatus, 0); 
           prefs.setBool(sharePrefTodayPlayAds, false);
           prefs.setInt(sharePrefTodayCorrectAnswerNum, 0); 
+        }
+      }
+
+      //BQA
+      if(prefs.getInt(sharePrefTodayBQARewardAdsGameMC)== null)
+      {
+        prefs.setInt(sharePrefTodayBQARewardAdsGameMC, 0);
+        prefs.setBool(sharePrefTodayBQACanRewardAdsGameMC, true);
+        prefs.setInt(sharePrefTotalBQAAnsweredNum, 0); 
+        prefs.setInt(sharePrefTodayBQANextButtonStatus, 0); 
+        prefs.setBool(sharePrefTodayBQAPlayAds, false);
+        prefs.setInt(sharePrefTodayBQACorrectAnswerNum, 0); 
+        
+        
+        
+      }
+      else
+      {
+        if(tempTime.isBefore(now))
+        {
+          prefs.setInt(sharePrefTodayBQARewardAdsGameMC, 0);
+          prefs.setBool(sharePrefTodayBQACanRewardAdsGameMC, true);
+          prefs.setInt(sharePrefTotalBQAAnsweredNum, 0); 
+          prefs.setInt(sharePrefTodayBQANextButtonStatus, 0); 
+          prefs.setBool(sharePrefTodayBQAPlayAds, false);
+          prefs.setInt(sharePrefTodayBQACorrectAnswerNum, 0); 
         }
       }
 

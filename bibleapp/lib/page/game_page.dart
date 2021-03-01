@@ -74,6 +74,25 @@ class _GamePageState extends State<GamePage> {
   static int totalTodayAnswerNumMax = 100;
   static int totalTodayCorrectAnswerNum = 0;
   static int todayNextButtonStatus = 0;//0 = next, 1 = ads, 2 = end
+  
+  //BQA thing
+  static List<String> displayBQAItem = new List<String>();
+  static List<Color> displayColorBQAMC = [bottomNavigationColor,bottomNavigationColor,bottomNavigationColor,bottomNavigationColor];
+  static bool isBQAPressNext = true;
+  static bool isBQAAnswered = false;
+  static bool isBQAPlayAds = false;
+  static int todayBQANextButtonStatus = 0;//0 = next, 1 = ads, 2 = end
+  static int numBQAStartX = 5;
+  static int numBQAX = 2;
+  static int expBQAStart = 0;
+  static int expBQAEnd = 0;
+  static int totalTodayBQACorrectAnswerNum = 0;
+  static int maxBQAAdsRewards = 9;
+  static int todayBQAAdsRewards = 0;
+  static bool todayBQACanAd = true;
+  static int totalTodayBQAAnswerNumMax = 100;
+  static String nextBQAButtonText = "";
+  static String nowBQALevel = "upgrade";
 
   @override
   void initState() {
@@ -90,7 +109,7 @@ class _GamePageState extends State<GamePage> {
   }
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
-    if(page==1 || page==2)
+    if(page==1 || page==2 || page==3)
     {
       setState(() {
         page=0;
@@ -105,12 +124,13 @@ class _GamePageState extends State<GamePage> {
       Widget tempList;
       if(page==0) tempList = _myListViewGame(context);
       else if(page==1) tempList = _myListViewChapterMC(context);
-      else if(page==2) tempList = _myListViewGameRules(context);
+      else if(page==2) tempList = _myListViewBQAMC(context);
+      else if(page==3) tempList = _myListViewGameRules(context);
       return tempList;
     }
 
 Widget _myListViewGame(BuildContext context) {
-      final europeanCountries = [FlutterI18n.translate(context, "gameMenuChapterMC"),FlutterI18n.translate(context, "gameMenuGameRules")];
+      final europeanCountries = [FlutterI18n.translate(context, "gameMenuChapterMC"),FlutterI18n.translate(context, "gameMenuBQAMC"),FlutterI18n.translate(context, "gameMenuGameRules")];
       return new Scaffold(
       appBar: AppBar( 
         title: Text(FlutterI18n.translate(context, "bottomBarGame"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
@@ -129,6 +149,8 @@ Widget _myListViewGame(BuildContext context) {
                   page = 1;
                 else if(index==1)
                   page = 2;  
+                else if(index==2)
+                  page = 3;  
               });
             }
             /*=> Scaffold
@@ -168,6 +190,79 @@ Widget _myListViewGame(BuildContext context) {
         nextButtonText = FlutterI18n.translate(context,"adsToQuestionButton");
       else if(todayNextButtonStatus==2)
         nextButtonText = FlutterI18n.translate(context,"buttonOutToday");
+    }
+
+    Widget _myListViewBQAMC(BuildContext context) {
+
+      // backing data
+      //var europeanCountries = queryBibleTitleByDefault();
+      nowBQALevel = FlutterI18n.translate(context,"displayCurrectLevel")+" "+prefs.getInt(sharePrefGameBQALevel).toString()+"\n"+FlutterI18n.translate(context,"nextLevelText")+" "+expBQAStart.toString()+"/"+expBQAEnd.toString();
+      if(todayBQAAdsRewards<maxBQAAdsRewards) todayBQANextButtonStatus = isBQAPlayAds ? 1 : 0;
+      prefs.setInt(sharePrefTodayBQANextButtonStatus,todayBQANextButtonStatus);
+      nextBQAButtonFun();
+      return 
+      new Scaffold(
+      appBar: AppBar( 
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
+          onPressed: () => {
+            setState(() {
+                page = 0;
+              })
+          },
+        ), 
+        title: Text(FlutterI18n.translate(context, "gameMenuBQAMC"),style: TextStyle(fontSize: ScreenUtil().setSp(fontOfContent-5, allowFontScalingSelf: true),),),
+      ),
+      body: new Center(
+        child:new Container(
+              margin: new EdgeInsets.all(4.0),
+              constraints: new BoxConstraints.expand(),
+              child: ListView(
+                children: <Widget>[
+                  new Column(
+                    children: <Widget>[
+                      //new Container(height: 5.0),
+                      new Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14.0,horizontal: 14.0),
+                        //height: 100.0,
+                        width: MediaQuery.of(context).size.width,//screen size
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(nowBQALevel,style: new TextStyle(fontWeight: FontWeight.bold,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true))),
+                            LinearProgressIndicator(
+                            backgroundColor: Colors.cyanAccent,
+                            valueColor: new AlwaysStoppedAnimation<Color>(Colors.green[300]),
+                            value: (expBQAStart/expBQAEnd),
+                          ),
+                          Text(FlutterI18n.translate(context, "todayScoreText") + totalTodayBQACorrectAnswerNum.toString()+'/'+totalTodayBQAAnswerNumMax.toString(),style: new TextStyle(fontWeight: FontWeight.bold,fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true))),
+                          ],
+                        ),
+                      ),
+                      //new Container(height: 5.0),
+                      new Container(
+                        padding: const EdgeInsets.symmetric(vertical: 14.0,horizontal: 14.0),
+                        //height: 100.0,
+                        width: MediaQuery.of(context).size.width,//screen size
+
+                        child: new Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: gameBQALogicMC(context),
+                        ),
+                      ),
+                      //new box style
+                      new Container(height: 5.0),
+                      
+                      
+                    ],
+                  ),
+                ],
+              ),
+              
+          ),
+      )
+      );
+
     }
 
     Widget _myListViewChapterMC(BuildContext context) {
@@ -469,11 +564,23 @@ Widget _myListViewGame(BuildContext context) {
       print("RewardedVideoAd event $event");
       if (event == RewardedVideoAdEvent.rewarded) {
         setState(() {
-          todayNextButtonStatus = 0;
-          prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
-          isPlayAds = false;
-          prefs.setBool(sharePrefTodayPlayAds,isPlayAds);
-          reSetTheQuestion();
+          if(page==1)
+          {
+              todayNextButtonStatus = 0;
+              prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
+              isPlayAds = false;
+              prefs.setBool(sharePrefTodayPlayAds,isPlayAds);
+              reSetTheQuestion();
+          }
+          else if(page==2)
+          {
+            todayBQANextButtonStatus = 0;
+            prefs.setInt(sharePrefTodayBQANextButtonStatus,todayBQANextButtonStatus);
+            isBQAPlayAds = false;
+            prefs.setBool(sharePrefTodayBQAPlayAds,isBQAPlayAds);
+            reSetTheBQAQuestion();
+          }
+          
           
         });
       }
@@ -487,21 +594,21 @@ Widget _myListViewGame(BuildContext context) {
     RewardedVideoAd.instance.load(
                         adUnitId: rewardedVideoAdsId,
                         targetingInfo: targetingInfo).catchError((e) => print("error in loading again"));
-    //prefs.setInt(sharePrefCorrectQuestionNum, 20); 
+    //each day picture testing code
+    //prefs.setInt(sharePrefCorrectQuestionNum, 50); 
     //prefs.setInt(sharePrefTotalAnsweredNum, 90); 
-    //prefs.setInt(sharePrefGameLevel, 4);
-    //prefs.setInt(sharePrefTodayRewardAdsGameMC, 9);
+    //prefs.setInt(sharePrefGameLevel, 5);
+    //prefs.setInt(sharePrefTodayRewardAdsGameMC, 10);
     //prefs.setBool(sharePrefTodayPlayAds, false);
-    //prefs.setInt(sharePrefTodayCorrectAnswerNum, 90);
-    
-    //prefs.setBool(sharePrefTodayCanRewardAdsGameMC, true);
+    //prefs.setInt(sharePrefTodayCorrectAnswerNum, 100);
+    //prefs.setBool(sharePrefTodayPlayAds,true);
     //todayNextButtonStatus = 2;
     //prefs.setInt(sharePrefTodayNextButtonStatus,todayNextButtonStatus);
+
     reSetTheQuestion();
-    //todayNextButtonStatus = 0;
-    
+    reSetTheBQAQuestion();
     setLevelExp();
-    
+    setBQALevelExp();
   }
 
   void setLevelExp()
@@ -634,6 +741,229 @@ Widget _myListViewGame(BuildContext context) {
       
       return tmepList;
     }
+
+
+    List<String> gameBQALogicCode()
+      {
+        
+        int selectedBQANumMC = new Random().nextInt(176)+1;
+        //titleNumCharNumMC = 14;
+
+        String theQuestion = "";
+        String correctAnswer = "";
+
+        List<String> tempStringList = FlutterI18n.translate(context, "BQA.$selectedBQANumMC").split("=.=");
+        theQuestion = tempStringList[0];
+        correctAnswer = tempStringList[1];
+        List<String> tempAnswer = [
+          tempStringList[1]
+          ,tempStringList[2]
+          ,tempStringList[3]
+          ,tempStringList[4]
+          ];
+          tempAnswer.shuffle();
+
+          List<String> temp = new List<String>();
+          
+          temp.add(theQuestion);
+          temp.add(tempAnswer[0]);
+          temp.add(tempAnswer[1]);
+          temp.add(tempAnswer[2]);
+          temp.add(tempAnswer[3]);
+          temp.add(correctAnswer);
+          isBQAPressNext = false;
+          return temp;
+
+      }
+
+      List<Widget> gameBQALogicMC(BuildContext context)
+      {
+        
+        if(isBQAPressNext)    
+            displayBQAItem = gameBQALogicCode();
+
+        List<Widget> tempList = new List<Widget>();
+
+        tempList.add(
+          new Text(displayBQAItem[0],
+          style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
+                                ,//color: fontTextColor
+                                ),),
+        ); 
+        
+        for(int i=1;i<5;i++)
+        {
+          tempList.add(
+                  RaisedButton(
+                    color:displayColorBQAMC[i-1],
+                    textColor: buttonTextColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                      child: Text(displayBQAItem[i]
+                      ,style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
+                      ,//color: buttonTextColor
+                      ),),
+                          onPressed: (){
+                            /*if(prefs!=null)
+                            {
+                                
+                            }*/
+                            if(!isBQAAnswered && !isBQAPlayAds)
+                            {
+                              setState(() {
+                              todayBQANextButtonStatus = 0;
+                              prefs.setInt(sharePrefTodayBQANextButtonStatus,todayBQANextButtonStatus);
+                              isBQAAnswered = true;
+                              if(displayBQAItem[5]==displayBQAItem[i])
+                              {
+                                displayColorBQAMC[i-1]=correctAnswerColor;
+                                int tempInt = prefs.getInt(sharePrefCorrectBQAQuestionNum)+1;
+                                prefs.setInt(sharePrefCorrectBQAQuestionNum, tempInt);
+                                if(prefs.getInt(sharePrefCorrectBQAQuestionNum)>=expBQAEnd)
+                                {
+                                  prefs.setInt(sharePrefGameBQALevel, prefs.getInt(sharePrefGameBQALevel)+1);
+                                  prefs.setInt(sharePrefCorrectBQAQuestionNum, 0);
+                                }
+                                totalTodayBQACorrectAnswerNum++;
+                                prefs.setInt(sharePrefTodayBQACorrectAnswerNum, totalTodayBQACorrectAnswerNum);
+                                
+                                
+                              }
+                              else
+                              {
+                                displayColorBQAMC[i-1]=weekEndTextColor;
+                                if(displayBQAItem[5]==displayBQAItem[1])
+                                  displayColorBQAMC[0]=correctAnswerColor;
+                                else if(displayBQAItem[5]==displayBQAItem[2])
+                                  displayColorBQAMC[1]=correctAnswerColor;
+                                else if(displayBQAItem[5]==displayBQAItem[3])
+                                  displayColorBQAMC[2]=correctAnswerColor;
+                                else if(displayBQAItem[5]==displayBQAItem[4])
+                                  displayColorBQAMC[3]=correctAnswerColor;
+                                
+                              }
+                              
+                              int tempInt2 = prefs.getInt(sharePrefTotalBQAAnsweredNum)+1;
+                              prefs.setInt(sharePrefTotalBQAAnsweredNum, tempInt2);
+                              if(tempInt2%10==0)
+                              {
+                                if(todayBQAAdsRewards>=maxBQAAdsRewards)
+                                {
+                                  todayBQACanAd = false;
+                                  prefs.setBool(sharePrefTodayBQACanRewardAdsGameMC,todayBQACanAd);
+                                  todayBQANextButtonStatus = 2;
+                                }
+                                else 
+                                {
+                                  todayBQAAdsRewards = prefs.getInt(sharePrefTodayBQARewardAdsGameMC)+1;
+                                  prefs.setInt(sharePrefTodayBQARewardAdsGameMC, todayBQAAdsRewards);
+                                  todayBQANextButtonStatus = 1;
+                                }
+                                prefs.setInt(sharePrefTodayBQANextButtonStatus,todayBQANextButtonStatus);
+                                isBQAPlayAds = true;
+                                prefs.setBool(sharePrefTodayBQAPlayAds,isBQAPlayAds);
+                              }
+                              
+                              
+                                
+
+                              setBQALevelExp();
+                                  
+                              });
+                            }
+                            
+                            
+                          },
+                    ),
+                  );     
+                  tempList.add(SizedBox(height: ScreenUtil().setSp(10, allowFontScalingSelf: true),));
+        }
+        tempList.add(new Container(height: 5.0),);         
+        tempList.add(
+          Visibility(
+                      visible: isBQAAnswered || isBQAPlayAds,
+                      child: RaisedButton(
+                    color:bottomNavigationColor,
+                    textColor: buttonTextColor,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(18.0),
+                      ),
+                      child: Text(nextBQAButtonText
+                      ,style:new TextStyle(fontSize: ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true)
+                      ,//color: buttonTextColor
+                      ),),
+                          onPressed: (){
+                            /*if(prefs!=null)
+                            {
+                                
+                            }*/
+                            setState(() {
+                              if(isBQAPlayAds && todayBQAAdsRewards<=maxBQAAdsRewards && todayBQACanAd)
+                              {
+                                RewardedVideoAd.instance.show().catchError((e) => print("error in loading 1st time"));
+                              }
+                              else if(!isBQAPlayAds)
+                              {
+                                reSetTheBQAQuestion();
+                              }
+                              
+
+                              });
+                            
+                          },
+                    ),
+                    ),
+                  
+                  );
+          
+                              
+
+        return tempList;
+      }
+
+      void setBQALevelExp()
+      {
+        expBQAEnd = numBQAStartX;
+        int tempEnd = prefs.getInt(sharePrefGameBQALevel);
+        for(int i=0;i<tempEnd;i++)
+        {
+            expBQAEnd *= numBQAX;
+        }
+        
+        expBQAStart = prefs.getInt(sharePrefCorrectBQAQuestionNum);
+      }
+
+      void reSetTheBQAQuestion()
+      {
+        todayBQANextButtonStatus = prefs.getInt(sharePrefTodayBQANextButtonStatus);
+        todayBQAAdsRewards = prefs.getInt(sharePrefTodayBQARewardAdsGameMC);
+        todayBQACanAd = prefs.getBool(sharePrefTodayBQACanRewardAdsGameMC);
+        isBQAPlayAds = prefs.getBool(sharePrefTodayBQAPlayAds);
+        totalTodayBQACorrectAnswerNum = prefs.getInt(sharePrefTodayBQACorrectAnswerNum);
+
+        if(todayBQAAdsRewards==0 && todayBQACanAd)
+        {
+          isBQAPlayAds = false;
+          prefs.setBool(sharePrefTodayBQAPlayAds,isBQAPlayAds);
+          
+        }
+          
+        isBQAPressNext = true;
+        isBQAAnswered = false;
+        displayColorBQAMC = [bottomNavigationColor,bottomNavigationColor,bottomNavigationColor,bottomNavigationColor];
+      }
+
+      void nextBQAButtonFun()
+      {
+        if(todayBQANextButtonStatus==0)
+          nextBQAButtonText = FlutterI18n.translate(context,"buttonNext");
+        else if(todayBQANextButtonStatus==1)
+          nextBQAButtonText = FlutterI18n.translate(context,"adsToQuestionButton");
+        else if(todayBQANextButtonStatus==2)
+          nextBQAButtonText = FlutterI18n.translate(context,"buttonOutToday");
+      }
+
 
 
   }

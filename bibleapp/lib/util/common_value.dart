@@ -41,16 +41,25 @@ import 'package:shared_preferences/shared_preferences.dart';
    String sharePrefBibleTodaysGotCrownLoadedReward = '_bibleTodaysGotCrownLoadedReward';
    String sharePrefLightDark = '_lightDark';
    String sharePrefReadBibleLevel = '_readBibleLevel';
+  String sharePrefUpdateVersionNum = '_updateVersionNum';
    //for game char MC
    String sharePrefCorrectQuestionNum = '_correctQuestionNum';
    String sharePrefTotalAnsweredNum = '_totalAnsweredNum';
    String sharePrefGameLevel = '_gameLevel';
    String sharePrefTodayRewardAdsGameMC = '_todayRewardAdsGameMC';
    String sharePrefTodayCanRewardAdsGameMC = '_todayCanRewardAdsGameMC';
-   String sharePrefUpdateVersionNum = '_updateVersionNum';
    String sharePrefTodayNextButtonStatus = '_todayNextButtonStatus';
    String sharePrefTodayPlayAds = '_todayPlayAds';
    String sharePrefTodayCorrectAnswerNum = '_todayCorrectAnswerNum';
+   //BQA
+   String sharePrefCorrectBQAQuestionNum = '_correctBQAQuestionNum';
+   String sharePrefTotalBQAAnsweredNum = '_totalBQAAnsweredNum';
+   String sharePrefGameBQALevel = '_gameBQALevel';
+   String sharePrefTodayBQARewardAdsGameMC = '_todayBQARewardAdsGameMC';
+   String sharePrefTodayBQACanRewardAdsGameMC = '_todayBQACanRewardAdsGameMC';
+   String sharePrefTodayBQANextButtonStatus = '_todayBQANextButtonStatus';
+   String sharePrefTodayBQAPlayAds = '_todayBQAPlayAds';
+   String sharePrefTodayBQACorrectAnswerNum = '_todayBQACorrectAnswerNum';
    
    //
    

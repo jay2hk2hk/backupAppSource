@@ -48,7 +48,7 @@ class _MainPageState extends State<MainPage>{
   //String firebaseAdId = FirebaseAdMob.testAppId;
   String rewardedVideoAdsId = Platform.isAndroid ? "ca-app-pub-9860072337130869/5350932207" : "ca-app-pub-9860072337130869/7088766690";
   String firebaseAdId = Platform.isAndroid ? "ca-app-pub-9860072337130869~8212800236" : "ca-app-pub-9860072337130869~3480731194";
-  int latestUpdateVersionNum = 1;//check is display the latest update box or not
+  int latestUpdateVersionNum = 2;//check is display the latest update box or not
   
 
   @override
