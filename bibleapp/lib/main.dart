@@ -6,13 +6,13 @@ import 'package:bibleapp/page/home_page.dart';
 import 'package:bibleapp/util/common_value.dart';
 //import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
+import 'package:flutter_i18n/loaders/decoders/json_decode_strategy.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:catcher/catcher.dart';
 
 void main() async {
-  
-  /// STEP 1. Create catcher configuration. 
+  /// STEP 1. Create catcher configuration.
   /// Debug configuration with dialog report mode and console handler. It will show dialog and once user accepts it, error will be shown   /// in console.
   /*CatcherOptions debugOptions =
       CatcherOptions(DialogReportMode(), [ConsoleHandler()]);
@@ -22,19 +22,21 @@ void main() async {
     EmailManualHandler(["jay2hk2hk@gmail.com"])
   ]);*/
 
-  
-
   final FlutterI18nDelegate flutterI18nDelegate = FlutterI18nDelegate(
     translationLoader: FileTranslationLoader(
-        useCountryCode: true,
-        //fallbackFile: 'zh_HK',
-        basePath: 'assets/i18n',
-        //forcedLocale: Locale('en','US'),
-        ),
+      useCountryCode: true,
+      fallbackFile: 'en_US',
+      basePath: 'assets/i18n',
+      //forcedLocale: Locale('en','US'),
+      decodeStrategies: [JsonDecodeStrategy()],
+    ),
+    missingTranslationHandler: (key, locale) {
+      print("--- Missing Key: $key, languageCode: ${locale.languageCode}");
+    },
   );
   WidgetsFlutterBinding.ensureInitialized();
   //prefs = await SharedPreferences.getInstance();
-  await flutterI18nDelegate.load(null);
+  //await flutterI18nDelegate.load(null);
   runApp(MyApp(flutterI18nDelegate));
 
   /// STEP 2. Pass your root widget (MyApp) along with Catcher configuration:
@@ -53,7 +55,6 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
-
   final FlutterI18nDelegate flutterI18nDelegate;
   static int lightDark = 0;
   MyApp(this.flutterI18nDelegate);
@@ -70,14 +71,15 @@ class MyApp extends StatelessWidget {
       });*/
     });
     return new RestartWidget(
-        child: /*FlutterEasyLoading(
-      child: */MaterialApp(
+      child: /*FlutterEasyLoading(
+      child: */
+          MaterialApp(
         /// STEP 3. Add navigator key from Catcher. It will be used to navigate user to report page or to show dialog.
-          //navigatorKey: Catcher.navigatorKey,
+        //navigatorKey: Catcher.navigatorKey,
         debugShowCheckedModeBanner: false,
         /*theme: new ThemeData(
           primaryColor: themeColor,
-        ),*///theme:lightDark==0 ? ThemeData.light(): ThemeData.dark(),
+        ),*/ //theme:lightDark==0 ? ThemeData.light(): ThemeData.dark(),
         home: new UserContainer(
           user: null,
           child: new HomePage(),
@@ -88,12 +90,13 @@ class MyApp extends StatelessWidget {
        */
         ),
         localizationsDelegates: [
-        flutterI18nDelegate,
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate
-      ],
+          flutterI18nDelegate,
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate
+        ],
+        builder: FlutterI18n.rootAppBuilder(),
       ),
-    //)
+      //)
     );
   }
 }
@@ -108,9 +111,7 @@ class RestartWidget extends StatefulWidget {
         super(key: key);
 
   static restartApp(BuildContext context) {
-    final _RestartWidgetState state =
-        context.ancestorStateOfType(const TypeMatcher<_RestartWidgetState>());
-    state.restartApp();
+    context.findAncestorStateOfType<_RestartWidgetState>().restartApp();
   }
 
   @override
