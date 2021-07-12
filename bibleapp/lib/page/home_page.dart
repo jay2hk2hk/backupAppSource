@@ -49,6 +49,7 @@ class _HomePageState extends State<HomePage> {
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";
   BannerAd _anchoredBanner;
+  bool _loadingAnchoredBanner = false;
   static final AdRequest request = AdRequest(
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
@@ -483,7 +484,10 @@ class _HomePageState extends State<HomePage> {
     //ScreenUtil.init(context, width: 750, height: 1334, allowFontScaling: true);
     ScreenUtil.init(context /*, allowFontScaling: true*/);
     //RestartWidget.restartApp(context);
-    _createAnchoredBanner(context);
+    if (!_loadingAnchoredBanner) {
+      _loadingAnchoredBanner = true;
+      _createAnchoredBanner(context);
+    }
 
     return
         //Column(
