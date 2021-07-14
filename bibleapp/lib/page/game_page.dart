@@ -18,7 +18,8 @@ import '../main.dart';
 import 'dart:async';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:bibleapp/util/common_value.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+//import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -41,11 +42,11 @@ class _GamePageState extends State<GamePage> {
     childDirected: true,
     nonPersonalizedAds: true,
   );*/
-  static final AdRequest request = AdRequest(
+  /*static final AdRequest request = AdRequest(
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
     nonPersonalizedAds: true,
-  );
+  );*/
   //String _userName;
   //String _userId;
   final dbHelper = SQLHelper.instance;
@@ -176,22 +177,92 @@ class _GamePageState extends State<GamePage> {
   static int totalTodayBQAAnswerNumMax = 100;
   static String nextBQAButtonText = "";
   static String nowBQALevel = "upgrade";
-  RewardedAd _rewardedAd;
-  int _numRewardedLoadAttempts = 0;
+  //RewardedAd _rewardedAd;
+  //int _numRewardedLoadAttempts = 0;
+  RewardedAd rewardedAd;
 
   @override
   void initState() {
     BackButtonInterceptor.add(myInterceptor);
-    MobileAds.instance.initialize();
-    _createRewardedAd();
+    rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
+    //MobileAds.instance.initialize();
+    //_createRewardedAd();
     super.initState();
+    rewardedAd.onEvent.listen((e) {
+      final event = e.keys.first;
+      switch (event) {
+        case RewardedAdEvent.loading:
+          //print('loading');
+          break;
+        case RewardedAdEvent.loaded:
+          //print('loaded');
+          break;
+        case RewardedAdEvent.loadFailed:
+          //final errorCode = e.values.first;
+          //print('load failed $errorCode');
+          break;
+        case RewardedAdEvent.showed:
+          if (Platform.isIOS) {
+            setState(() {
+            if (page == 1) {
+                todayNextButtonStatus = 0;
+                prefs.setInt(
+                    sharePrefTodayNextButtonStatus, todayNextButtonStatus);
+                isPlayAds = false;
+                prefs.setBool(sharePrefTodayPlayAds, isPlayAds);
+                reSetTheQuestion();
+              } else if (page == 2) {
+                todayBQANextButtonStatus = 0;
+                prefs.setInt(
+                    sharePrefTodayBQANextButtonStatus, todayBQANextButtonStatus);
+                isBQAPlayAds = false;
+                prefs.setBool(sharePrefTodayBQAPlayAds, isBQAPlayAds);
+                reSetTheBQAQuestion();
+              }
+            });
+
+          }
+          //print('ad opened');
+          break;
+        case RewardedAdEvent.closed:
+          //print('ad closed');
+          break;
+        case RewardedAdEvent.earnedReward:
+          //final reward = e.values.first;
+          //print('earned reward: $reward');
+          setState(() {
+            if (page == 1) {
+              todayNextButtonStatus = 0;
+              prefs.setInt(
+                  sharePrefTodayNextButtonStatus, todayNextButtonStatus);
+              isPlayAds = false;
+              prefs.setBool(sharePrefTodayPlayAds, isPlayAds);
+              reSetTheQuestion();
+            } else if (page == 2) {
+              todayBQANextButtonStatus = 0;
+              prefs.setInt(
+                  sharePrefTodayBQANextButtonStatus, todayBQANextButtonStatus);
+              isBQAPlayAds = false;
+              prefs.setBool(sharePrefTodayBQAPlayAds, isBQAPlayAds);
+              reSetTheBQAQuestion();
+            }
+          });
+          break;
+        case RewardedAdEvent.showFailed:
+          //final errorCode = e.values.first;
+          //print('show failed $errorCode');
+          break;
+        default:
+          break;
+      }
+    });
     init();
   }
 
   @override
   void dispose() {
     super.dispose();
-    _rewardedAd?.dispose();
+    //_rewardedAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
   }
 
@@ -206,7 +277,7 @@ class _GamePageState extends State<GamePage> {
     return true;
   }
 
-  void _createRewardedAd() {
+  /*void _createRewardedAd() {
     RewardedAd.load(
         adUnitId: rewardedVideoAdsId,
         request: request,
@@ -269,7 +340,7 @@ class _GamePageState extends State<GamePage> {
       print('$ad with reward $RewardItem(${reward.amount}, ${reward.type}');
     });
     _rewardedAd = null;
-  }
+  }*/
 
   @override
   Widget build(BuildContext context) {
@@ -730,19 +801,20 @@ class _GamePageState extends State<GamePage> {
                   allowFontScalingSelf: true), //color: buttonTextColor
             ),
           ),
-          onPressed: () {
-            /*if(prefs!=null)
-                        {
-                            
-                        }*/
-            setState(() {
-              if (isPlayAds && todayAdsRewards <= maxAdsRewards && todayCanAd) {
-                //RewardedVideoAd.instance.show().catchError((e) => print("error in loading 1st time"));
-                _showRewardedAd();
-              } else if (!isPlayAds) {
+          onPressed: () async {
+            if (isPlayAds && todayAdsRewards <= maxAdsRewards && todayCanAd) {
+              //RewardedVideoAd.instance.show().catchError((e) => print("error in loading 1st time"));
+              //_showRewardedAd();
+              // Load only if not loaded
+              if (!rewardedAd.isLoaded) await rewardedAd.load();
+              if (rewardedAd.isLoaded) rewardedAd.show();
+              // Load the ad again after it's shown
+              rewardedAd.load();
+            } else if (!isPlayAds) {
+              setState(() {
                 reSetTheQuestion();
-              }
-            });
+              });
+            }
           },
         ),
       ),
@@ -1134,23 +1206,24 @@ class _GamePageState extends State<GamePage> {
                   allowFontScalingSelf: true), //color: buttonTextColor
             ),
           ),
-          onPressed: () {
-            /*if(prefs!=null)
-                            {
-                                
-                            }*/
-            setState(() {
-              if (isBQAPlayAds &&
-                  todayBQAAdsRewards <= maxBQAAdsRewards &&
-                  todayBQACanAd) {
-                /*RewardedVideoAd.instance
+          onPressed: () async {
+            if (isBQAPlayAds &&
+                todayBQAAdsRewards <= maxBQAAdsRewards &&
+                todayBQACanAd) {
+              /*RewardedVideoAd.instance
                     .show()
                     .catchError((e) => print("error in loading 1st time"));*/
-                _showRewardedAd();
-              } else if (!isBQAPlayAds) {
+              //_showRewardedAd();
+              // Load only if not loaded
+              if (!rewardedAd.isLoaded) await rewardedAd.load();
+              if (rewardedAd.isLoaded) rewardedAd.show();
+              // Load the ad again after it's shown
+              rewardedAd.load();
+            } else if (!isBQAPlayAds) {
+              setState(() {
                 reSetTheBQAQuestion();
-              }
-            });
+              });
+            }
           },
         ),
       ),

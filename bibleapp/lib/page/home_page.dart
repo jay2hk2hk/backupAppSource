@@ -18,7 +18,8 @@ import 'package:wakelock/wakelock.dart';
 
 import '../main.dart';
 import 'game_page.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+//import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 Locale currentLang;
 
@@ -48,13 +49,14 @@ class _HomePageState extends State<HomePage> {
   String firebaseAdId = Platform.isAndroid
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";
-  BannerAd _anchoredBanner;
-  bool _loadingAnchoredBanner = false;
-  static final AdRequest request = AdRequest(
+  //BannerAd _anchoredBanner;
+  //bool _loadingAnchoredBanner = false;
+  /*static final AdRequest request = AdRequest(
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
     nonPersonalizedAds: true,
-  );
+  );*/
+  final bannerController = BannerAdController();
 
   /*static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     //testDevices: testDevice != null ? <String>[testDevice] : null,
@@ -82,14 +84,15 @@ class _HomePageState extends State<HomePage> {
     super.dispose();
     //_bannerAd?.dispose();
 
-    _anchoredBanner?.dispose();
+    //_anchoredBanner?.dispose();
+    bannerController.dispose();
   }
 
   @override
   void initState() {
     //FirebaseAdMob.instance.initialize(appId: firebaseAdId);
     //_bannerAd = createBannerAd()..load();
-    MobileAds.instance.initialize();
+    //MobileAds.instance.initialize();
 
     Future.delayed(Duration.zero, () async {
       prefs = await SharedPreferences.getInstance();
@@ -367,6 +370,18 @@ class _HomePageState extends State<HomePage> {
         });
     setInitEventInCal();
     super.initState();
+    bannerController.onEvent.listen((e) {
+      final event = e.keys.first;
+      // final info = e.values.first;
+      switch (event) {
+        case BannerAdEvent.loaded:
+          // setState(() => _bannerAdHeight = (info as int)?.toDouble());
+          break;
+        default:
+          break;
+      }
+    });
+    bannerController.load();
     //not sleep mode
     Wakelock.enable();
   }
@@ -406,7 +421,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  Future<void> _createAnchoredBanner(BuildContext context) async {
+  /*Future<void> _createAnchoredBanner(BuildContext context) async {
     /*final AnchoredAdaptiveBannerAdSize size = ;
     await AdSize.getAnchoredAdaptiveBannerAdSize(
       Orientation.portrait,
@@ -439,7 +454,7 @@ class _HomePageState extends State<HomePage> {
       ),
     );
     return banner.load();
-  }
+  }*/
 
   void setInitEventInCal() async {
     var now = eventNoteTitle;
@@ -484,10 +499,10 @@ class _HomePageState extends State<HomePage> {
     //ScreenUtil.init(context, width: 750, height: 1334, allowFontScaling: true);
     ScreenUtil.init(context /*, allowFontScaling: true*/);
     //RestartWidget.restartApp(context);
-    if (!_loadingAnchoredBanner) {
+    /*if (!_loadingAnchoredBanner) {
       _loadingAnchoredBanner = true;
       _createAnchoredBanner(context);
-    }
+    }*/
 
     return
         //Column(
@@ -516,7 +531,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     flex: 0,
-                    child: (_anchoredBanner == null)
+                    child: BannerAd(
+                      controller: bannerController,
+                      unitId: bannerAdsId,
+                    ),
+                    /*(_anchoredBanner == null)
                         ? SizedBox(
                             height: 70,
                           )
@@ -525,7 +544,7 @@ class _HomePageState extends State<HomePage> {
                             width: _anchoredBanner.size.width.toDouble(),
                             height: _anchoredBanner.size.height.toDouble(),
                             child: AdWidget(ad: _anchoredBanner),
-                          ),
+                          ),*/
                   ),
                 ],
               ),

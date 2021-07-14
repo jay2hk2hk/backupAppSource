@@ -16,7 +16,8 @@ import 'package:flutter/services.dart';
 import 'package:share/share.dart';
 
 import '../main.dart';
-import 'package:google_mobile_ads/google_mobile_ads.dart';
+//import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -39,11 +40,11 @@ class _MainPageState extends State<MainPage> {
     childDirected: true,
     nonPersonalizedAds: true,
   );*/
-  static final AdRequest request = AdRequest(
+  /*static final AdRequest request = AdRequest(
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
     nonPersonalizedAds: true,
-  );
+  );*/
   final dbHelper = SQLHelper.instance;
   final dateFormat = new DateFormat('yyyy-MM-dd');
   static double fontOfContent = 60.0; //px
@@ -65,15 +66,56 @@ class _MainPageState extends State<MainPage> {
       : "ca-app-pub-9860072337130869~3480731194";*/
   int latestUpdateVersionNum =
       3; //check is display the latest update box or not
-  RewardedAd _rewardedAd;
-  int _numRewardedLoadAttempts = 0;
+  //RewardedAd _rewardedAd;
+  //int _numRewardedLoadAttempts = 0;
+  RewardedAd rewardedAd;
 
   @override
   void initState() {
     super.initState();
+    rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
-    MobileAds.instance.initialize();
-    _createRewardedAd();
+    rewardedAd.onEvent.listen((e) {
+      final event = e.keys.first;
+      switch (event) {
+        case RewardedAdEvent.loading:
+          //print('loading');
+          break;
+        case RewardedAdEvent.loaded:
+          //print('loaded');
+          break;
+        case RewardedAdEvent.loadFailed:
+          //final errorCode = e.values.first;
+          //print('load failed $errorCode');
+          break;
+        /*case RewardedAdEvent.opened:
+          print('ad opened');
+          break;*/
+        case RewardedAdEvent.closed:
+          //print('ad closed');
+          break;
+        case RewardedAdEvent.earnedReward:
+          //final reward = e.values.first;
+          //print('earned reward: $reward');
+          setState(() {
+            var now = DateTime.parse(dateFormat.format(DateTime.now()));
+            insertCrown(1, now.toString());
+            //totalOfCrown();
+            crownNum += 1;
+            prefs.setInt(sharePrefBibleTodaysGotCrownTotal, crownNum);
+            prefs.setBool(sharePrefBibleTodaysGotCrown, true);
+          });
+          break;
+        case RewardedAdEvent.showFailed:
+          //final errorCode = e.values.first;
+          //print('show failed $errorCode');
+          break;
+        default:
+          break;
+      }
+    });
+    //MobileAds.instance.initialize();
+    //_createRewardedAd();
     /*FirebaseAdMob.instance.initialize(appId: firebaseAdId);
     //_bannerAd = createBannerAd()..load();
     RewardedVideoAd.instance.listener =
@@ -114,10 +156,10 @@ class _MainPageState extends State<MainPage> {
     /*_bannerAd?.dispose();
     _nativeAd?.dispose();
     _interstitialAd?.dispose();*/
-    _rewardedAd?.dispose();
+    //_rewardedAd?.dispose();
   }
 
-  void _createRewardedAd() {
+  /*void _createRewardedAd() {
     RewardedAd.load(
         adUnitId: rewardedVideoAdsId,
         request: request,
@@ -170,7 +212,7 @@ class _MainPageState extends State<MainPage> {
       });
     });
     _rewardedAd = null;
-  }
+  }*/
 
   /*
   static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
@@ -810,9 +852,14 @@ class _MainPageState extends State<MainPage> {
                   allowFontScalingSelf: true), //color: buttonTextColor
             ),
           ),
-          onPressed: () {
+          onPressed: () async {
             //RewardedVideoAd.instance.show();
-            _showRewardedAd();
+            //_showRewardedAd();
+            // Load only if not loaded
+            if (!rewardedAd.isLoaded) await rewardedAd.load();
+            if (rewardedAd.isLoaded) rewardedAd.show();
+            // Load the ad again after it's shown
+            rewardedAd.load();
           },
           //color: raisedButtonColor,
           //textColor: buttonTextColor,
