@@ -53,6 +53,8 @@ import 'package:translator/translator.dart';
 
 import 'package:flutter/material.dart';
 
+import 'package:is_lock_screen/is_lock_screen.dart';
+
 //stt
 final SpeechToText speech = SpeechToText();
 bool _hasSpeech = false;
@@ -74,7 +76,7 @@ class BibleApp extends StatefulWidget {
 
 enum TtsState { playing, stopped }
 
-class _BibleAppState extends State<BibleApp> {
+class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   //String _userName;
   //String _userId;
   final dbHelper = SQLHelper.instance;
@@ -245,12 +247,17 @@ class _BibleAppState extends State<BibleApp> {
 
   int _start = 5000;
 
+  bool isBackground = false;
+
   //language
   static Locale currentLang;
 
   //
   String startBibleContentNo = '1';
   String endBibleContentNo = '1';
+
+  int _scrollControllerForTitlePageTime = 100;
+  int _scrollControllerTime = 100;
 
   void errorListener(SpeechRecognitionError error) {
     print("Received error status: $error, listening: ${speech.isListening}");
@@ -453,8 +460,31 @@ class _BibleAppState extends State<BibleApp> {
 }*/
 
   @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    switch (state) {
+      case AppLifecycleState.resumed:
+        print("app in resumed");
+        isBackground = false;
+        break;
+      case AppLifecycleState.inactive:
+        print("app in inactive");
+        isBackground = true;
+        break;
+      case AppLifecycleState.paused:
+        print("app in paused");
+        isBackground = true;
+        break;
+      case AppLifecycleState.detached:
+        print("app in detached");
+        isBackground = true;
+        break;
+    }
+  }
+
+  @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     //initBibleContent();
 
     language = prefs.getString(sharePrefSoundLanguage);
@@ -582,12 +612,18 @@ class _BibleAppState extends State<BibleApp> {
     });
 
     flutterTts.setCompletionHandler(() {
-      setState(() async {
+      setState(() /*async*/ {
         if (tempCountSound < tempBible.length) {
           _scrollController.scrollTo(
               index: tempBibleIndexList[tempCountSound],
-              duration: Duration(milliseconds: 1));
-          var result = _startSpeak(tempBible[tempCountSound]);
+              duration: Duration(milliseconds: _scrollControllerTime));
+
+          String tempPlayString = tempBible[tempCountSound]
+              .substring(tempBible[tempCountSound].indexOf(".") + 1);
+
+          tempPlayString = subStringForBible(tempPlayString);
+
+          var result = _startSpeak(tempPlayString);
           tempCountSound += 1;
           if (result == 1) ttsState = TtsState.playing;
         } else {
@@ -597,13 +633,24 @@ class _BibleAppState extends State<BibleApp> {
           ttsState = TtsState.stopped;
           if (isPlayAll) {
             //print("isPlayAll");
-            startTimer();
-            showDialog(
-                barrierDismissible: false,
-                context: context,
-                builder: (_) {
-                  return MyDialog();
+            //run in lock screen
+            if (isBackground) {
+              rightButton();
+              _dataForListView = queryBibleContentByTitle(_titleId, _titleNum)
+                  .whenComplete(() {
+                setState(() {
+                  playAllContent();
                 });
+              });
+            } else {
+              startTimer();
+              showDialog(
+                  barrierDismissible: false,
+                  context: context,
+                  builder: (_) {
+                    return MyDialog();
+                  });
+            }
           } else {
             isPlayAll = true;
             playStopButtonInSelectionList = FontAwesomeIcons.play;
@@ -661,7 +708,7 @@ class _BibleAppState extends State<BibleApp> {
 
     _scrollController.scrollTo(
         index: tempBibleIndexList[tempCountSound],
-        duration: Duration(milliseconds: 1));
+        duration: Duration(milliseconds: _scrollControllerTime));
     setState(() {
       isButtonDisable = true;
     });
@@ -688,7 +735,7 @@ class _BibleAppState extends State<BibleApp> {
 
     _scrollController.scrollTo(
         index: tempBibleIndexList[tempCountSound],
-        duration: Duration(milliseconds: 1));
+        duration: Duration(milliseconds: _scrollControllerTime));
     setState(() {
       isButtonDisable = true;
     });
@@ -716,7 +763,8 @@ class _BibleAppState extends State<BibleApp> {
     for (int i = 0; i < tempBible.length; i++) {
       tempBibleIndexList.add(i);
     }
-    _scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
+    _scrollController.scrollTo(
+        index: 0, duration: Duration(milliseconds: _scrollControllerTime));
     setState(() {
       isButtonDisable = true;
     });
@@ -727,7 +775,8 @@ class _BibleAppState extends State<BibleApp> {
     setState(() {
       tempCountSound = 0;
       tempBibleIndexList = new List<int>();
-      _scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
+      _scrollController.scrollTo(
+          index: 0, duration: Duration(milliseconds: _scrollControllerTime));
       isButtonDisable = false;
     });
     _stopSpeak();
@@ -753,6 +802,7 @@ class _BibleAppState extends State<BibleApp> {
     //_bannerAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
     //appAds.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -769,6 +819,9 @@ class _BibleAppState extends State<BibleApp> {
       prefs.setString(sharePrefTitleId, _titleId);
       prefs.setString(sharePrefTitleNum, _titleNum);
       prefs.setDouble(sharePrefFontSize, fontOfContent);
+      if (Platform.isAndroid) {
+        if (rate > rateMaxIos) rate = rateNormalIos;
+      }
       prefs.setDouble(sharePrefSpeechRate, rate);
       prefs.setString(sharePrefSoundLanguage, language);
       prefs.setString(sharePrefDisplayLanguage, displayLanguage);
@@ -798,7 +851,7 @@ class _BibleAppState extends State<BibleApp> {
 
     if (prefs.getDouble(sharePrefSpeechRate) == null) {
       if (Platform.isAndroid)
-        rate = rateNormalAnd;
+        rate = rateNormalIos; //rate = rateNormalAnd;
       else
         rate = rateNormalIos;
       await prefs.setDouble(sharePrefSpeechRate, rate);
@@ -955,7 +1008,7 @@ class _BibleAppState extends State<BibleApp> {
     if (_contentNum != "1")
       _scrollController.scrollTo(
           index: int.parse(_contentNum) - 1,
-          duration: Duration(milliseconds: 1));
+          duration: Duration(milliseconds: _scrollControllerTime));
     prefs.setString(sharePrefContentNum, "1");
   }
 
@@ -987,7 +1040,8 @@ class _BibleAppState extends State<BibleApp> {
           getBibleTitleByTitleId(_titleId) + ' ' + _titleNum;
       //_dataForListView = queryBibleContentByTitle(_titleId,_titleNum);
     });
-    _scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
+    _scrollController.scrollTo(
+        index: 0, duration: Duration(milliseconds: _scrollControllerTime));
   }
 
   //right button for previous content
@@ -1010,16 +1064,82 @@ class _BibleAppState extends State<BibleApp> {
           getBibleTitleByTitleId(_titleId) + ' ' + _titleNum;
       //_dataForListView = queryBibleContentByTitle(_titleId,_titleNum);
     });
-    _scrollController.scrollTo(index: 0, duration: Duration(milliseconds: 1));
+    _scrollController.scrollTo(
+        index: 0, duration: Duration(milliseconds: _scrollControllerTime));
+  }
+
+  String subStringForBible(String tempSubString) {
+    if (tempSubString.contains("（") && tempSubString.contains("）")) {
+      //check if substring empty, show orginal
+      if ((tempSubString.substring(0, tempSubString.indexOf("（")) +
+                  tempSubString.substring(
+                      tempSubString.indexOf("）") + 1, (tempSubString.length)))
+              .length >
+          2)
+        tempSubString = tempSubString.substring(0, tempSubString.indexOf("（")) +
+            tempSubString.substring(
+                tempSubString.indexOf("）") + 1, (tempSubString.length));
+    }
+
+    if (tempSubString.contains("【") && tempSubString.contains("】")) {
+      //check if substring empty, show orginal
+      if ((tempSubString.substring(0, tempSubString.indexOf("【")) +
+                  tempSubString.substring(
+                      tempSubString.indexOf("】") + 1, (tempSubString.length)))
+              .length >
+          2)
+        tempSubString = tempSubString.substring(0, tempSubString.indexOf("【")) +
+            tempSubString.substring(
+                tempSubString.indexOf("】") + 1, (tempSubString.length));
+    }
+    return tempSubString;
   }
 
   String copyShareReturnText() {
-    String tempText = "";
-    tempText += "$_bibleTitleButtonText \n";
+    String tempTextForTitle = "";
+    String tempText2ForContent = "";
+    String tempText3ForSubString = "";
+    String tempText4ForSaveSubString = "";
+    tempTextForTitle += "$_bibleTitleButtonText: ";
     for (int i = 0; i < tmepBibleList.length; i++) {
-      if (listSelection[i]) tempText += tmepBibleList[i] + "\n";
+      if (listSelection[i]) {
+        tempText3ForSubString += (i + 1).toString() + ",";
+        String tempSubString = tmepBibleList[i]
+            .substring(tmepBibleList[i].indexOf(".") + 1)
+            .replaceAll(" ", "");
+        //copy text no need
+        //tempSubString = subStringForBible(tempSubString);
+
+        tempText2ForContent += tempSubString;
+      }
     }
-    return tempText;
+    tempText3ForSubString = tempText3ForSubString.substring(
+        0, tempText3ForSubString.lastIndexOf(","));
+    List<String> tempList = tempText3ForSubString.split(",");
+    for (int j = 0; j < tempList.length; j++) {
+      if (j == 0)
+        tempText4ForSaveSubString += tempList[j];
+      else if (int.parse(tempList[j - 1]) + 1 != int.parse(tempList[j])) {
+        if (tempText4ForSaveSubString.lastIndexOf("-") ==
+            tempText4ForSaveSubString.length - 1) {
+          tempText4ForSaveSubString += tempList[j - 1];
+          tempText4ForSaveSubString += "," + tempList[j];
+        }
+
+        /*else
+            tempText4ForSaveSubString += "," + tempList[j];*/
+      } else {
+        if (tempText4ForSaveSubString.lastIndexOf("-") !=
+            tempText4ForSaveSubString.length - 1)
+          tempText4ForSaveSubString += "-";
+        if (j == tempList.length - 1) tempText4ForSaveSubString += tempList[j];
+      }
+    }
+
+    return tempTextForTitle +
+        tempText4ForSaveSubString +
+        "\n" +
+        tempText2ForContent;
   }
 
   void copyToClipboard() {
@@ -1281,10 +1401,13 @@ class _BibleAppState extends State<BibleApp> {
         if (_titleIdForDisplay == _titleId)
           _scrollControllerForTitlePage.scrollTo(
               index: int.parse(_titleNum) - 1,
-              duration: Duration(milliseconds: 1));
+              duration:
+                  Duration(milliseconds: _scrollControllerForTitlePageTime));
         else
           _scrollControllerForTitlePage.scrollTo(
-              index: 0, duration: Duration(milliseconds: 1));
+              index: 0,
+              duration:
+                  Duration(milliseconds: _scrollControllerForTitlePageTime));
         _state = 2;
       });
     } else if (_state == 2) {
@@ -1298,9 +1421,11 @@ class _BibleAppState extends State<BibleApp> {
         _bibleTitleButtonText =
             getBibleTitleByTitleId(_titleId) + ' ' + _titleNum;
         _scrollControllerForTitlePage.scrollTo(
-            index: 0, duration: Duration(milliseconds: 1));
+            index: 0,
+            duration:
+                Duration(milliseconds: _scrollControllerForTitlePageTime));
         _scrollController.scrollTo(
-            index: 0, duration: Duration(milliseconds: 1));
+            index: 0, duration: Duration(milliseconds: _scrollControllerTime));
         Navigator.pop(content);
       });
     }
@@ -1342,7 +1467,8 @@ class _BibleAppState extends State<BibleApp> {
     if (_scrollControllerForTitlePage
         .isAttached /*&& _bibleSeletion.length>index*/)
       _scrollControllerForTitlePage.scrollTo(
-          index: index, duration: Duration(milliseconds: 100));
+          index: index,
+          duration: Duration(milliseconds: _scrollControllerForTitlePageTime));
   }
 
   void insertBookmark(int text) async {
@@ -1684,7 +1810,8 @@ void _insert(Map<String, dynamic> row) async {
                                         onPressed: () {
                                           setState(() {
                                             if (Platform.isAndroid)
-                                              rate = rateMaxAnd;
+                                              rate =
+                                                  rateMaxIos; //rate = rateMaxAnd;
                                             else
                                               rate = rateMaxIos;
                                           });
@@ -1708,7 +1835,8 @@ void _insert(Map<String, dynamic> row) async {
                             else prefs.setInt(sharePrefLightDark, 0);  
                             RestartWidget.restartApp(context);*/
                                             if (Platform.isAndroid)
-                                              rate = rateNormalAnd;
+                                              rate =
+                                                  rateNormalIos; //rate = rateNormalAnd;
                                             else
                                               rate = rateNormalIos;
                                           });
@@ -1728,7 +1856,8 @@ void _insert(Map<String, dynamic> row) async {
                                         onPressed: () {
                                           setState(() {
                                             if (Platform.isAndroid)
-                                              rate = rateMinAnd;
+                                              rate =
+                                                  rateMinIos; //rate = rateMinAnd;
                                             else
                                               rate = rateMinIos;
                                           });

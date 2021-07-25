@@ -56,6 +56,9 @@ class _NotesPageState extends State<NotesPage> {
 
   double sizeOfIcon = 50.0;
 
+  bool validController1 = false;
+  bool validController2 = false;
+
   void errorListener(SpeechRecognitionError error) {
     print("Received error status: $error, listening: ${speech.isListening}");
     //Navigator.pop(context);
@@ -129,8 +132,6 @@ class _NotesPageState extends State<NotesPage> {
     super.initState();
     BackButtonInterceptor.add(myInterceptor);
     initSpeechState();
-    //_controller2.selection = TextSelection.fromPosition(
-    //    TextPosition(offset: _controller2.text.length));
 
     //_events = {
     /*_selectedDay: [[1,'Event A7'], [2,'Event B7']/*, 'Event C7', 'Event D7'*/],
@@ -171,13 +172,14 @@ class _NotesPageState extends State<NotesPage> {
     //print("BACK BUTTON!"); // Do some stuff.
     if (page != 0) {
       if (page == 2) {
-        if (_controller.text != "" || _controller2.text != "") {
+        _saveNote(true);
+        /*if (_controller.text != "" || _controller2.text != "") {
           _saveNote();
         } else {
           setState(() {
             page = 1;
           });
-        }
+        }*/
       } else {
         setState(() {
           page -= 1;
@@ -534,24 +536,56 @@ class _NotesPageState extends State<NotesPage> {
     );
   }
 
-  void _saveNote() async {
-    editCurrentNotes = BibleNotes(
-        id: editCurrentNotes.id,
-        title: _controller.text,
-        content: _controller2.text,
-        date: eventNoteTitle.toString());
-    int id = await dbHelper.insertNotes(editCurrentNotes);
-    editCurrentNotes = BibleNotes(
-        id: id,
-        title: _controller.text,
-        content: _controller2.text,
-        date: eventNoteTitle.toString());
+  void _saveNote(bool isBack) async {
+    if (_controller.text.isEmpty || _controller2.text.isEmpty) {
+      if (_controller.text.isEmpty && _controller2.text.isEmpty) {
+        setState(() {
+          validController1 = true;
+          validController2 = true;
+        });
+      } else if (_controller.text.isEmpty) {
+        setState(() {
+          validController1 = true;
+        });
+      } else if (_controller2.text.isEmpty) {
+        setState(() {
+          validController2 = true;
+        });
+      } else if (_controller.text.isNotEmpty) {
+        setState(() {
+          validController1 = false;
+        });
+      } else if (_controller2.text.isNotEmpty) {
+        setState(() {
+          validController2 = false;
+        });
+      }
+    } else if (_controller.text.isNotEmpty && _controller2.text.isNotEmpty) {
+      editCurrentNotes = BibleNotes(
+          id: editCurrentNotes.id,
+          title: _controller.text,
+          content: _controller2.text,
+          date: eventNoteTitle.toString());
+      int id = await dbHelper.insertNotes(editCurrentNotes);
+      editCurrentNotes = BibleNotes(
+          id: id,
+          title: _controller.text,
+          content: _controller2.text,
+          date: eventNoteTitle.toString());
+      setState(() {
+        validController1 = false;
+        validController2 = false;
+      });
+    }
     setState(() {
-      page = 1;
+      if (isBack) page = 1;
     });
   }
 
   Widget getNotesPage(BuildContext context) {
+    //_controller2.selection =
+    //    TextSelection.collapsed(offset: _controller2.text.length);
+    //_controller2.selection = TextSelection.fromPosition(TextPosition(offset: _controller2.text.length));
     return GestureDetector(
         onTap: () {
           FocusScopeNode currentFocus = FocusScope.of(context);
@@ -569,13 +603,14 @@ class _NotesPageState extends State<NotesPage> {
                     ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),
               ),
               onPressed: () {
-                if (_controller.text != "" || _controller2.text != "") {
+                _saveNote(true);
+                /*if (_controller.text != "" || _controller2.text != "") {
                   _saveNote();
                 } else {
                   setState(() {
                     page = 1;
                   });
-                }
+                }*/
               },
             ),
             title: Text(
@@ -594,7 +629,7 @@ class _NotesPageState extends State<NotesPage> {
                         .setSp(sizeOfIcon, allowFontScalingSelf: true),
                   ),
                   onPressed: () {
-                    _saveNote();
+                    _saveNote(false);
                   }),
               SizedBox(
                 width: ScreenUtil().setSp(5, allowFontScalingSelf: true),
@@ -643,15 +678,21 @@ class _NotesPageState extends State<NotesPage> {
                   ),
                   controller: _controller,
                   decoration: InputDecoration(
-                      labelText: FlutterI18n.translate(context, "noteTitle")),
+                    labelText: FlutterI18n.translate(context, "noteTitle"),
+                    errorText: validController1
+                        ? FlutterI18n.translate(context, "noteTitle")
+                        : null,
+                  ),
                 ),
                 TextFormField(
+                  autofocus: true,
                   style: TextStyle(
                     fontSize: ScreenUtil()
                         .setSp(fontOfContent, allowFontScalingSelf: true),
                   ),
                   controller: _controller2,
                   onChanged: (text) {
+                    _saveNote(false);
                     //TextSelection previousSelection = _controller2.selection;
                     //_controller2.text = text;
                     //_controller2.selection = previousSelection;
@@ -659,7 +700,11 @@ class _NotesPageState extends State<NotesPage> {
                   maxLines: 10,
                   minLines: 3,
                   decoration: InputDecoration(
-                      labelText: FlutterI18n.translate(context, "noteContent")),
+                    labelText: FlutterI18n.translate(context, "noteContent"),
+                    errorText: validController2
+                        ? FlutterI18n.translate(context, "noteTitle")
+                        : null,
+                  ),
                 ),
               ],
             )),

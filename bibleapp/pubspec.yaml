@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.22.0+45
+version: 3.23.0+46
 
 environment:
   sdk: ">=2.1.0 <3.0.0"
@@ -45,7 +45,7 @@ dependencies:
   html_unescape: ^1.0.1+3
   #flutter_widgets: ^0.1.12
   flutter_webview_plugin: ^0.3.10+2
-  flutter_tts: ^1.2.6
+  flutter_tts: ^3.2.1
   synchronized: ^2.2.0
   share: ^0.6.3+6
   modal_progress_hud: ^0.1.3
@@ -54,7 +54,7 @@ dependencies:
   font_awesome_flutter: ^8.8.1
   rflutter_alert: ^1.0.3
   percent_indicator: ^2.1.3
-  speech_to_text: ^2.2.0
+  speech_to_text: ^4.2.2
   wakelock: ^0.1.4+1
   table_calendar: ^2.3.0
   intl: ^0.17.0
@@ -66,8 +66,8 @@ dependencies:
   scrollable_positioned_list: ^0.1.8
   modal_bottom_sheet: ^2.0.0
   native_admob_flutter: ^1.4.0
-
-
+  is_lock_screen: ^2.0.0
+  marquee_widget: ^1.2.0
 
 dev_dependencies:
   flutter_test:

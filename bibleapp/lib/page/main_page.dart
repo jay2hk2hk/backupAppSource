@@ -18,6 +18,7 @@ import 'package:share/share.dart';
 import '../main.dart';
 //import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:marquee_widget/marquee_widget.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -55,6 +56,10 @@ class _MainPageState extends State<MainPage> {
 
   static int titleNumForBibleSentenceItem = 0;
   static bool onewayBoolForTitleNumForBibleSentenceItemRan = true;
+  String encourageText = "";
+  final int encourageTextListLength = 30;
+  final int marqueeTIme = 20;
+  int regInt = 1;
 
   //String rewardedVideoAdsId = RewardedVideoAd.testAdUnitId;
   //String firebaseAdId = FirebaseAdMob.testAppId;
@@ -65,14 +70,21 @@ class _MainPageState extends State<MainPage> {
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";*/
   int latestUpdateVersionNum =
-      3; //check is display the latest update box or not
+      4; //check is display the latest update box or not
   //RewardedAd _rewardedAd;
   //int _numRewardedLoadAttempts = 0;
   RewardedAd rewardedAd;
 
   @override
   void initState() {
+    regInt = (new Random().nextInt(encourageTextListLength) + 1);
+    Timer.periodic(Duration(seconds: marqueeTIme), (timer) {
+      setState(() {
+        regInt = (new Random().nextInt(encourageTextListLength) + 1);
+      });
+    });
     super.initState();
+
     rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
     rewardedAd.onEvent.listen((e) {
@@ -88,9 +100,19 @@ class _MainPageState extends State<MainPage> {
           //final errorCode = e.values.first;
           //print('load failed $errorCode');
           break;
-        /*case RewardedAdEvent.opened:
-          print('ad opened');
-          break;*/
+        case RewardedAdEvent.showed:
+          if (Platform.isIOS) {
+            setState(() {
+              var now = DateTime.parse(dateFormat.format(DateTime.now()));
+              insertCrown(1, now.toString());
+              //totalOfCrown()
+              crownNum += 1;
+              prefs.setInt(sharePrefBibleTodaysGotCrownTotal, crownNum);
+              prefs.setBool(sharePrefBibleTodaysGotCrown, true);
+            });
+          }
+          //print('ad opened');
+          break;
         case RewardedAdEvent.closed:
           //print('ad closed');
           break;
@@ -262,6 +284,9 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     //ScreenUtil.init(context, width: 750, height: 1334, allowFontScaling: true);
+
+    encourageText = FlutterI18n.translate(
+        context, "encourageTextList." + regInt.toString());
     return /*MaterialApp(
       theme:prefs.getInt(sharePrefLightDark) ==0 ? ThemeData.light(): ThemeData.dark(),
       title: FlutterI18n.translate(context, "appName"),
@@ -375,6 +400,25 @@ class _MainPageState extends State<MainPage> {
             children: <Widget>[
               new Column(
                 children: <Widget>[
+                  new Container(height: 5.0),
+                  new Container(
+                      child: Marquee(
+                    directionMarguee: DirectionMarguee.oneDirection,
+                    animationDuration: Duration(seconds: marqueeTIme),
+                    backDuration: Duration(milliseconds: 5000),
+                    pauseDuration: Duration(milliseconds: 2500),
+                    child: Text(
+                        //"                                                                                      " +
+                        encourageText, //+
+                        //"                                                                                                                                          ",
+                        style: new TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: ScreenUtil().setSp(
+                              fontOfContent, /*allowFontScalingSelf: true*/
+                            )
+                            //,color: fontTextColor
+                            )),
+                  )),
                   new Container(height: 5.0),
                   new Container(
                     padding: const EdgeInsets.symmetric(
@@ -591,14 +635,16 @@ class _MainPageState extends State<MainPage> {
               ),
               onPressed: () {
                 setState(() {
-                  Share.share(FlutterI18n.translate(context,
+                  String tempString = FlutterI18n.translate(context,
                           "bibleTitle." + tempTitleList[0] + ".title") +
                       " " +
                       tempTitleList[1] +
                       ":" +
                       tempTitle +
                       "\n" +
-                      tempDisplayContent);
+                      tempDisplayContent;
+                  tempString = subStringForBible(tempString);
+                  Share.share(tempString);
                 });
               }),
           IconButton(
@@ -608,15 +654,16 @@ class _MainPageState extends State<MainPage> {
                     ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),
               ),
               onPressed: () {
-                Clipboard.setData(new ClipboardData(
-                    text: FlutterI18n.translate(context,
-                            "bibleTitle." + tempTitleList[0] + ".title") +
-                        " " +
-                        tempTitleList[1] +
-                        ":" +
-                        tempTitle +
-                        "\n" +
-                        tempDisplayContent));
+                String tempString = FlutterI18n.translate(
+                        context, "bibleTitle." + tempTitleList[0] + ".title") +
+                    " " +
+                    tempTitleList[1] +
+                    ":" +
+                    tempTitle +
+                    "\n" +
+                    tempDisplayContent;
+                tempString = subStringForBible(tempString);
+                Clipboard.setData(new ClipboardData(text: tempString));
               }),
         ],
       ),
@@ -710,6 +757,34 @@ class _MainPageState extends State<MainPage> {
     return tempDisplayContent;
   }
   */
+
+  String subStringForBible(String tempSubString) {
+    /*if (tempSubString.contains("（") && tempSubString.contains("）")) {
+      //check if substring empty, show orginal
+      if ((tempSubString.substring(0, tempSubString.indexOf("（")) +
+                  tempSubString.substring(
+                      tempSubString.indexOf("）") + 1, (tempSubString.length)))
+              .length >
+          2)
+        tempSubString = tempSubString.substring(0, tempSubString.indexOf("（")) +
+            tempSubString.substring(
+                tempSubString.indexOf("）") + 1, (tempSubString.length));
+    }
+
+    if (tempSubString.contains("【") && tempSubString.contains("】")) {
+      //check if substring empty, show orginal
+      if ((tempSubString.substring(0, tempSubString.indexOf("【")) +
+                  tempSubString.substring(
+                      tempSubString.indexOf("】") + 1, (tempSubString.length)))
+              .length >
+          2)
+        tempSubString = tempSubString.substring(0, tempSubString.indexOf("【")) +
+            tempSubString.substring(
+                tempSubString.indexOf("】") + 1, (tempSubString.length));
+    }*/
+    return tempSubString;
+  }
+
   List<Widget> bibleTodaysItem(BuildContext context) {
     List<Widget> tempList = new List<Widget>();
     /*DateTime todayDate = new DateTime.now();
