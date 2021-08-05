@@ -29,6 +29,7 @@ List<String> chnageLanguageList = [
   "繁體中文和合本(國語)",
   "简体中文和合本(普通话)"
 ];
+
 List<String> languageTextValue = ["en-US", "zh-HK", "zh-TW", "zh-CN"];
 List<String> languageVolumeValue = ["en-US", "yue-HK", "zh-TW", "zh-CN"];
 String sharePrefTitleId = '_titleId';

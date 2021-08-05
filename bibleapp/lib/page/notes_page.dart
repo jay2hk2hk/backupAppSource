@@ -19,6 +19,7 @@ import 'package:flutter/services.dart';
 import 'dart:async';
 
 import '../main.dart';
+import 'package:share/share.dart';
 
 double fontOfContent = 60.0; //px
 double fontOfTitleButton = 40.0;
@@ -599,18 +600,11 @@ class _NotesPageState extends State<NotesPage> {
             leading: IconButton(
               icon: Icon(
                 Icons.arrow_back,
-                /*color: Colors.black*/ size:
+                size:
                     ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),
               ),
               onPressed: () {
                 _saveNote(true);
-                /*if (_controller.text != "" || _controller2.text != "") {
-                  _saveNote();
-                } else {
-                  setState(() {
-                    page = 1;
-                  });
-                }*/
               },
             ),
             title: Text(
@@ -621,7 +615,81 @@ class _NotesPageState extends State<NotesPage> {
                   color: buttonTextColor),
             ),
             actions: <Widget>[
-              IconButton(
+              new PopupMenuButton<String>(
+                  //offset: Offset(500, 500),
+                  //elevation: 20,
+                  icon: FaIcon(
+                    FontAwesomeIcons.ellipsisV,
+                    color: iconColor,
+                    size: ScreenUtil()
+                        .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                  ),
+                  itemBuilder: (BuildContext context) =>
+                      <PopupMenuEntry<String>>[
+                        new PopupMenuItem<String>(
+                          value: 'save',
+                          child: Icon(
+                            FontAwesomeIcons.save,
+                            color: iconAlertDialogColor,
+                            size: ScreenUtil()
+                                .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                          ),
+                        ),
+                        new PopupMenuDivider(height: 1.0),
+                        new PopupMenuItem<String>(
+                          value: 'delete',
+                          child: Icon(
+                            FontAwesomeIcons.trash,
+                            color: iconAlertDialogColor,
+                            size: ScreenUtil()
+                                .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                          ),
+                        ),
+                        new PopupMenuDivider(height: 1.0),
+                        new PopupMenuItem<String>(
+                          value: 'copy',
+                          child: Icon(
+                            FontAwesomeIcons.copy,
+                            color: iconAlertDialogColor,
+                            size: ScreenUtil()
+                                .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                          ),
+                        ),
+                        new PopupMenuDivider(height: 1.0),
+                        new PopupMenuItem<String>(
+                          value: 'share',
+                          child: Icon(
+                            FontAwesomeIcons.share,
+                            color: iconAlertDialogColor,
+                            size: ScreenUtil()
+                                .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                          ),
+                        ),
+                        new PopupMenuDivider(height: 1.0),
+                        new PopupMenuItem<String>(
+                          value: 'cancel',
+                          child: Icon(
+                            FontAwesomeIcons.times,
+                            color: iconAlertDialogColor,
+                            size: ScreenUtil()
+                                .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                          ),
+                        ),
+                      ],
+                  onSelected: (String value) {
+                    if (value == 'save') {
+                      _saveNote(false);
+                    } else if (value == 'delete') {
+                      _showConfirm(context, "");
+                    } else if (value == 'copy') {
+                      Clipboard.setData(new ClipboardData(
+                          text: _controller.text + "\n" + _controller2.text));
+                    } else if (value == 'share') {
+                      Share.share(_controller.text + "\n" + _controller2.text);
+                    }
+                  }),
+              SizedBox(width: 20),
+              /*IconButton(
                   icon: Icon(
                     FontAwesomeIcons.save,
                     color: iconColor,
@@ -644,7 +712,7 @@ class _NotesPageState extends State<NotesPage> {
                   onPressed: () //async
                       {
                     _showConfirm(context, "");
-                  }),
+                  }),*/
               /*SizedBox(width:ScreenUtil().setSp(5, allowFontScalingSelf: true),),
           IconButton(icon: Icon(FontAwesomeIcons.microphone,color: iconColor,size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),), onPressed: ()
           {
@@ -692,7 +760,7 @@ class _NotesPageState extends State<NotesPage> {
                   ),
                   controller: _controller2,
                   onChanged: (text) {
-                    _saveNote(false);
+                    //_saveNote(false);
                     //TextSelection previousSelection = _controller2.selection;
                     //_controller2.text = text;
                     //_controller2.selection = previousSelection;

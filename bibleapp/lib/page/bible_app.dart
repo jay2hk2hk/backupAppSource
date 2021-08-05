@@ -21,6 +21,7 @@ import 'package:html_unescape/html_unescape.dart';
 //import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import 'package:intl/intl.dart';
 import 'package:speech_to_text/speech_recognition_error.dart';
 import 'package:speech_to_text/speech_recognition_result.dart';
 //import 'package:bibleappnew/util/flutter_tts.dart';
@@ -1069,7 +1070,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   }
 
   String subStringForBible(String tempSubString) {
-    if (tempSubString.contains("（") && tempSubString.contains("）")) {
+    while (tempSubString.contains("（") && tempSubString.contains("）")) {
       //check if substring empty, show orginal
       if ((tempSubString.substring(0, tempSubString.indexOf("（")) +
                   tempSubString.substring(
@@ -1081,7 +1082,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
                 tempSubString.indexOf("）") + 1, (tempSubString.length));
     }
 
-    if (tempSubString.contains("【") && tempSubString.contains("】")) {
+    while (tempSubString.contains("【") && tempSubString.contains("】")) {
       //check if substring empty, show orginal
       if ((tempSubString.substring(0, tempSubString.indexOf("【")) +
                   tempSubString.substring(
@@ -2084,14 +2085,16 @@ void _insert(Map<String, dynamic> row) async {
                   Container(
                     //color: containerColor,
                     child: ListTile(
-                      title: Text(
-                        snapshot.data.length == 0 ? "" : snapshot.data[index],
+                      title: Center(
+                          child: Text(
+                        FlutterI18n.translate(context,
+                            "bibleVersion"), //snapshot.data.length == 0 ? "" : snapshot.data[index],
                         style: new TextStyle(
-                          fontSize: ScreenUtil().setSp(fontOfTitleButton,
+                          fontSize: ScreenUtil().setSp(fontOfContent - 20,
                               allowFontScalingSelf: true),
                           //color: fontTextColor,
                         ),
-                      ),
+                      )),
                     ),
                   ),
                 ],
