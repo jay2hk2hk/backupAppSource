@@ -121,7 +121,7 @@ class _NotesPageState extends State<NotesPage> {
       //lastWords = "${result.recognizedWords} - ${result.finalResult}";
       if (result.finalResult) {
         lastWords = result.recognizedWords;
-        print("lastWords=" + lastWords);
+        //print("lastWords=" + lastWords);
         _controller2.text += lastWords;
         //Navigator.pop(context);
       }

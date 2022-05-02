@@ -16,8 +16,8 @@ import 'package:flutter/services.dart';
 import 'package:share/share.dart';
 
 import '../main.dart';
-//import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+//import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:marquee_widget/marquee_widget.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
@@ -70,10 +70,15 @@ class _MainPageState extends State<MainPage> {
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";*/
   int latestUpdateVersionNum =
-      5; //check is display the latest update box or not
-  //RewardedAd _rewardedAd;
+      6; //check is display the latest update box or not
+  RewardedAd _rewardedAd;
   //int _numRewardedLoadAttempts = 0;
-  RewardedAd rewardedAd;
+  //RewardedAd rewardedAd;
+  static final AdRequest request = AdRequest(
+    keywords: <String>['foo', 'bar'],
+    contentUrl: 'http://foo.com/bar.html',
+    nonPersonalizedAds: true,
+  );
 
   @override
   void initState() {
@@ -84,10 +89,11 @@ class _MainPageState extends State<MainPage> {
       });
     });
     super.initState();
+    _createRewardedAd();
 
-    rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
+    //rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
-    rewardedAd.onEvent.listen((e) {
+    /*rewardedAd.onEvent.listen((e) {
       final event = e.keys.first;
       switch (event) {
         case RewardedAdEvent.loading:
@@ -135,7 +141,7 @@ class _MainPageState extends State<MainPage> {
         default:
           break;
       }
-    });
+    });*/
     //MobileAds.instance.initialize();
     //_createRewardedAd();
     /*FirebaseAdMob.instance.initialize(appId: firebaseAdId);
@@ -178,26 +184,21 @@ class _MainPageState extends State<MainPage> {
     /*_bannerAd?.dispose();
     _nativeAd?.dispose();
     _interstitialAd?.dispose();*/
-    //_rewardedAd?.dispose();
+    _rewardedAd?.dispose();
   }
 
-  /*void _createRewardedAd() {
+  void _createRewardedAd() {
     RewardedAd.load(
         adUnitId: rewardedVideoAdsId,
         request: request,
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
-            print('$ad loaded.');
+            //print('$ad loaded.');
             _rewardedAd = ad;
-            _numRewardedLoadAttempts = 0;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            print('RewardedAd failed to load: $error');
+            //print('RewardedAd failed to load: $error');
             _rewardedAd = null;
-            _numRewardedLoadAttempts += 1;
-            if (_numRewardedLoadAttempts <= maxFailedLoadAttempts) {
-              _createRewardedAd();
-            }
           },
         ));
   }
@@ -208,22 +209,25 @@ class _MainPageState extends State<MainPage> {
       return;
     }
     _rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (RewardedAd ad) =>
-          print('ad onAdShowedFullScreenContent.'),
+      onAdShowedFullScreenContent: (RewardedAd ad) {
+        //print('ad onAdShowedFullScreenContent.');
+      },
       onAdDismissedFullScreenContent: (RewardedAd ad) {
-        print('$ad onAdDismissedFullScreenContent.');
+        //print('$ad onAdDismissedFullScreenContent.');
         ad.dispose();
         _createRewardedAd();
       },
       onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-        print('$ad onAdFailedToShowFullScreenContent: $error');
+        //print('$ad onAdFailedToShowFullScreenContent: $error');
+
         ad.dispose();
         _createRewardedAd();
       },
     );
 
-    _rewardedAd.show(onUserEarnedReward: (RewardedAd ad, RewardItem reward) {
-      print('$ad with reward $RewardItem(${reward.amount}, ${reward.type}');
+    _rewardedAd.setImmersiveMode(true);
+    _rewardedAd.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+      //print('$ad with reward $RewardItem(${reward.amount}, ${reward.type})');
       setState(() {
         var now = DateTime.parse(dateFormat.format(DateTime.now()));
         insertCrown(1, now.toString());
@@ -234,7 +238,7 @@ class _MainPageState extends State<MainPage> {
       });
     });
     _rewardedAd = null;
-  }*/
+  }
 
   /*
   static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
@@ -929,12 +933,12 @@ class _MainPageState extends State<MainPage> {
           ),
           onPressed: () async {
             //RewardedVideoAd.instance.show();
-            //_showRewardedAd();
+            _showRewardedAd();
             // Load only if not loaded
-            if (!rewardedAd.isLoaded) await rewardedAd.load();
+            /*if (!rewardedAd.isLoaded) await rewardedAd.load();
             if (rewardedAd.isLoaded) rewardedAd.show();
             // Load the ad again after it's shown
-            rewardedAd.load();
+            rewardedAd.load();*/
           },
           //color: raisedButtonColor,
           //textColor: buttonTextColor,

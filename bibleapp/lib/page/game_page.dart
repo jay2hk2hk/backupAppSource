@@ -18,8 +18,8 @@ import '../main.dart';
 import 'dart:async';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:bibleapp/util/common_value.dart';
-//import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+//import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -42,11 +42,11 @@ class _GamePageState extends State<GamePage> {
     childDirected: true,
     nonPersonalizedAds: true,
   );*/
-  /*static final AdRequest request = AdRequest(
+  static final AdRequest request = AdRequest(
     keywords: <String>['foo', 'bar'],
     contentUrl: 'http://foo.com/bar.html',
     nonPersonalizedAds: true,
-  );*/
+  );
   //String _userName;
   //String _userId;
   final dbHelper = SQLHelper.instance;
@@ -177,18 +177,18 @@ class _GamePageState extends State<GamePage> {
   static int totalTodayBQAAnswerNumMax = 100;
   static String nextBQAButtonText = "";
   static String nowBQALevel = "upgrade";
-  //RewardedAd _rewardedAd;
+  RewardedAd _rewardedAd;
   //int _numRewardedLoadAttempts = 0;
-  RewardedAd rewardedAd;
+  // rewardedAd;
 
   @override
   void initState() {
     BackButtonInterceptor.add(myInterceptor);
-    rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
+    //rewardedAd = RewardedAd(unitId: rewardedVideoAdsId);
     //MobileAds.instance.initialize();
-    //_createRewardedAd();
+    _createRewardedAd();
     super.initState();
-    rewardedAd.onEvent.listen((e) {
+    /*.onEvent.listen((e) {
       final event = e.keys.first;
       switch (event) {
         case RewardedAdEvent.loading:
@@ -255,14 +255,14 @@ class _GamePageState extends State<GamePage> {
         default:
           break;
       }
-    });
+    */
     init();
   }
 
   @override
   void dispose() {
     super.dispose();
-    //_rewardedAd?.dispose();
+    _rewardedAd?.dispose();
     BackButtonInterceptor.remove(myInterceptor);
   }
 
@@ -277,23 +277,18 @@ class _GamePageState extends State<GamePage> {
     return true;
   }
 
-  /*void _createRewardedAd() {
+  void _createRewardedAd() {
     RewardedAd.load(
         adUnitId: rewardedVideoAdsId,
         request: request,
         rewardedAdLoadCallback: RewardedAdLoadCallback(
           onAdLoaded: (RewardedAd ad) {
-            print('$ad loaded.');
+            //print('$ad loaded.');
             _rewardedAd = ad;
-            _numRewardedLoadAttempts = 0;
           },
           onAdFailedToLoad: (LoadAdError error) {
-            print('RewardedAd failed to load: $error');
+            //print('RewardedAd failed to load: $error');
             _rewardedAd = null;
-            _numRewardedLoadAttempts += 1;
-            if (_numRewardedLoadAttempts <= maxFailedLoadAttempts) {
-              _createRewardedAd();
-            }
           },
         ));
   }
@@ -304,23 +299,22 @@ class _GamePageState extends State<GamePage> {
       return;
     }
     _rewardedAd.fullScreenContentCallback = FullScreenContentCallback(
-      onAdShowedFullScreenContent: (RewardedAd ad) {
-        print('ad onAdShowedFullScreenContent.');
-        _createRewardedAd();
-      },
+      onAdShowedFullScreenContent: (RewardedAd ad) {},
       onAdDismissedFullScreenContent: (RewardedAd ad) {
-        print('$ad onAdDismissedFullScreenContent.');
+        //print('$ad onAdDismissedFullScreenContent.');
         ad.dispose();
         _createRewardedAd();
       },
       onAdFailedToShowFullScreenContent: (RewardedAd ad, AdError error) {
-        print('$ad onAdFailedToShowFullScreenContent: $error');
+        //print('$ad onAdFailedToShowFullScreenContent: $error');
         ad.dispose();
         _createRewardedAd();
       },
     );
 
-    _rewardedAd.show(onUserEarnedReward: (RewardedAd ad, RewardItem reward) {
+    _rewardedAd.setImmersiveMode(true);
+    _rewardedAd.show(onUserEarnedReward: (AdWithoutView ad, RewardItem reward) {
+      //print('$ad with reward $RewardItem(${reward.amount}, ${reward.type})');
       setState(() {
         if (page == 1) {
           todayNextButtonStatus = 0;
@@ -337,10 +331,9 @@ class _GamePageState extends State<GamePage> {
           reSetTheBQAQuestion();
         }
       });
-      print('$ad with reward $RewardItem(${reward.amount}, ${reward.type}');
     });
     _rewardedAd = null;
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -804,12 +797,12 @@ class _GamePageState extends State<GamePage> {
           onPressed: () async {
             if (isPlayAds && todayAdsRewards <= maxAdsRewards && todayCanAd) {
               //RewardedVideoAd.instance.show().catchError((e) => print("error in loading 1st time"));
-              //_showRewardedAd();
+              _showRewardedAd();
               // Load only if not loaded
-              if (!rewardedAd.isLoaded) await rewardedAd.load();
+              /*if (!rewardedAd.isLoaded) await rewardedAd.load();
               if (rewardedAd.isLoaded) rewardedAd.show();
               // Load the ad again after it's shown
-              rewardedAd.load();
+              rewardedAd.load();*/
             } else if (!isPlayAds) {
               setState(() {
                 reSetTheQuestion();
@@ -1215,10 +1208,10 @@ class _GamePageState extends State<GamePage> {
                     .catchError((e) => print("error in loading 1st time"));*/
               //_showRewardedAd();
               // Load only if not loaded
-              if (!rewardedAd.isLoaded) await rewardedAd.load();
+              /* (!rewardedAd.isLoaded) await rewardedAd.load();
               if (rewardedAd.isLoaded) rewardedAd.show();
               // Load the ad again after it's shown
-              rewardedAd.load();
+              rewardedAd.load();*/
             } else if (!isBQAPlayAds) {
               setState(() {
                 reSetTheBQAQuestion();

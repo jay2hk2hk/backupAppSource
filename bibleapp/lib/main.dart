@@ -8,7 +8,7 @@ import 'package:bibleapp/util/common_value.dart';
 import 'package:flutter_i18n/flutter_i18n.dart';
 import 'package:flutter_i18n/loaders/decoders/json_decode_strategy.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
+//import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 //import 'package:catcher/catcher.dart';
 
@@ -44,7 +44,7 @@ void main() async {
   //Catcher(MyApp(flutterI18nDelegate), debugConfig: debugOptions, releaseConfig: releaseOptions);
 
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.initialize();
+  //await MobileAds.initialize();
   SystemChrome.setPreferredOrientations(
       [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
   //runApp(new MyApp());

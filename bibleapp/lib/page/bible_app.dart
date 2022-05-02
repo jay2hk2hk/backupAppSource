@@ -1076,10 +1076,13 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
                   tempSubString.substring(
                       tempSubString.indexOf("）") + 1, (tempSubString.length)))
               .length >
-          2)
+          2) {
         tempSubString = tempSubString.substring(0, tempSubString.indexOf("（")) +
             tempSubString.substring(
                 tempSubString.indexOf("）") + 1, (tempSubString.length));
+      } else {
+        tempSubString = "";
+      }
     }
 
     while (tempSubString.contains("【") && tempSubString.contains("】")) {
@@ -1088,10 +1091,13 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
                   tempSubString.substring(
                       tempSubString.indexOf("】") + 1, (tempSubString.length)))
               .length >
-          2)
+          2) {
         tempSubString = tempSubString.substring(0, tempSubString.indexOf("【")) +
             tempSubString.substring(
                 tempSubString.indexOf("】") + 1, (tempSubString.length));
+      } else {
+        tempSubString = "";
+      }
     }
     return tempSubString;
   }

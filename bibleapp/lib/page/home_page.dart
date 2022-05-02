@@ -18,8 +18,8 @@ import 'package:wakelock/wakelock.dart';
 
 import '../main.dart';
 import 'game_page.dart';
-//import 'package:google_mobile_ads/google_mobile_ads.dart';
-import 'package:native_admob_flutter/native_admob_flutter.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+//import 'package:native_admob_flutter/native_admob_flutter.dart';
 
 Locale currentLang;
 
@@ -41,14 +41,19 @@ class _HomePageState extends State<HomePage> {
   List<Widget> list = List();
   final dateFormat = new DateFormat('yyyy-MM-dd');
   double fontOfContent = 40.0;
-  //String bannerAdsId = BannerAd.testAdUnitId;
+  String bannerAdsId = BannerAd.testAdUnitId;
   //String firebaseAdId = FirebaseAdMob.testAppId;
-  String bannerAdsId = Platform.isAndroid
+  /*String bannerAdsId = Platform.isAndroid
       ? "ca-app-pub-9860072337130869/5088892533"
-      : "ca-app-pub-9860072337130869/8724092620";
+      : "ca-app-pub-9860072337130869/8724092620";*/
   String firebaseAdId = Platform.isAndroid
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";
+  // TODO: Add a BannerAd instance
+  BannerAd _ad;
+
+  // TODO: Add _isAdLoaded
+  bool _isAdLoaded = false;
   //BannerAd _anchoredBanner;
   //bool _loadingAnchoredBanner = false;
   /*static final AdRequest request = AdRequest(
@@ -56,7 +61,7 @@ class _HomePageState extends State<HomePage> {
     contentUrl: 'http://foo.com/bar.html',
     nonPersonalizedAds: true,
   );*/
-  final bannerController = BannerAdController();
+  // bannerController = BannerAdController();
 
   /*static const MobileAdTargetingInfo targetingInfo = MobileAdTargetingInfo(
     //testDevices: testDevice != null ? <String>[testDevice] : null,
@@ -83,9 +88,11 @@ class _HomePageState extends State<HomePage> {
     //为了避免内存泄露，需要调用.dispose
     super.dispose();
     //_bannerAd?.dispose();
+    // TODO: Dispose a BannerAd object
+    _ad.dispose();
 
     //_anchoredBanner?.dispose();
-    bannerController.dispose();
+    //bannerController.dispose();
   }
 
   @override
@@ -93,6 +100,28 @@ class _HomePageState extends State<HomePage> {
     //FirebaseAdMob.instance.initialize(appId: firebaseAdId);
     //_bannerAd = createBannerAd()..load();
     //MobileAds.instance.initialize();
+    // TODO: Create a BannerAd instance
+    _ad = BannerAd(
+      adUnitId: bannerAdsId,
+      size: AdSize.banner,
+      request: AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (_) {
+          setState(() {
+            _isAdLoaded = true;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+
+          print('Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    );
+
+    // TODO: Load an ad
+    _ad.load();
 
     Future.delayed(Duration.zero, () async {
       prefs = await SharedPreferences.getInstance();
@@ -370,7 +399,7 @@ class _HomePageState extends State<HomePage> {
         });
     setInitEventInCal();
     super.initState();
-    bannerController.onEvent.listen((e) {
+    /*bannerController.onEvent.listen((e) {
       final event = e.keys.first;
       // final info = e.values.first;
       switch (event) {
@@ -381,7 +410,7 @@ class _HomePageState extends State<HomePage> {
           break;
       }
     });
-    bannerController.load();
+    bannerController.load();*/
     //not sleep mode
     Wakelock.enable();
   }
@@ -531,20 +560,12 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Expanded(
                     flex: 0,
-                    child: BannerAd(
-                      controller: bannerController,
-                      unitId: bannerAdsId,
+                    child: Container(
+                      child: AdWidget(ad: _ad),
+                      width: _ad.size.width.toDouble(),
+                      height: _ad.size.height.toDouble(),
+                      alignment: Alignment.center,
                     ),
-                    /*(_anchoredBanner == null)
-                        ? SizedBox(
-                            height: 70,
-                          )
-                        : Container(
-                            color: Colors.green,
-                            width: _anchoredBanner.size.width.toDouble(),
-                            height: _anchoredBanner.size.height.toDouble(),
-                            child: AdWidget(ad: _anchoredBanner),
-                          ),*/
                   ),
                 ],
               ),
@@ -558,95 +579,113 @@ class _HomePageState extends State<HomePage> {
                       key: globalKey,
                       items: [
                         BottomNavigationBarItem(
-                            icon: FaIcon(
-                              FontAwesomeIcons.home,
-                              color: _bottomNavigationColor,
-                              size: ScreenUtil().setSp(fontOfContent,
-                                  allowFontScalingSelf: true),
-                            ),
-                            title: Text(
+                          icon: FaIcon(
+                            FontAwesomeIcons.home,
+                            color: _bottomNavigationColor,
+                            size: ScreenUtil().setSp(fontOfContent,
+                                allowFontScalingSelf: true),
+                          ),
+                          label:
+                              FlutterI18n.translate(context, "bottomBarHome"),
+                          /*title: Text(
                               FlutterI18n.translate(context, "bottomBarHome"),
                               style: TextStyle(
                                 color: _bottomNavigationColor,
                                 fontSize: ScreenUtil().setSp(fontOfContent,
                                     allowFontScalingSelf: true),
                               ),
-                            )),
+                            )*/
+                        ),
                         BottomNavigationBarItem(
-                            icon: FaIcon(
-                              FontAwesomeIcons.bible,
-                              color: _bottomNavigationColor,
-                              size: ScreenUtil().setSp(fontOfContent,
-                                  allowFontScalingSelf: true),
-                            ),
-                            title: Text(
+                          icon: FaIcon(
+                            FontAwesomeIcons.bible,
+                            color: _bottomNavigationColor,
+                            size: ScreenUtil().setSp(fontOfContent,
+                                allowFontScalingSelf: true),
+                          ),
+                          label:
+                              FlutterI18n.translate(context, "bottomBarBible"),
+                          /*title: Text(
                               FlutterI18n.translate(context, "bottomBarBible"),
                               style: TextStyle(
                                 color: _bottomNavigationColor,
                                 fontSize: ScreenUtil().setSp(fontOfContent,
                                     allowFontScalingSelf: true),
                               ),
-                            )),
+                            )*/
+                        ),
                         BottomNavigationBarItem(
-                            icon: FaIcon(
-                              FontAwesomeIcons.gamepad,
-                              color: _bottomNavigationColor,
-                              size: ScreenUtil().setSp(fontOfContent,
-                                  allowFontScalingSelf: true),
-                            ),
-                            title: Text(
+                          icon: FaIcon(
+                            FontAwesomeIcons.gamepad,
+                            color: _bottomNavigationColor,
+                            size: ScreenUtil().setSp(fontOfContent,
+                                allowFontScalingSelf: true),
+                          ),
+                          label:
+                              FlutterI18n.translate(context, "bottomBarGame"),
+                          /*title: Text(
                               FlutterI18n.translate(context, "bottomBarGame"),
                               style: TextStyle(
                                 color: _bottomNavigationColor,
                                 fontSize: ScreenUtil().setSp(fontOfContent,
                                     allowFontScalingSelf: true),
                               ),
-                            )),
+                            )*/
+                        ),
                         BottomNavigationBarItem(
-                            icon: FaIcon(
-                              FontAwesomeIcons.search,
-                              color: _bottomNavigationColor,
-                              size: ScreenUtil().setSp(fontOfContent,
-                                  allowFontScalingSelf: true),
-                            ),
-                            title: Text(
+                          icon: FaIcon(
+                            FontAwesomeIcons.search,
+                            color: _bottomNavigationColor,
+                            size: ScreenUtil().setSp(fontOfContent,
+                                allowFontScalingSelf: true),
+                          ),
+                          label:
+                              FlutterI18n.translate(context, "bottomBarSearch"),
+                          /*title: Text(
                               FlutterI18n.translate(context, "bottomBarSearch"),
                               style: TextStyle(
                                 color: _bottomNavigationColor,
                                 fontSize: ScreenUtil().setSp(fontOfContent,
                                     allowFontScalingSelf: true),
                               ),
-                            )),
+                            )*/
+                        ),
                         BottomNavigationBarItem(
-                            icon: FaIcon(
-                              FontAwesomeIcons.book,
-                              color: _bottomNavigationColor,
-                              size: ScreenUtil().setSp(fontOfContent,
-                                  allowFontScalingSelf: true),
-                            ),
-                            title: Text(
+                          icon: FaIcon(
+                            FontAwesomeIcons.book,
+                            color: _bottomNavigationColor,
+                            size: ScreenUtil().setSp(fontOfContent,
+                                allowFontScalingSelf: true),
+                          ),
+                          label:
+                              FlutterI18n.translate(context, "bottomBarNotes"),
+                          /*title: Text(
                               FlutterI18n.translate(context, "bottomBarNotes"),
                               style: TextStyle(
                                 color: _bottomNavigationColor,
                                 fontSize: ScreenUtil().setSp(fontOfContent,
                                     allowFontScalingSelf: true),
                               ),
-                            )),
+                            )*/
+                        ),
                         BottomNavigationBarItem(
-                            icon: Icon(
-                              Icons.more,
-                              color: _bottomNavigationColor,
-                              size: ScreenUtil().setSp(fontOfContent,
-                                  allowFontScalingSelf: true),
-                            ),
-                            title: Text(
+                          icon: Icon(
+                            Icons.more,
+                            color: _bottomNavigationColor,
+                            size: ScreenUtil().setSp(fontOfContent,
+                                allowFontScalingSelf: true),
+                          ),
+                          label:
+                              FlutterI18n.translate(context, "bottomBarMore"),
+                          /*title: Text(
                               FlutterI18n.translate(context, "bottomBarMore"),
                               style: TextStyle(
                                 color: _bottomNavigationColor,
                                 fontSize: ScreenUtil().setSp(fontOfContent,
                                     allowFontScalingSelf: true),
                               ),
-                            )),
+                            )*/
+                        ),
                       ],
                       currentIndex: _currentIndex,
                       onTap: (int index) {
