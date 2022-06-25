@@ -196,19 +196,27 @@ class _HomePageState extends State<HomePage> {
                 .difference(now)
                 .inDays <
             0) {
-          prefs.setString(sharePrefBibleTodaysString,
-              saveAllBibleTodaysSentence[now.month - 1][now.day - 1]);
-          if (prefs.getInt(sharePrefReadBibleLevel) > 0) {
-            String tempString = "20:";
-            if (prefs
-                .getString(sharePrefBibleTodaysString)
-                .contains(tempString)) tempString = "19:";
-            prefs.setString(
-                sharePrefBibleTodaysString,
-                prefs.getString(sharePrefBibleTodaysString) +
-                    "," +
-                    tempString +
-                    now.day.toString());
+          if (prefs.getInt(sharePrefReadBibleLevel) >= 3) {
+            prefs.setString(sharePrefBibleTodaysString,
+                saveAllBibleTodaysSentenceOneYearC[now.month - 1][now.day - 1]);
+          } else if (prefs.getInt(sharePrefReadBibleLevel) >= 2) {
+            prefs.setString(sharePrefBibleTodaysString,
+                saveAllBibleTodaysSentenceHalf[now.month - 1][now.day - 1]);
+          } else {
+            prefs.setString(sharePrefBibleTodaysString,
+                saveAllBibleTodaysSentence[now.month - 1][now.day - 1]);
+            if (prefs.getInt(sharePrefReadBibleLevel) > 0) {
+              String tempString = "20:";
+              if (prefs
+                  .getString(sharePrefBibleTodaysString)
+                  .contains(tempString)) tempString = "19:";
+              prefs.setString(
+                  sharePrefBibleTodaysString,
+                  prefs.getString(sharePrefBibleTodaysString) +
+                      "," +
+                      tempString +
+                      now.day.toString());
+            }
           }
         }
       }
@@ -222,19 +230,27 @@ class _HomePageState extends State<HomePage> {
                 .difference(now)
                 .inDays <
             0) {
-          prefs.setString(sharePrefBibleTodaysReadString,
-              saveAllBibleTodaysSentence[now.month - 1][now.day - 1]);
-          if (prefs.getInt(sharePrefReadBibleLevel) > 0) {
-            String tempString = "20:";
-            if (prefs
-                .getString(sharePrefBibleTodaysReadString)
-                .contains(tempString)) tempString = "19:";
-            prefs.setString(
-                sharePrefBibleTodaysReadString,
-                prefs.getString(sharePrefBibleTodaysReadString) +
-                    "," +
-                    tempString +
-                    now.day.toString());
+          if (prefs.getInt(sharePrefReadBibleLevel) >= 3) {
+            prefs.setString(sharePrefBibleTodaysReadString,
+                saveAllBibleTodaysSentenceOneYearC[now.month - 1][now.day - 1]);
+          } else if (prefs.getInt(sharePrefReadBibleLevel) >= 2) {
+            prefs.setString(sharePrefBibleTodaysReadString,
+                saveAllBibleTodaysSentenceHalf[now.month - 1][now.day - 1]);
+          } else {
+            prefs.setString(sharePrefBibleTodaysReadString,
+                saveAllBibleTodaysSentence[now.month - 1][now.day - 1]);
+            if (prefs.getInt(sharePrefReadBibleLevel) > 0) {
+              String tempString = "20:";
+              if (prefs
+                  .getString(sharePrefBibleTodaysReadString)
+                  .contains(tempString)) tempString = "19:";
+              prefs.setString(
+                  sharePrefBibleTodaysReadString,
+                  prefs.getString(sharePrefBibleTodaysReadString) +
+                      "," +
+                      tempString +
+                      now.day.toString());
+            }
           }
         }
       }
@@ -576,6 +592,9 @@ class _HomePageState extends State<HomePage> {
                   //data:prefs.getInt(sharePrefLightDark) ==0 ? ThemeData.light(): ThemeData.dark(),
                   //child:
                   BottomNavigationBar(
+                      selectedItemColor: _bottomNavigationColor,
+                      selectedFontSize: ScreenUtil()
+                          .setSp(fontOfContent, allowFontScalingSelf: true),
                       key: globalKey,
                       items: [
                         BottomNavigationBarItem(
@@ -587,14 +606,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           label:
                               FlutterI18n.translate(context, "bottomBarHome"),
-                          /*title: Text(
-                              FlutterI18n.translate(context, "bottomBarHome"),
-                              style: TextStyle(
-                                color: _bottomNavigationColor,
-                                fontSize: ScreenUtil().setSp(fontOfContent,
-                                    allowFontScalingSelf: true),
-                              ),
-                            )*/
                         ),
                         BottomNavigationBarItem(
                           icon: FaIcon(
@@ -605,14 +616,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           label:
                               FlutterI18n.translate(context, "bottomBarBible"),
-                          /*title: Text(
-                              FlutterI18n.translate(context, "bottomBarBible"),
-                              style: TextStyle(
-                                color: _bottomNavigationColor,
-                                fontSize: ScreenUtil().setSp(fontOfContent,
-                                    allowFontScalingSelf: true),
-                              ),
-                            )*/
                         ),
                         BottomNavigationBarItem(
                           icon: FaIcon(
@@ -623,14 +626,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           label:
                               FlutterI18n.translate(context, "bottomBarGame"),
-                          /*title: Text(
-                              FlutterI18n.translate(context, "bottomBarGame"),
-                              style: TextStyle(
-                                color: _bottomNavigationColor,
-                                fontSize: ScreenUtil().setSp(fontOfContent,
-                                    allowFontScalingSelf: true),
-                              ),
-                            )*/
                         ),
                         BottomNavigationBarItem(
                           icon: FaIcon(
@@ -641,14 +636,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           label:
                               FlutterI18n.translate(context, "bottomBarSearch"),
-                          /*title: Text(
-                              FlutterI18n.translate(context, "bottomBarSearch"),
-                              style: TextStyle(
-                                color: _bottomNavigationColor,
-                                fontSize: ScreenUtil().setSp(fontOfContent,
-                                    allowFontScalingSelf: true),
-                              ),
-                            )*/
                         ),
                         BottomNavigationBarItem(
                           icon: FaIcon(
@@ -659,14 +646,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           label:
                               FlutterI18n.translate(context, "bottomBarNotes"),
-                          /*title: Text(
-                              FlutterI18n.translate(context, "bottomBarNotes"),
-                              style: TextStyle(
-                                color: _bottomNavigationColor,
-                                fontSize: ScreenUtil().setSp(fontOfContent,
-                                    allowFontScalingSelf: true),
-                              ),
-                            )*/
                         ),
                         BottomNavigationBarItem(
                           icon: Icon(
@@ -677,14 +656,6 @@ class _HomePageState extends State<HomePage> {
                           ),
                           label:
                               FlutterI18n.translate(context, "bottomBarMore"),
-                          /*title: Text(
-                              FlutterI18n.translate(context, "bottomBarMore"),
-                              style: TextStyle(
-                                color: _bottomNavigationColor,
-                                fontSize: ScreenUtil().setSp(fontOfContent,
-                                    allowFontScalingSelf: true),
-                              ),
-                            )*/
                         ),
                       ],
                       currentIndex: _currentIndex,

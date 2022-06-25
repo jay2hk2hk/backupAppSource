@@ -13,6 +13,7 @@ import 'package:share/share.dart';
 import '../main.dart';
 import 'dart:async';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:bibleapp/util/common_function.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -38,6 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
   static int bibleTitleOld = 39;
   static int titleId = 0;
   var unescape = new HtmlUnescape(); //decode th html chinese word
+  static String displayLanguage = languageTextValue[0];
 
   @override
   void initState() {
@@ -100,7 +102,9 @@ class _SettingsPageState extends State<SettingsPage> {
       tempList = _myListViewTheApostlesCreed(context);
     else if (page == 10)
       tempList = _myListViewTheNiceneCreed(context);
-    else if (page == 11) tempList = _myListViewTheAthanasianCreed(context);
+    else if (page == 11)
+      tempList = _myListViewTheAthanasianCreed(context);
+    else if (page == 12) tempList = _myListSelectLang(context);
 
     return tempList;
   }
@@ -113,7 +117,8 @@ class _SettingsPageState extends State<SettingsPage> {
       FlutterI18n.translate(context, "moreMenuBibleTodaysLevel"),
       FlutterI18n.translate(context, "moreMenuSupportForUs"),
       FlutterI18n.translate(context, "moreMenuAboutUs"),
-      FlutterI18n.translate(context, "moreMenuOtherInformation")
+      FlutterI18n.translate(context, "moreMenuOtherInformation"),
+      FlutterI18n.translate(context, "moreMenuSelectLang")
     ];
     return new Scaffold(
       appBar: AppBar(
@@ -153,7 +158,9 @@ class _SettingsPageState extends State<SettingsPage> {
                       page = 7;
                     else if (index == 5)
                       page = 5;
-                    else if (index == 6) page = 8;
+                    else if (index == 6)
+                      page = 8;
+                    else if (index == 7) page = 12;
                   });
                 }
                 /*=> Scaffold
@@ -204,6 +211,12 @@ class _SettingsPageState extends State<SettingsPage> {
             itemBuilder: (context, index) {
               return GestureDetector(
                   child: ListTile(
+                    trailing: (prefs.getInt(sharePrefLightDark) == index)
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.greenAccent,
+                          )
+                        : SizedBox.shrink(),
                     title: Text(
                       europeanCountries[index],
                       style: TextStyle(
@@ -216,11 +229,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       page = 0;
                     });
-                    if (index == 0) {
+                    /*if (index == 0) {
                       prefs.setInt(sharePrefLightDark, 0);
                     } else {
                       prefs.setInt(sharePrefLightDark, 1);
-                    }
+                    }*/
+                    prefs.setInt(sharePrefLightDark, index);
                     RestartWidget.restartApp(context);
                   });
             }, //itemBuilder
@@ -339,8 +353,10 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget _myListBibleLevel(BuildContext context) {
     // backing data
     final europeanCountries = [
-      FlutterI18n.translate(context, "basic"),
-      FlutterI18n.translate(context, "advanced")
+      FlutterI18n.translate(context, "finishedOneYearBasic"),
+      FlutterI18n.translate(context, "finishedOneYearAdvanced"),
+      FlutterI18n.translate(context, "finishedHalfYearHighGrade"),
+      FlutterI18n.translate(context, "finishedOneYearChallengeGrade")
     ];
 
     return new Scaffold(
@@ -370,6 +386,12 @@ class _SettingsPageState extends State<SettingsPage> {
             itemBuilder: (context, index) {
               return GestureDetector(
                   child: ListTile(
+                    trailing: (prefs.getInt(sharePrefReadBibleLevel) == index)
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.greenAccent,
+                          )
+                        : SizedBox.shrink(),
                     title: Text(
                       europeanCountries[index],
                       style: TextStyle(
@@ -382,11 +404,12 @@ class _SettingsPageState extends State<SettingsPage> {
                     setState(() {
                       page = 0;
                     });
-                    if (index == 0) {
+                    /*if (index == 0) {
                       prefs.setInt(sharePrefReadBibleLevel, 0);
                     } else {
                       prefs.setInt(sharePrefReadBibleLevel, 1);
-                    }
+                    }*/
+                    prefs.setInt(sharePrefReadBibleLevel, index);
                     RestartWidget.restartApp(context);
                   });
             }, //itemBuilder
@@ -672,6 +695,72 @@ class _SettingsPageState extends State<SettingsPage> {
         ));
   }
 
+  Widget _myListSelectLang(BuildContext context) {
+    // backing data
+    final europeanCountries = [
+      chnageLanguageList[0],
+      chnageLanguageList[1],
+      chnageLanguageList[2],
+      chnageLanguageList[3]
+    ];
+
+    return new Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(
+              Icons.arrow_back,
+              size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),
+            ),
+            onPressed: () => {
+              setState(() {
+                page = 0;
+              })
+            },
+          ),
+          title: Text(
+            FlutterI18n.translate(context, "moreMenuSelectLang"),
+            style: TextStyle(
+              fontSize: ScreenUtil()
+                  .setSp(fontOfContent - 5, allowFontScalingSelf: true),
+            ),
+          ),
+        ),
+        body: new Center(
+          child: ListView.separated(
+            itemCount: europeanCountries.length,
+            itemBuilder: (context, index) {
+              return GestureDetector(
+                  child: ListTile(
+                    trailing: (prefs.getString(sharePrefDisplayLanguage) ==
+                            languageTextValue[index])
+                        ? Icon(
+                            Icons.check,
+                            color: Colors.greenAccent,
+                          )
+                        : SizedBox.shrink(),
+                    title: Text(
+                      europeanCountries[index],
+                      style: TextStyle(
+                        fontSize: ScreenUtil()
+                            .setSp(fontOfContent, allowFontScalingSelf: true),
+                      ),
+                    ),
+                  ),
+                  onTap: () {
+                    setState(() {
+                      page = 0;
+                    });
+                    changeLanguage(
+                        context, languageTextValue[index], displayLanguage);
+                  });
+            }, //itemBuilder
+            separatorBuilder: (context, index) {
+              return Divider();
+            }, //separatorBuilder
+          ),
+        ));
+  }
+
   void shareToOther() {
     Share.share(copyShareReturnText());
   }
@@ -787,6 +876,21 @@ class _SettingsPageState extends State<SettingsPage> {
                         : "";
                     return Container(
                       child: ListTile(
+                        trailing: IconButton(
+                          icon: Icon(
+                            Icons.close,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () {
+                            List<String> temp = tempTitle.split('-');
+                            _showConfirm(
+                                context,
+                                "",
+                                titleId,
+                                int.parse(titleButtonText.split(' ')[1]),
+                                int.parse(temp[0]));
+                          },
+                        ),
                         title: RaisedButton(
                           color: bottomNavigationColor,
                           textColor: buttonTextColor,
@@ -900,5 +1004,44 @@ class _SettingsPageState extends State<SettingsPage> {
     //  tmepList.add('No');
 
     return tmepList;
+  }
+
+  void _showConfirm(BuildContext _context, String text, int titleId,
+      int contentId, int textId) {
+    showDialog<void>(
+      context: _context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(FlutterI18n.translate(context, "confirmDelete"),
+              style: new TextStyle(
+                  fontSize: ScreenUtil()
+                      .setSp(fontOfContent, allowFontScalingSelf: true))),
+          content: Text(text),
+          actions: <Widget>[
+            FlatButton(
+              child: Text(FlutterI18n.translate(context, "cancelButton"),
+                  style: new TextStyle(
+                      fontSize: ScreenUtil()
+                          .setSp(fontOfContent, allowFontScalingSelf: true))),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            FlatButton(
+              child: Text(FlutterI18n.translate(context, "okButton"),
+                  style: new TextStyle(
+                      fontSize: ScreenUtil()
+                          .setSp(fontOfContent, allowFontScalingSelf: true))),
+              onPressed: () async {
+                await dbHelper.deleteBookMarkByTitleIdContentIdTextId(
+                    titleId, contentId, textId);
+                Navigator.of(context).pop();
+                setState(() {});
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 }

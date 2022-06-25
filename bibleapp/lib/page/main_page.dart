@@ -19,6 +19,7 @@ import '../main.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 //import 'package:native_admob_flutter/native_admob_flutter.dart';
 import 'package:marquee_widget/marquee_widget.dart';
+import 'package:bibleapp/util/common_function.dart';
 
 GlobalKey globalKey = new GlobalKey(debugLabel: 'btm_app_bar');
 
@@ -70,7 +71,7 @@ class _MainPageState extends State<MainPage> {
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";*/
   int latestUpdateVersionNum =
-      6; //check is display the latest update box or not
+      7; //check is display the latest update box or not
   RewardedAd _rewardedAd;
   //int _numRewardedLoadAttempts = 0;
   //RewardedAd rewardedAd;
@@ -318,61 +319,89 @@ class _MainPageState extends State<MainPage> {
                     new PopupMenuItem<String>(
                       value: languageTextValue[0],
                       child: new Container(
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          child: new Text(
-                            chnageLanguageList[0],
-                            style: TextStyle(
-                              /*color: fontTextColor,*/ fontSize: ScreenUtil()
-                                  .setSp(sizeOfIcon - 10,
-                                      allowFontScalingSelf: true),
-                            ),
-                          )),
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: ListTile(
+                          trailing: prefs.getString(sharePrefDisplayLanguage) ==
+                                  languageTextValue[0]
+                              ? Icon(
+                                  Icons.check,
+                                  color: Colors.greenAccent,
+                                )
+                              : SizedBox.shrink(),
+                          title: Text(chnageLanguageList[0],
+                              style: TextStyle(
+                                fontSize: ScreenUtil().setSp(sizeOfIcon - 10,
+                                    allowFontScalingSelf: true),
+                              )),
+                        ),
+                      ),
                     ),
                     new PopupMenuDivider(height: 1.0),
                     new PopupMenuItem<String>(
                       value: languageTextValue[1],
                       child: new Container(
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          child: new Text(
-                            chnageLanguageList[1],
-                            style: TextStyle(
-                              /*color: fontTextColor,*/ fontSize: ScreenUtil()
-                                  .setSp(sizeOfIcon - 10,
-                                      allowFontScalingSelf: true),
-                            ),
-                          )),
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: ListTile(
+                          trailing: prefs.getString(sharePrefDisplayLanguage) ==
+                                  languageTextValue[1]
+                              ? Icon(
+                                  Icons.check,
+                                  color: Colors.greenAccent,
+                                )
+                              : SizedBox.shrink(),
+                          title: Text(chnageLanguageList[1],
+                              style: TextStyle(
+                                fontSize: ScreenUtil().setSp(sizeOfIcon - 10,
+                                    allowFontScalingSelf: true),
+                              )),
+                        ),
+                      ),
                     ),
                     new PopupMenuDivider(height: 1.0),
                     new PopupMenuItem<String>(
                       value: languageTextValue[2],
                       child: new Container(
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          child: new Text(
-                            chnageLanguageList[2],
-                            style: TextStyle(
-                              /*color: fontTextColor,*/ fontSize: ScreenUtil()
-                                  .setSp(sizeOfIcon - 10,
-                                      allowFontScalingSelf: true),
-                            ),
-                          )),
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: ListTile(
+                          trailing: prefs.getString(sharePrefDisplayLanguage) ==
+                                  languageTextValue[2]
+                              ? Icon(
+                                  Icons.check,
+                                  color: Colors.greenAccent,
+                                )
+                              : SizedBox.shrink(),
+                          title: Text(chnageLanguageList[2],
+                              style: TextStyle(
+                                fontSize: ScreenUtil().setSp(sizeOfIcon - 10,
+                                    allowFontScalingSelf: true),
+                              )),
+                        ),
+                      ),
                     ),
                     new PopupMenuDivider(height: 1.0),
                     new PopupMenuItem<String>(
                       value: languageTextValue[3],
                       child: new Container(
-                          width: double.infinity,
-                          alignment: Alignment.center,
-                          child: new Text(
-                            chnageLanguageList[3],
-                            style: TextStyle(
-                              /*color: fontTextColor,*/ fontSize: ScreenUtil()
-                                  .setSp(sizeOfIcon - 10,
-                                      allowFontScalingSelf: true),
-                            ),
-                          )),
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        child: ListTile(
+                          trailing: prefs.getString(sharePrefDisplayLanguage) ==
+                                  languageTextValue[3]
+                              ? Icon(
+                                  Icons.check,
+                                  color: Colors.greenAccent,
+                                )
+                              : SizedBox.shrink(),
+                          title: Text(chnageLanguageList[3],
+                              style: TextStyle(
+                                fontSize: ScreenUtil().setSp(sizeOfIcon - 10,
+                                    allowFontScalingSelf: true),
+                              )),
+                        ),
+                      ),
                     ),
                     new PopupMenuDivider(height: 1.0),
                     new PopupMenuItem<String>(
@@ -391,7 +420,8 @@ class _MainPageState extends State<MainPage> {
                     ),
                   ],
               onSelected: (String value) {
-                if (value != 'cancel') changeLanguage(value);
+                if (value != 'cancel')
+                  changeLanguage(context, value, displayLanguage);
               }),
           SizedBox(width: 20),
         ],
@@ -504,7 +534,7 @@ class _MainPageState extends State<MainPage> {
   }
 
   //language
-  changeLanguage(String value) async {
+  /*changeLanguage(String value) async {
     displayLanguage = value;
     prefs.setString(sharePrefDisplayLanguage, displayLanguage);
     String language = "";
@@ -512,12 +542,12 @@ class _MainPageState extends State<MainPage> {
     currentLang = Locale(cl[0], cl[1]);
 
     await FlutterI18n.refresh(context, currentLang);
-    setState(() {
-      //_dataForListView = queryBibleContentByTitle(_titleId,_titleNum);
-      if (languageTextValue[0] == value)
-        language = languageVolumeValue[0];
-      else if (languageTextValue[1] == value) {
-        /*bool haveTts = false;
+    //setState(() {
+    //_dataForListView = queryBibleContentByTitle(_titleId,_titleNum);
+    if (languageTextValue[0] == value)
+      language = languageVolumeValue[0];
+    else if (languageTextValue[1] == value) {
+      /*bool haveTts = false;
         for (String type in languages)
         {
           if(type.toLowerCase().indexOf('hk')>=0 || type.toLowerCase().indexOf('yue')>=0)
@@ -527,16 +557,16 @@ class _MainPageState extends State<MainPage> {
           }
         }
         if(!haveTts) language = languageVolumeValue[2];*/
-        Platform.isAndroid
-            ? language = languageVolumeValue[1]
-            : language = languageTextValue[1];
-      } else if (languageTextValue[2] == value)
-        language = languageVolumeValue[2];
-      else if (languageTextValue[3] == value) language = languageVolumeValue[3];
-      prefs.setString(sharePrefSoundLanguage, language);
-      RestartWidget.restartApp(context);
-    });
-  }
+      Platform.isAndroid
+          ? language = languageVolumeValue[1]
+          : language = languageTextValue[1];
+    } else if (languageTextValue[2] == value)
+      language = languageVolumeValue[2];
+    else if (languageTextValue[3] == value) language = languageVolumeValue[3];
+    prefs.setString(sharePrefSoundLanguage, language);
+    RestartWidget.restartApp(context);
+    //});
+  }*/
 
   void insertCrown(int type, String date) async {
     final fido = BibleCrown(
@@ -691,12 +721,17 @@ class _MainPageState extends State<MainPage> {
     }
 
     tempList.add(
-      RaisedButton(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(18.0),
+      ElevatedButton(
+        style: ButtonStyle(
+          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+          )),
+          /*textStyle: MaterialStateProperty.all<TextStyle>(TextStyle(
+            backgroundColor: bottomNavigationColor,
+            color: buttonTextColor,
+          )),*/
         ),
-        color: bottomNavigationColor,
-        textColor: buttonTextColor,
         child: Text(
           FlutterI18n.translate(
                   context, "bibleTitle." + tempTitleList[0] + ".title") +
@@ -718,10 +753,6 @@ class _MainPageState extends State<MainPage> {
           final BottomNavigationBar navigationBar = globalKey.currentWidget;
           navigationBar.onTap(1);
         },
-        //color: raisedButtonColor,
-        //textColor: buttonTextColor,
-        //padding: EdgeInsets.fromLTRB(9, 9, 9, 9),
-        //splashColor: splashColor,
       ),
     );
 
@@ -822,11 +853,12 @@ class _MainPageState extends State<MainPage> {
         for (int j = 0; j < tempContentTitleList.length; j++) {
           tempList.add(Row(
             children: [
-              RaisedButton(
-                color: bottomNavigationColor,
-                textColor: buttonTextColor,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
+              ElevatedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  )),
                 ),
                 child: Text(
                   FlutterI18n.translate(context,
@@ -918,11 +950,12 @@ class _MainPageState extends State<MainPage> {
         tempTodaysList2.length <= 1 &&
         tempTodaysList2[0] == "") {
       tempList.add(
-        RaisedButton(
-          color: bottomNavigationColor,
-          textColor: buttonTextColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        ElevatedButton(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Text(
             FlutterI18n.translate(context, "wantGetCrownText"),

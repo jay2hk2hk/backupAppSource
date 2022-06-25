@@ -29,8 +29,10 @@
     "standardStyle": "标准风格",
     "darkStyle": "黑暗风格",
     "moreMenuBibleTodaysLevel": "读经任务等级",
-    "basic": "基础",
-    "advanced": "进阶",
+    "finishedOneYearBasic": "基础（一年读完圣经）",
+    "finishedOneYearAdvanced": "进阶（一年读完圣经）",
+    "finishedHalfYearHighGrade": "高级（半年读完圣经)",
+    "finishedOneYearChallengeGrade": "挑战（一年读完圣经）",
     "bibleTodaysLevelTitle": "更改将于明天生效",
     "buttonFrom": "从",
     "buttonTo": "到",
@@ -64,6 +66,7 @@
     "moreMenuSupportForUs": "对我们的支持",
     "supportForUsText": "弟兄姊妹们的支持,分享,使用,推荐,五星好评就是对我们的支持!!\n\n有适合的广告请按一次和完成读经任务看广告拿冠冕就是对我们的捐赠!!\n\n愿主耶稣的恩惠常与弟兄姊妹们同在,神的话和福音广传!!\n\n好施舍的，必得丰裕；滋润人的，必得滋润。 （箴言11:25）\n",
     "shareAppText": "冠冕圣经\n\nGoogle Play\nhttps://play.google.com/store/apps/details?id=com.companyname.BibleApp\n\nApp Store\nhttps://apps.apple.com/us/app/crown-bible-kjv/id1492558806?ls=1",
+    "moreMenuSelectLang": "选择语言",
     "gameRulesText": "请从四个选项当中，选出一个作为正确的答案。 \n答对加一分，答错没有分。 \n当分数到达指定数目时可以升等级。 \n每天题目有限，请好好答题。 \n",
     "bibleVersion": "简体中文和合本",
     "BQA": {
@@ -280,8 +283,10 @@
         "31": "生活"
     },
     "pleaseSelect": "请选择",
+    "pleaseSpeak": "请讲圣经的章",
+    "pleaseSpeakForExample": "例如罗马书 12",
     "latestUpdates": "最新更新",
-    "latestUpdatesText": "-修复了一些关于播放圣经声音的错误",
+    "latestUpdatesText": "-新增不同读经任务等级\n-强化话音转章功能\n-优化选择章节功能\n-添加删除书签功能",
     "numberForMic": {
         "1": "一",
         "2": "二",

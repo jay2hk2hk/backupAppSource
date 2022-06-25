@@ -56,11 +56,89 @@ import 'package:flutter/material.dart';
 
 import 'package:is_lock_screen/is_lock_screen.dart';
 
+import 'package:bibleapp/util/common_function.dart';
+
+import 'package:scroll_navigation/scroll_navigation.dart';
+
 //stt
 final SpeechToText speech = SpeechToText();
 bool _hasSpeech = false;
 String _currentLocaleId = "";
 String lastWords = "";
+String lastWordsDisplay = "";
+List<String> _bibleSeletion;
+int bibleTitleTotal = 66;
+int bibleTitleNew = 40;
+var bibleTitleTotalNum = [
+  50,
+  40,
+  27,
+  36,
+  34,
+  24,
+  21,
+  4,
+  31,
+  24,
+  22,
+  25,
+  29,
+  36,
+  10,
+  13,
+  10,
+  42,
+  150,
+  31,
+  12,
+  8,
+  66,
+  52,
+  5,
+  48,
+  12,
+  14,
+  3,
+  9,
+  1,
+  4,
+  7,
+  3,
+  3,
+  3,
+  2,
+  14,
+  4,
+  28,
+  16,
+  24,
+  21,
+  28,
+  16,
+  16,
+  13,
+  6,
+  6,
+  4,
+  4,
+  5,
+  3,
+  6,
+  4,
+  3,
+  1,
+  13,
+  5,
+  5,
+  3,
+  5,
+  1,
+  1,
+  1,
+  22
+];
+String _titleNum = "1"; // save title num for bookmark
+String _titleId = "1"; // save title id for bookmark
 
 int timerStatus = 0; //0=init,1=stop,2=refresh,3=play
 int timerCountMins = 5000;
@@ -81,82 +159,15 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   //String _userName;
   //String _userId;
   final dbHelper = SQLHelper.instance;
+
   bool isInitContent = true;
   static bool isInitTitle = true;
-  static String _titleId = "1"; // save title id for bookmark
-  static String _titleNum = "1"; // save title num for bookmark
+
+  //static String _titleNum = "1"; // save title num for bookmark
+  //static String _titleId = "1"; // save title id for bookmark
   static String _contentNum = "1"; // save content num for bookmark
   static String _titleIdForDisplay =
       "1"; // save title id for bookmark for temp title display
-
-  static var bibleTitleTotalNum = [
-    50,
-    40,
-    27,
-    36,
-    34,
-    24,
-    21,
-    4,
-    31,
-    24,
-    22,
-    25,
-    29,
-    36,
-    10,
-    13,
-    10,
-    42,
-    150,
-    31,
-    12,
-    8,
-    66,
-    52,
-    5,
-    48,
-    12,
-    14,
-    3,
-    9,
-    1,
-    4,
-    7,
-    3,
-    3,
-    3,
-    2,
-    14,
-    4,
-    28,
-    16,
-    24,
-    21,
-    28,
-    16,
-    16,
-    13,
-    6,
-    6,
-    4,
-    4,
-    5,
-    3,
-    6,
-    4,
-    3,
-    1,
-    13,
-    5,
-    5,
-    3,
-    5,
-    1,
-    1,
-    1,
-    22
-  ];
 
   //List<Map<String, dynamic>> temp = new List<Map<String, dynamic>>();
   //static Map<String,dynamic> bibleAll = new Map<String,dynamic>();//get from json
@@ -168,7 +179,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
       new List<BibleContent>(); //content display
   static List<BibleTitle> jsonBibleTitleResult =
       new List<BibleTitle>(); //title display
-  static List<String> _bibleSeletion;
+
   static List<String> _bibleSeletionDefault;
   static List<BibleBookmark> _bibleBookmarkList;
   static String _titleSelection; //save title selection for back button
@@ -179,8 +190,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   static /*spl.*/ ItemScrollController
       _scrollControllerForTitlePage = /*spl.*/ ItemScrollController(); //the scroll controller of jump to
   static int listViewInitIndex = 1;
-  static int bibleTitleTotal = 66;
-  static int bibleTitleNew = 40;
+
   static int bibleTitleOld = 39;
   FlutterTts flutterTts = FlutterTts(); //tts
   //tts setting
@@ -259,154 +269,6 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
 
   int _scrollControllerForTitlePageTime = 100;
   int _scrollControllerTime = 100;
-
-  void errorListener(SpeechRecognitionError error) {
-    print("Received error status: $error, listening: ${speech.isListening}");
-    //Navigator.pop(context);
-    stopListening();
-    setState(() {
-      //lastError = "${error.errorMsg} - ${error.permanent}";
-    });
-  }
-
-  void statusListener(String status) {
-    print(
-        "Received listener status: $status, listening: ${speech.isListening}");
-    //if(!speech.isListening)
-    //Navigator.pop(context);
-    setState(() {
-      //lastStatus = "$status";
-    });
-  }
-
-  Future<void> initSpeechState() async {
-    bool hasSpeech = await speech.initialize(
-        onError: errorListener, onStatus: statusListener);
-    if (hasSpeech) {
-      //_localeNames = await speech.locales();
-
-      var systemLocale = await speech.systemLocale();
-      _currentLocaleId =
-          prefs.getString(sharePrefSoundLanguage); //systemLocale.localeId;
-    }
-
-    if (!mounted) return;
-
-    setState(() {
-      _hasSpeech = hasSpeech;
-    });
-  }
-
-  void startListening() {
-    lastWords = "";
-    //lastError = "";
-    speech.listen(
-        onResult: resultListener,
-        listenFor: Duration(seconds: 5),
-        localeId: _currentLocaleId,
-        //onSoundLevelChange: soundLevelListener,
-        cancelOnError: true,
-        partialResults: true);
-    setState(() {});
-  }
-
-  void stopListening() {
-    speech.stop();
-    setState(() {
-      //level = 0.0;
-    });
-  }
-
-  void cancelListening() {
-    speech.cancel();
-    setState(() {
-      //level = 0.0;
-    });
-  }
-
-  void resultListener(SpeechRecognitionResult result) {
-    setState(() {
-      //var translation = await translator.translate('馬太福音2',from:'zh-tw', to: 'en');
-      //print(translation);
-      //lastWords = "${result.recognizedWords} - ${result.finalResult}";
-      if (result.finalResult) {
-        if (_bibleSeletion == null) _bibleSeletion = queryBibleTitleByDefault();
-        lastWords = result.recognizedWords;
-        String titleForSTT = "";
-        //print("lastWords="+lastWords);
-        for (int i = 0; i < _bibleSeletion.length; i++) {
-          //lastWords.contains(_bibleSeletion[i]);
-          if (i != 0 &&
-              i != 39 &&
-              i != 68 &&
-              lastWords.contains(_bibleSeletion[i])) {
-            titleForSTT = getBibleTitleIdByTitle(_bibleSeletion[i]);
-            if (double.tryParse(titleForSTT) != null) {}
-            lastWords = lastWords.substring(_bibleSeletion[i].length);
-          }
-        }
-        if (titleForSTT == "") {
-          List<String> tempList = queryBibleWrong();
-          for (int y = 0; y < tempList.length; y++) {
-            if (lastWords.contains(tempList[y])) {
-              int tempNum = 0;
-              if (y == 0) {
-                tempNum = 13;
-              } else
-                tempNum = 14;
-              titleForSTT = getBibleTitleIdByTitle(_bibleSeletion[tempNum]);
-              lastWords = lastWords.substring(_bibleSeletion[tempNum].length);
-            }
-          }
-        }
-        //print("titleForSTT="+titleForSTT);
-        if (titleForSTT != "") {
-          _titleId = titleForSTT.toString();
-          List<String> tempTitleNumList = queryTitleNum(titleForSTT);
-          String titleNum = "0";
-          for (int j = 0; j < tempTitleNumList.length; j++) {
-            if (lastWords.indexOf(tempTitleNumList[j]) >= 0 &&
-                tempTitleNumList[j] != "") {
-              titleNum = tempTitleNumList[j];
-              //print(lastWords);
-              //break;
-            }
-          }
-
-          //int title = tempTitleNumList.indexWhere((element) => element.toLowerCase().contains(lastWords));
-          if (titleNum != "0") {
-            _titleNum = titleNum;
-
-            /*lastWords = lastWords.substring(titleNum.length);
-            List<String> tempContentList = queryBibleContentByTitleForSTT(_titleId,_titleNum);
-            String contentNum = "0";
-            for(int k = 0; k<tempContentList.length; k++)
-            {
-              if(lastWords.lastIndexOf(tempTitleNumList[k])>=0 && tempTitleNumList[k]!="")
-              {
-                contentNum = (k+1).toString();
-              }
-            }
-            if(contentNum!="0")
-              _contentNum = contentNum;*/
-
-          } else {
-            List<String> tmepNumMic = queryNumberMic();
-            for (int x = 0; x < tmepNumMic.length; x++)
-              if (tmepNumMic[x] == lastWords) titleNum = (x + 1).toString();
-            if (titleNum == "0")
-              _titleNum = "1";
-            else
-              _titleNum = titleNum.toString();
-          }
-        }
-
-        //int title = _bibleSeletion.indexWhere((element) => element.toLowerCase().contains(lastWords));
-        //print("lastWords="+lastWords);
-        //Navigator.pop(context);
-      }
-    });
-  }
 
   //true ads native adv android
   //ca-app-pub-9860072337130869/2224676926
@@ -490,6 +352,9 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
 
     language = prefs.getString(sharePrefSoundLanguage);
     displayLanguage = prefs.getString(sharePrefDisplayLanguage);
+    Future.delayed(Duration.zero, () {
+      loadQueryToTitleList2();
+    });
 
     _initTheSelectionList();
     _initTts();
@@ -807,6 +672,164 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
     super.dispose();
   }
 
+  void errorListener(SpeechRecognitionError error) {
+    print("Received error status: $error, listening: ${speech.isListening}");
+    //Navigator.pop(context);
+    stopListening();
+    setState(() {
+      //lastError = "${error.errorMsg} - ${error.permanent}";
+    });
+  }
+
+  void statusListener(String status) {
+    print(
+        "Received listener status: $status, listening: ${speech.isListening}");
+    //if(!speech.isListening)
+    //Navigator.pop(context);
+    setState(() {
+      //lastStatus = "$status";
+    });
+  }
+
+  Future<void> initSpeechState() async {
+    bool hasSpeech = await speech.initialize(
+        onError: errorListener, onStatus: statusListener);
+    if (hasSpeech) {
+      //_localeNames = await speech.locales();
+
+      var systemLocale = await speech.systemLocale();
+      _currentLocaleId =
+          prefs.getString(sharePrefSoundLanguage); //systemLocale.localeId;
+    }
+
+    if (!mounted) return;
+
+    setState(() {
+      _hasSpeech = hasSpeech;
+    });
+  }
+
+  void startListening() {
+    lastWords = "";
+    lastWordsDisplay = "";
+    //lastError = "";
+    speech.listen(
+        onResult: resultListener,
+        listenFor: Duration(seconds: 5),
+        localeId: _currentLocaleId,
+        //onSoundLevelChange: soundLevelListener,
+        cancelOnError: true,
+        partialResults: true);
+    setState(() {});
+  }
+
+  void stopListening() {
+    speech.stop();
+    Navigator.pop(context);
+    setState(() {
+      //level = 0.0;
+    });
+  }
+
+  void cancelListening() {
+    speech.cancel();
+    Navigator.pop(context);
+    setState(() {
+      //level = 0.0;
+    });
+  }
+
+  void resultListener(SpeechRecognitionResult result) {
+    setState(() {
+      //var translation = await translator.translate('馬太福音2',from:'zh-tw', to: 'en');
+      //print(translation);
+      //lastWords = "${result.recognizedWords} - ${result.finalResult}";
+
+      if (result.finalResult) {
+        if (_bibleSeletion == null)
+          _bibleSeletion =
+              queryBibleTitleByDefault(context, bibleTitleTotal, bibleTitleNew);
+        lastWords = result.recognizedWords;
+        lastWordsDisplay = lastWords;
+        print("lastWordsDisplay=" + lastWordsDisplay);
+        String titleForSTT = "";
+        //print("lastWords="+lastWords);
+        for (int i = 0; i < _bibleSeletion.length; i++) {
+          //lastWords.contains(_bibleSeletion[i]);
+          if (i != 0 &&
+              i != 39 &&
+              i != 68 &&
+              lastWords.contains(_bibleSeletion[i])) {
+            titleForSTT = getBibleTitleIdByTitle(context, _bibleSeletion[i]);
+            if (double.tryParse(titleForSTT) != null) {}
+            lastWords = lastWords.substring(_bibleSeletion[i].length);
+          }
+        }
+        if (titleForSTT == "") {
+          List<String> tempList = queryBibleWrong(context);
+          for (int y = 0; y < tempList.length; y++) {
+            if (lastWords.contains(tempList[y])) {
+              int tempNum = 0;
+              if (y == 0) {
+                tempNum = 13;
+              } else
+                tempNum = 14;
+              titleForSTT =
+                  getBibleTitleIdByTitle(context, _bibleSeletion[tempNum]);
+              lastWords = lastWords.substring(_bibleSeletion[tempNum].length);
+            }
+          }
+        }
+        //print("titleForSTT="+titleForSTT);
+        if (titleForSTT != "") {
+          _titleId = titleForSTT.toString();
+          List<String> tempTitleNumList =
+              queryTitleNum(titleForSTT, bibleTitleTotalNum);
+          String titleNum = "0";
+          for (int j = 0; j < tempTitleNumList.length; j++) {
+            if (lastWords.indexOf(tempTitleNumList[j]) >= 0 &&
+                tempTitleNumList[j] != "") {
+              titleNum = tempTitleNumList[j];
+              //print(lastWords);
+              //break;a
+            }
+          }
+
+          //int title = tempTitleNumList.indexWhere((element) => element.toLowerCase().contains(lastWords));
+          if (titleNum != "0") {
+            _titleNum = titleNum;
+
+            /*lastWords = lastWords.substring(titleNum.length);
+            List<String> tempContentList = queryBibleContentByTitleForSTT(_titleId,_titleNum);
+            String contentNum = "0";
+            for(int k = 0; k<tempContentList.length; k++)
+            {
+              if(lastWords.lastIndexOf(tempTitleNumList[k])>=0 && tempTitleNumList[k]!="")
+              {
+                contentNum = (k+1).toString();
+              }
+            }
+            if(contentNum!="0")
+              _contentNum = contentNum;*/
+
+          } else {
+            List<String> tmepNumMic = queryNumberMic(context);
+            for (int x = 0; x < tmepNumMic.length; x++)
+              if (tmepNumMic[x] == lastWords) titleNum = (x + 1).toString();
+            if (titleNum == "0")
+              _titleNum = "1";
+            else
+              _titleNum = titleNum.toString();
+          }
+        }
+
+        //int title = _bibleSeletion.indexWhere((element) => element.toLowerCase().contains(lastWords));
+        print("lastWords=" + lastWords);
+        Navigator.pop(context);
+      }
+    });
+  }
+
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
     if (ttsState == TtsState.playing) _stopSpeak();
@@ -1016,7 +1039,17 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   //every stat reload the list view
   Future<List<String>> loadQueryToTitleList() async {
     if (_state == 1) {
-      _bibleSeletion = queryBibleTitleByDefault();
+      _bibleSeletion =
+          queryBibleTitleByDefault(context, bibleTitleTotal, bibleTitleNew);
+    }
+
+    return _bibleSeletion;
+  }
+
+  List<String> loadQueryToTitleList2() {
+    if (_state == 1) {
+      _bibleSeletion =
+          queryBibleTitleByDefault(context, bibleTitleTotal, bibleTitleNew);
     }
 
     return _bibleSeletion;
@@ -1202,7 +1235,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   }
 
 //query title by default
-  List<String> queryBibleTitleByDefault() {
+  /*<String> queryBibleTitleByDefault() {
     //_bibleSeletionDefault = [FlutterI18n.translate(context, "bibleTitleSelection.1.selection"),FlutterI18n.translate(context, "bibleTitleSelection.2.selection")];
     //_titleSelection = _bibleSeletionDefault[1];//save title selection for back button
     //return _bibleSeletionDefault;
@@ -1211,14 +1244,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
     int endCount = bibleTitleTotal;
     //int endCount = jsonBibleTitleResult.length;
 
-    /*if(text==_bibleSeletionDefault[0])
-    {
-      endCount = bibleTitleOld;
-    }
-    else if(text==_bibleSeletionDefault[1])
-    {
-      startCount = bibleTitleNew;
-    }*/
+   
     for (int i = startCount; i <= endCount; i++) {
       if (i == startCount)
         tmepList.add(FlutterI18n.translate(context,
@@ -1231,23 +1257,23 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
     }
     tmepList.add('');
     return tmepList;
-  }
+  }*/
 
-  List<String> queryNumberMic() {
+  /*List<String> queryNumberMic() {
     List<String> tmepList = new List<String>();
     for (int i = 1; i <= 10; i++) {
       tmepList.add(FlutterI18n.translate(context, "numberForMic.$i"));
     }
     return tmepList;
-  }
+  }*/
 
-  List<String> queryBibleWrong() {
+  /*List<String> queryBibleWrong() {
     List<String> tmepList = new List<String>();
     for (int i = 1; i <= 2; i++) {
       tmepList.add(FlutterI18n.translate(context, "bibleTitleWrongFix.$i"));
     }
     return tmepList;
-  }
+  }*/
 
   List<String> queryBibleContentByTitleForSTT(String titleId, String titleNum) {
     /*List<BibleContent> t = jsonBibleContentResult.where((v) => v.titleId == titleId  && v.titleNum == titleNum).toList();
@@ -1280,13 +1306,13 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   }
 
 //query title by title
-  String getBibleTitleIdByTitle(String title) {
+  /*String getBibleTitleIdByTitle(String title) {
     //List<BibleTitle> temp = jsonBibleTitleResult.where((v) => v.title == title).toList();
     //return temp[0].titleId;
     String temp = FlutterI18n.translate(context,
         "bibleTitle.$title.titleId") /*bibleAll["bibleTitle"][title]["titleId"]*/;
     return temp;
-  }
+  }*/
 
 //query title by titleid
   String getBibleTitleByTitleId(String titleId) {
@@ -1331,13 +1357,13 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   }
 
 //query title by num
-  List<String> queryTitleNum(String titleId) {
+  /*List<String> queryTitleNum(String titleId) {
     int temp = bibleTitleTotalNum[int.parse(titleId) - 1];
     List<String> tmepList = List.generate(temp, (i) => (i + 1).toString());
     tmepList.add('');
 
     return tmepList;
-  }
+  }*/
 
 // when select the list
   _onSelectedList(int index, String text) {
@@ -1389,7 +1415,8 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
     setState(() {
       _state = 1;
       _bibleListTitle = "";
-      _bibleSeletion = queryBibleTitleByDefault();
+      _bibleSeletion =
+          queryBibleTitleByDefault(context, bibleTitleTotal, bibleTitleNew);
       _titleIdForDisplay = _titleId;
       //_bibleTitleButtonText.replaceAll(new RegExp(r'$titleNum'), '');
       //_titleId = getBibleTitleIdByTitle(_bibleTitleButtonText.replaceAll(new RegExp(r' $titleNum'), ''));
@@ -1402,9 +1429,9 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
     if (_state == 1) {
       setState(() {
         //_titleSelection = text;
-        _titleIdForDisplay = getBibleTitleIdByTitle(text);
+        _titleIdForDisplay = getBibleTitleIdByTitle(content, text);
         _bibleListTitle = text;
-        _bibleSeletion = queryTitleNum(_titleIdForDisplay);
+        _bibleSeletion = queryTitleNum(_titleIdForDisplay, bibleTitleTotalNum);
         if (_titleIdForDisplay == _titleId)
           _scrollControllerForTitlePage.scrollTo(
               index: int.parse(_titleNum) - 1,
@@ -1420,7 +1447,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
     } else if (_state == 2) {
       setState(() {
         //_titleSelection = text;
-        _titleId = getBibleTitleIdByTitle(_bibleListTitle);
+        _titleId = getBibleTitleIdByTitle(content, _bibleListTitle);
         _titleNum = text;
         _bibleListTitle = "";
         //_dataForListView = queryBibleContentByTitle(_titleId,_titleNum);
@@ -1433,6 +1460,48 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
                 Duration(milliseconds: _scrollControllerForTitlePageTime));
         _scrollController.scrollTo(
             index: 0, duration: Duration(milliseconds: _scrollControllerTime));
+        Navigator.pop(content);
+      });
+    }
+  }
+
+  // when select the list
+  _onSelectedListTitle2(String text, BuildContext content) {
+    if (_state == 1) {
+      setState(() {
+        //_titleSelection = text;
+        _titleIdForDisplay = getBibleTitleIdByTitle(content, text);
+        _bibleListTitle = text;
+        _bibleSeletion = queryTitleNum(_titleIdForDisplay, bibleTitleTotalNum);
+        /*if (_titleIdForDisplay == _titleId)
+          _scrollControllerForTitlePage.scrollTo(
+              index: int.parse(_titleNum) - 1,
+              duration:
+                  Duration(milliseconds: _scrollControllerForTitlePageTime));
+        else
+          _scrollControllerForTitlePage.scrollTo(
+              index: 0,
+              duration:
+                  Duration(milliseconds: _scrollControllerForTitlePageTime));*/
+        _state = 2;
+      });
+    } else if (_state == 2) {
+      setState(() {
+        //_titleSelection = text;
+        _state = 1;
+        _titleId = getBibleTitleIdByTitle(content, _bibleListTitle);
+        _titleNum = text;
+        _bibleListTitle = "";
+        //_dataForListView = queryBibleContentByTitle(_titleId,_titleNum);
+
+        _bibleTitleButtonText =
+            getBibleTitleByTitleId(_titleId) + ' ' + _titleNum;
+        /*_scrollControllerForTitlePage.scrollTo(
+            index: 0,
+            duration:
+                Duration(milliseconds: _scrollControllerForTitlePageTime));
+        _scrollController.scrollTo(
+            index: 0, duration: Duration(milliseconds: _scrollControllerTime));*/
         Navigator.pop(content);
       });
     }
@@ -1622,12 +1691,12 @@ void _insert(Map<String, dynamic> row) async {
               onPressed: () {
                 if ((_hasSpeech || !speech.isListening) && !isButtonDisable) {
                   startListening();
-                  /*showDialog(
-              barrierDismissible: false,
-              context: context,
-              builder: (_) {
-                return MyDialog();
-              });*/
+                  showDialog(
+                      barrierDismissible: false,
+                      context: context,
+                      builder: (_) {
+                        return MyDialogMic();
+                      });
                 }
               }),
           SizedBox(
@@ -1910,8 +1979,8 @@ void _insert(Map<String, dynamic> row) async {
         ],
       ),
       drawer: Container(
-        width: ScreenUtil().setSp(650, allowFontScalingSelf: true),
-        child: myDrawer(context),
+        width: ScreenUtil().setSp(1050, allowFontScalingSelf: true),
+        child: myDrawer2(context),
       ),
 
       //endDrawer: myDrawer2(context),
@@ -2370,17 +2439,240 @@ void _insert(Map<String, dynamic> row) async {
 
   Widget myDrawer2(BuildContext context) {
     return Drawer(
-        child: Row(
-      children: <Widget>[
-        IconButton(
-          icon: FaIcon(
-            FontAwesomeIcons.ellipsisV,
-            color: iconColor,
+      child: MediaQuery.removePadding(
+        context: context,
+        //移除抽屉菜单顶部默认留白
+        removeTop: true,
+        removeBottom: true,
+        child: new Scaffold(
+            appBar: PreferredSize(
+              preferredSize: Size.fromHeight(70.0), // here the desired height
+              child: AppBar(
+                automaticallyImplyLeading: false,
+                title: Column(children: <Widget>[
+                  //Text(''),//empty row
+                  Row(
+                    children: <Widget>[
+                      InkWell(
+                        child: Container(
+                          child: Icon(
+                            Icons.arrow_back,
+                            color: iconColor,
+                            size: ScreenUtil()
+                                .setSp(sizeOfIcon, allowFontScalingSelf: true),
+                          ),
+                        ),
+                        onTap: () => !isButtonDisable
+                            ? _onBackSelectedListTitle(context)
+                            : null,
+                      ),
+                      /*IconButton(
+                            //alignment: Alignment.bottomCenter,
+                            icon: Icon(Icons.arrow_back, size: ScreenUtil().setSp(sizeOfIcon, allowFontScalingSelf: true),),
+                            onPressed: () => !isButtonDisable ? _onBackSelectedListTitle(context) : null,
+                          ),*/
+                      SizedBox(
+                        width:
+                            ScreenUtil().setSp(10, allowFontScalingSelf: true),
+                      ),
+                      Text(
+                        _bibleListTitle,
+                        style: new TextStyle(
+                          fontSize: ScreenUtil().setSp(fontOfTitleButton,
+                              allowFontScalingSelf: true),
+                          //color:buttonTextColor
+                        ),
+                      ),
+                    ],
+                  ),
+                ]),
+              ),
+            ),
+            body: _myListViewForTitle2(context)),
+      ),
+    );
+  }
+
+  //list view for  setup
+  Widget _myListViewForTitle2(BuildContext context) {
+    Widget tempWidget = new Container();
+    if (_state == 1) {
+      List<String> temp = loadQueryToTitleList2();
+      List<Widget> tempListLeft = new List<Widget>();
+      List<Widget> tempListRight = new List<Widget>();
+      for (int i = 0; i < bibleTitleNew; i++) {
+        tempListLeft.add(ElevatedButton(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
-          onPressed: null,
-        )
+          child: Text(
+            temp[i],
+            style: new TextStyle(
+              fontSize: ScreenUtil().setSp(fontOfContent,
+                  allowFontScalingSelf: true), //color: buttonTextColor
+            ),
+          ),
+          onPressed: () {
+            if (i != 0) _onSelectedListTitle2(temp[i], context);
+          },
+        ));
+      }
+      for (int j = bibleTitleNew; j < bibleTitleTotal; j++) {
+        tempListRight.add(ElevatedButton(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
+          ),
+          child: Text(
+            temp[j],
+            style: new TextStyle(
+              fontSize: ScreenUtil().setSp(fontOfContent,
+                  allowFontScalingSelf: true), //color: buttonTextColor
+            ),
+          ),
+          onPressed: () {
+            if (j != bibleTitleNew) _onSelectedListTitle2(temp[j], context);
+          },
+        ));
+      }
+
+      tempWidget = new Container(
+          child: SingleChildScrollView(
+              child: Column(children: [
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Column(children: tempListLeft),
+            Column(children: tempListRight),
+          ],
+        ),
+      ])));
+    } else if (_state == 2) {
+      List<String> temp = loadQueryToTitleList2();
+      List<Widget> tempList = new List<Widget>();
+      for (int i = 0; i < temp.length - 1; i++) {
+        tempList.add(ElevatedButton(
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(360.0),
+            )),
+          ),
+          child: Text(
+            temp[i],
+            style: new TextStyle(
+              fontSize: ScreenUtil().setSp(fontOfContent,
+                  allowFontScalingSelf: true), //color: buttonTextColor
+            ),
+          ),
+          onPressed: () {
+            _onSelectedListTitle2(temp[i], context);
+          },
+        ));
+      }
+
+      tempWidget = new Container(
+          child: SingleChildScrollView(
+              padding: EdgeInsets.all(
+                  ScreenUtil().setSp(16.0, allowFontScalingSelf: true)),
+              child: Wrap(
+                spacing: ScreenUtil()
+                    .setSp(8.0, allowFontScalingSelf: true), // 主轴(水平)方向间距
+                runSpacing: ScreenUtil()
+                    .setSp(4.0, allowFontScalingSelf: true), // 纵轴（垂直）方向间距
+                alignment: WrapAlignment.start, //沿主轴方向居中
+                children: tempList,
+              )));
+    }
+
+    return tempWidget;
+    /*TitleScrollNavigation(
+      barStyle: TitleNavigationBarStyle(
+        background: prefs.getInt(sharePrefLightDark) == 0
+            ? buttonTextColor
+            : boxShadowColor,
+        style: TextStyle(
+          fontWeight: FontWeight.bold,
+          fontSize:
+              ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),
+        ),
+        padding: EdgeInsets.symmetric(horizontal: 40.0),
+        spaceBetween: 40,
+      ),
+      titles: [
+        FlutterI18n.translate(context, "bibleTitleSelection.1.selection"),
+        FlutterI18n.translate(context, "bibleTitleSelection.2.selection"),
       ],
-    ));
+      pages: [
+        Container(color: Colors.blue[50]),
+        Container(color: Colors.red[50]),
+      ],
+    );*/
+    /*new FutureBuilder<List>(
+      future: loadQueryToTitleList(),
+      initialData: List(),
+      builder: (context, snapshot) {
+        return new /*spl.*/ ScrollablePositionedList.separated(
+          itemScrollController: _scrollControllerForTitlePage,
+          itemCount: snapshot.data == null ? 0 : snapshot.data.length,
+          separatorBuilder: (context, index) =>
+              Divider(height: 1.0, color: splashColor),
+          itemBuilder: (context, index) {
+            if (snapshot.data.length > index) {
+              if (snapshot.data[index] == '' ||
+                  (((index == 0 &&
+                              snapshot.data[index] ==
+                                  FlutterI18n.translate(context,
+                                      "bibleTitleSelection.1.selection") /*bibleAll["bibleTitleSelection"]["1"]["selection"]*/) ||
+                          (index == bibleTitleNew &&
+                              snapshot.data[index] ==
+                                  FlutterI18n.translate(context,
+                                      "bibleTitleSelection.2.selection") /*bibleAll["bibleTitleSelection"]["2"]["selection"]*/)) &&
+                      _state == 1)) {
+                return Container(
+                  child: ListTile(
+                    title: Text(
+                      snapshot.data.length == 0
+                          ? ""
+                          : snapshot.data[index] == ''
+                              ? ''
+                              : snapshot.data[index] + ":",
+                      style: new TextStyle(
+                        fontSize: ScreenUtil()
+                            .setSp(fontOfContent, allowFontScalingSelf: true),
+                        //color:fontTextColor
+                      ),
+                    ),
+                    onTap: () => null,
+                  ),
+                );
+              } else {
+                return Container(
+                  child: ListTile(
+                    title: Text(
+                      snapshot.data.length == 0 ? "" : snapshot.data[index],
+                      style: new TextStyle(
+                        fontSize: ScreenUtil()
+                            .setSp(fontOfContent, allowFontScalingSelf: true),
+                        //color:fontTextColor
+                      ),
+                    ),
+                    onTap: () =>
+                        _onSelectedListTitle(snapshot.data[index], context),
+                  ),
+                );
+              }
+            }
+          }, //itemBuilder
+        );
+      },
+    );*/
   }
 }
 
@@ -2589,6 +2881,116 @@ class ModalFitState extends State<ModalFit> {
                 )),
           )),
         ),
+      ),
+    );
+  }
+}
+
+class MyDialogMic extends StatefulWidget {
+  @override
+  _MyDialogStateMic createState() => new _MyDialogStateMic();
+}
+
+class _MyDialogStateMic extends State<MyDialogMic> {
+  //timer
+  //Timer _timer;
+  //int _start = 6000;
+  @override
+  void initState() {
+    super.initState();
+    //startTimer();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  /*void startTimer() {
+    const oneSec = const Duration(milliseconds: 50);
+    _timer = new Timer.periodic(
+      oneSec,
+      (Timer timer) => setState(
+        () {
+          if (_start <= 50) {
+            setState(() {});
+            timer.cancel();
+            Navigator.pop(context);
+          } else {
+            setState(() {});
+          }
+        },
+      ),
+    );
+  }*/
+
+  @override
+  Widget build(BuildContext context) {
+    return ButtonBarTheme(
+      data: ButtonBarThemeData(alignment: MainAxisAlignment.center),
+      child: AlertDialog(
+        shape: RoundedRectangleBorder(
+            //Alert Dialog with Rounded corners in flutter
+            borderRadius: BorderRadius.all(Radius.circular(20.0))),
+        title: Text(
+          FlutterI18n.translate(context, "pleaseSpeak"),
+          textAlign: TextAlign.center,
+          style: TextStyle(
+              color: iconAlertDialogColor, fontWeight: FontWeight.bold),
+        ),
+        content: Icon(
+          FontAwesomeIcons.microphone,
+          color: fontTextColor,
+          size: ScreenUtil().setSp(150, allowFontScalingSelf: true),
+        ),
+        actions: <Widget>[
+          Row(
+              //mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                Text(
+                  FlutterI18n.translate(context, "pleaseSpeakForExample"),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: iconAlertDialogColor, fontWeight: FontWeight.bold),
+                ),
+                /*IconButton(
+                    icon: FaIcon(
+                      FontAwesomeIcons.times, /*color: iconAlertDialogColor,*/
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        //_start = timerCountMins;
+                        //timerStatus = 1;
+                      });
+                      //_timer.cancel();
+                      Navigator.pop(context);
+                    }),
+                IconButton(
+                    icon: FaIcon(
+                      FontAwesomeIcons.sync, /*color: iconAlertDialogColor,*/
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        //_start = timerCountMins;
+                        //timerStatus = 2;
+                      });
+                      //_timer.cancel();
+                      Navigator.pop(context);
+                    }),
+                IconButton(
+                    icon: FaIcon(
+                      FontAwesomeIcons.play, /*color: iconAlertDialogColor,*/
+                    ),
+                    onPressed: () {
+                      setState(() {
+                        //_start = timerCountMins;
+                        //timerStatus = 3;
+                      });
+                      //_timer.cancel();
+                      Navigator.pop(context);
+                    }),*/
+              ]),
+        ],
       ),
     );
   }
