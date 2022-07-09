@@ -71,7 +71,7 @@ class _MainPageState extends State<MainPage> {
       ? "ca-app-pub-9860072337130869~8212800236"
       : "ca-app-pub-9860072337130869~3480731194";*/
   int latestUpdateVersionNum =
-      7; //check is display the latest update box or not
+      8; //check is display the latest update box or not
   RewardedAd _rewardedAd;
   //int _numRewardedLoadAttempts = 0;
   //RewardedAd rewardedAd;

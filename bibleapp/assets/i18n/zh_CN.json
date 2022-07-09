@@ -286,7 +286,7 @@
     "pleaseSpeak": "请讲圣经的章",
     "pleaseSpeakForExample": "例如罗马书 12",
     "latestUpdates": "最新更新",
-    "latestUpdatesText": "-新增不同读经任务等级\n-强化话音转章功能\n-优化选择章节功能\n-添加删除书签功能",
+    "latestUpdatesText": "-修复菜单问题",
     "numberForMic": {
         "1": "一",
         "2": "二",

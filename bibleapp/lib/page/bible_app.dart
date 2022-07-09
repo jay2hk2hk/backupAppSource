@@ -2520,7 +2520,7 @@ void _insert(Map<String, dynamic> row) async {
           },
         ));
       }
-      for (int j = bibleTitleNew; j < bibleTitleTotal; j++) {
+      for (int j = bibleTitleNew; j < bibleTitleTotal + 2; j++) {
         tempListRight.add(ElevatedButton(
           style: ButtonStyle(
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
