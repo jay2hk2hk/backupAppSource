@@ -172,7 +172,7 @@ class _NotesPageState extends State<NotesPage> {
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
     if (page != 0) {
-      if (page == 2) {
+      if (page == 1) {
         _saveNote(true);
         /*if (_controller.text != "" || _controller2.text != "") {
           _saveNote();
@@ -343,7 +343,8 @@ class _NotesPageState extends State<NotesPage> {
                   borderRadius: BorderRadius.circular(18.0),
                 ),
                 child: Text(
-                  /*event[0].toString() + ' ' +*/ event[1].toString(),
+                  "",
+                  /*event[0].toString() + ' ' +*/ //event[1].toString(),
                   style: new TextStyle(
                       fontSize: ScreenUtil()
                           .setSp(fontOfContent, allowFontScalingSelf: true),
@@ -579,7 +580,7 @@ class _NotesPageState extends State<NotesPage> {
       });
     }
     setState(() {
-      if (isBack) page = 1;
+      if (isBack) page = 0;
     });
   }
 
@@ -608,7 +609,8 @@ class _NotesPageState extends State<NotesPage> {
               },
             ),
             title: Text(
-              dateFormat.format(eventNoteTitle).toString(),
+              //dateFormat.format(eventNoteTitle).toString(),
+              FlutterI18n.translate(context, "bottomBarNotes"),
               style: new TextStyle(
                   fontSize: ScreenUtil()
                       .setSp(fontOfContent - 5, allowFontScalingSelf: true),
@@ -626,7 +628,7 @@ class _NotesPageState extends State<NotesPage> {
                   ),
                   itemBuilder: (BuildContext context) =>
                       <PopupMenuEntry<String>>[
-                        new PopupMenuItem<String>(
+                        /*new PopupMenuItem<String>(
                           value: 'save',
                           child: Icon(
                             FontAwesomeIcons.save,
@@ -634,7 +636,7 @@ class _NotesPageState extends State<NotesPage> {
                             size: ScreenUtil()
                                 .setSp(sizeOfIcon, allowFontScalingSelf: true),
                           ),
-                        ),
+                        ),*/
                         new PopupMenuDivider(height: 1.0),
                         new PopupMenuItem<String>(
                           value: 'delete',
@@ -680,7 +682,7 @@ class _NotesPageState extends State<NotesPage> {
                     if (value == 'save') {
                       _saveNote(false);
                     } else if (value == 'delete') {
-                      _showConfirm(context, "");
+                      _showConfirm(context, "", 0);
                     } else if (value == 'copy') {
                       Clipboard.setData(new ClipboardData(
                           text: _controller.text + "\n" + _controller2.text));
@@ -781,9 +783,48 @@ class _NotesPageState extends State<NotesPage> {
   }
 
   Widget getNotesListPage(BuildContext context) {
-    return Scaffold(
+    final f = new DateFormat('yyyy-MM-dd');
+    return /*new Scaffold(
       appBar: AppBar(
-        leading: IconButton(
+        title: Text(
+          FlutterI18n.translate(context, "bottomBarNotes"),
+          style: TextStyle(
+            fontSize: ScreenUtil()
+                .setSp(fontOfContent - 5, allowFontScalingSelf: true),
+          ),
+        ),
+      ),
+      body: new Center(
+        child: ListView.separated(
+          itemCount: europeanCountries.length,
+          itemBuilder: (context, index) {
+            return GestureDetector(
+                child: ListTile(
+                  title: Text(
+                    europeanCountries[index],
+                    style: TextStyle(
+                      fontSize: ScreenUtil()
+                          .setSp(fontOfContent, allowFontScalingSelf: true),
+                    ),
+                  ),
+                ),
+                onTap: () {
+                }
+                /*=> Scaffold
+                    .of(context)
+                    .showSnackBar(SnackBar(content: Text(index.toString()))),*/
+                );
+          }, //itemBuilder
+          separatorBuilder: (context, index) {
+            return Divider();
+          }, //separatorBuilder
+        ),
+      ),
+    );*/
+
+        Scaffold(
+      appBar: AppBar(
+        /*leading: IconButton(
           icon: Icon(
             Icons.arrow_back,
             /*color: Colors.black*/ size:
@@ -794,30 +835,14 @@ class _NotesPageState extends State<NotesPage> {
               page = 0;
             });
           },
-        ),
+        ),*/
         title: Text(
-          dateFormat.format(eventNoteTitle).toString(),
+          FlutterI18n.translate(context, "bottomBarNotes"),
           style: new TextStyle(
               fontSize:
                   ScreenUtil().setSp(fontOfContent, allowFontScalingSelf: true),
               color: buttonTextColor),
         ),
-        /*actions: <Widget>[
-          IconButton(icon: Icon(FontAwesomeIcons.save,color: iconColor,), onPressed: () async
-          {
-              editCurrentNotes = BibleNotes(id:editCurrentNotes.id,title: _controller.text,content: _controller2.text,date: eventNoteTitle.toString());
-              int id = await dbHelper.insertNotes(editCurrentNotes);
-              editCurrentNotes = BibleNotes(id:id,title: _controller.text,content: _controller2.text,date: eventNoteTitle.toString());
-              setState(() {
-                page = 0;
-              });
-          }),
-          IconButton(icon: Icon(FontAwesomeIcons.trash,color: iconColor,), onPressed: () //async
-          {
-            _showConfirm(context,"");
-              
-          }),
-        ],*/
       ),
       body: Container(
         margin: new EdgeInsets.all(4.0),
@@ -825,18 +850,89 @@ class _NotesPageState extends State<NotesPage> {
           children: <Widget>[
             Expanded(
                 child: FutureBuilder<List>(
-                    future: getTodaysMonthEvent(),
+                    future:
+                        dbHelper.getAllBibleNotes(), //getTodaysMonthEvent(),
                     initialData: List(),
                     builder: (context, snapshot) {
-                      return _buildEventList(snapshot.data);
+                      return new Center(
+                        child: ListView.separated(
+                          itemCount: snapshot.data.length,
+                          itemBuilder: (context, index) {
+                            return GestureDetector(
+                                child: ListTile(
+                                  trailing: IconButton(
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.redAccent,
+                                    ),
+                                    onPressed: () {
+                                      _showConfirm(
+                                          context, "", snapshot.data[index].id);
+                                    },
+                                  ),
+                                  title: Text(
+                                    /*f.format(DateTime.parse(
+                                        snapshot.data[index].date))*/
+                                    snapshot.data[index].title,
+                                    style: TextStyle(
+                                      fontSize: ScreenUtil().setSp(
+                                          fontOfContent,
+                                          allowFontScalingSelf: true),
+                                    ),
+                                  ),
+                                ),
+                                onTap: () {
+                                  setState(() {
+                                    editCurrentNotes = BibleNotes(
+                                        id: int.parse(
+                                            snapshot.data[index].id.toString()),
+                                        title: snapshot.data[index].title
+                                            .toString(),
+                                        content: snapshot.data[index].content
+                                            .toString(),
+                                        date: snapshot.data[index].date
+                                            .toString());
+                                    _controller.text = editCurrentNotes != null
+                                        ? editCurrentNotes.title
+                                        : "";
+                                    _controller2.text = editCurrentNotes != null
+                                        ? editCurrentNotes.content
+                                        : "";
+                                    //_controller.text =""; //editCurrentNotes != null ? editCurrentNotes.title : "";
+                                    //_controller2.text =""; //editCurrentNotes != null ? editCurrentNotes.content : "";
+                                    page = 1;
+                                  });
+                                }
+                                /*=> Scaffold
+                                    .of(context)
+                                    .showSnackBar(SnackBar(content: Text(index.toString()))),*/
+                                );
+                          }, //itemBuilder
+                          separatorBuilder: (context, index) {
+                            return Divider();
+                          }, //separatorBuilder
+                        ),
+                      );
                     })),
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        //tooltip: 'Add', // used by assistive technologies
+        onPressed: () {
+          setState(() {
+            editCurrentNotes = BibleNotes();
+            _controller.text = "";
+            _controller2.text = "";
+            page = 1;
+          });
+        },
+        child: Icon(Icons.add),
+      ),
     );
   }
 
-  void _showConfirm(BuildContext _context, String text) {
+  void _showConfirm(BuildContext _context, String text, int id) {
     showDialog<void>(
       context: _context,
       builder: (BuildContext context) {
@@ -862,10 +958,10 @@ class _NotesPageState extends State<NotesPage> {
                       fontSize: ScreenUtil()
                           .setSp(fontOfContent, allowFontScalingSelf: true))),
               onPressed: () async {
-                await dbHelper.deleteNote(editCurrentNotes.id);
+                await dbHelper.deleteNote(id == 0 ? editCurrentNotes.id : id);
                 Navigator.of(context).pop();
                 setState(() {
-                  page = 1;
+                  page = 0;
                 });
               },
             ),
@@ -880,10 +976,12 @@ class _NotesPageState extends State<NotesPage> {
     //ScreenUtil.init(context, width: 750, height: 1334, allowFontScaling: true);
     Widget tempReturn;
     if (page == 0)
-      tempReturn = getCalPage();
-    else if (page == 1)
+      //tempReturn = getCalPage();
       tempReturn = getNotesListPage(context);
-    else if (page == 2) tempReturn = getNotesPage(context);
+    else if (page == 1)
+      //tempReturn = getNotesListPage(context);
+      tempReturn = getNotesPage(context);
+    //else if (page == 2) tempReturn = getNotesPage(context);
 
     return /*MaterialApp(
       theme:prefs.getInt(sharePrefLightDark) ==0 ? ThemeData.light(): ThemeData.dark(),

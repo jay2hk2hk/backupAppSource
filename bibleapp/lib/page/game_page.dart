@@ -147,7 +147,7 @@ class _GamePageState extends State<GamePage> {
   String rewardedVideoAdsId = Platform.isAndroid
       ? "ca-app-pub-9860072337130869/5350932207"
       : "ca-app-pub-9860072337130869/7088766690";
-  static int maxAdsRewards = 9;
+  static int maxAdsRewards = 900000;
   static int todayAdsRewards = 0;
   static bool todayCanAd = true;
   static int totalTodayAnswerNumMax = 100;
@@ -485,7 +485,7 @@ class _GamePageState extends State<GamePage> {
                                 Colors.green[300]),
                             value: (expBQAStart / expBQAEnd),
                           ),
-                          Text(
+                          /*Text(
                               FlutterI18n.translate(context, "todayScoreText") +
                                   totalTodayBQACorrectAnswerNum.toString() +
                                   '/' +
@@ -493,7 +493,7 @@ class _GamePageState extends State<GamePage> {
                               style: new TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: ScreenUtil().setSp(fontOfContent,
-                                      allowFontScalingSelf: true))),
+                                      allowFontScalingSelf: true))),*/
                         ],
                       ),
                     ),
@@ -584,7 +584,7 @@ class _GamePageState extends State<GamePage> {
                                 Colors.green[300]),
                             value: (expStart / expEnd),
                           ),
-                          Text(
+                          /*Text(
                               FlutterI18n.translate(context, "todayScoreText") +
                                   totalTodayCorrectAnswerNum.toString() +
                                   '/' +
@@ -592,7 +592,7 @@ class _GamePageState extends State<GamePage> {
                               style: new TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: ScreenUtil().setSp(fontOfContent,
-                                      allowFontScalingSelf: true))),
+                                      allowFontScalingSelf: true))),*/
                         ],
                       ),
                     ),
@@ -1206,7 +1206,7 @@ class _GamePageState extends State<GamePage> {
               /*RewardedVideoAd.instance
                     .show()
                     .catchError((e) => print("error in loading 1st time"));*/
-              //_showRewardedAd();
+              _showRewardedAd();
               // Load only if not loaded
               /* (!rewardedAd.isLoaded) await rewardedAd.load();
               if (rewardedAd.isLoaded) rewardedAd.show();

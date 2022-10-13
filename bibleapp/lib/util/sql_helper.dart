@@ -308,6 +308,27 @@ class SQLHelper {
     });
   }
 
+  Future<List<BibleNotes>> getAllBibleNotes() async {
+    // Get a reference to the database.
+    final Database db = await database;
+
+    // Query the table.
+    final List<Map<String, dynamic>> maps = await db.query(
+      bible_notes,
+      orderBy: 'date',
+    );
+
+    // Convert the List<Map<String, dynamic> into a List<>.
+    return List.generate(maps.length, (i) {
+      return BibleNotes(
+        id: maps[i]['id'],
+        title: maps[i]['title'].toString(),
+        content: maps[i]['content'],
+        date: maps[i]['date'],
+      );
+    });
+  }
+
   Future<List<BibleNotes>> getBibleNotesById(int id) async {
     // Get a reference to the database.
     final Database db = await database;
