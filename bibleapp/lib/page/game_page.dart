@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:back_button_interceptor/back_button_interceptor.dart';
 import 'package:bibleapp/model/bible_bookmark.dart';
@@ -697,11 +698,14 @@ class _GamePageState extends State<GamePage> {
 
     for (int i = 2; i < 6; i++) {
       tempList.add(
-        RaisedButton(
-          color: displayColorMC[i - 2],
-          textColor: buttonTextColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(displayColorMC[i - 2]),
+            textStyle:
+                MaterialStateProperty.all(TextStyle(color: buttonTextColor)),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Text(
             displayItem[i],
@@ -781,11 +785,14 @@ class _GamePageState extends State<GamePage> {
     tempList.add(
       Visibility(
         visible: isAnswered || isPlayAds,
-        child: RaisedButton(
-          color: bottomNavigationColor,
-          textColor: buttonTextColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        child: ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(bottomNavigationColor),
+            textStyle:
+                MaterialStateProperty.all(TextStyle(color: buttonTextColor)),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Text(
             nextButtonText,
@@ -1099,11 +1106,15 @@ class _GamePageState extends State<GamePage> {
 
     for (int i = 1; i < 5; i++) {
       tempList.add(
-        RaisedButton(
-          color: displayColorBQAMC[i - 1],
-          textColor: buttonTextColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor:
+                MaterialStateProperty.all(displayColorBQAMC[i - 1]),
+            textStyle:
+                MaterialStateProperty.all(TextStyle(color: buttonTextColor)),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Text(
             displayBQAItem[i],
@@ -1186,11 +1197,14 @@ class _GamePageState extends State<GamePage> {
     tempList.add(
       Visibility(
         visible: isBQAAnswered || isBQAPlayAds,
-        child: RaisedButton(
-          color: bottomNavigationColor,
-          textColor: buttonTextColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        child: ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(bottomNavigationColor),
+            textStyle:
+                MaterialStateProperty.all(TextStyle(color: buttonTextColor)),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Text(
             nextBQAButtonText,

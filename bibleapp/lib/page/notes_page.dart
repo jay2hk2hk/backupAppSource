@@ -338,9 +338,15 @@ class _NotesPageState extends State<NotesPage> {
         .map((event) => Container(
               margin:
                   const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-              child: RaisedButton(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(18.0),
+              child: ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(raisedButtonColor),
+                  shadowColor: MaterialStateProperty.all(splashColor),
+                  textStyle: MaterialStateProperty.all(
+                      TextStyle(color: buttonTextColor)),
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(18.0),
+                  )),
                 ),
                 child: Text(
                   "",
@@ -372,19 +378,21 @@ class _NotesPageState extends State<NotesPage> {
                                       MaterialPageRoute(builder: (context) => NotesEditor()),
                                       );*/
                 },
-                color: raisedButtonColor,
-                textColor: buttonTextColor,
-                //padding: EdgeInsets.fromLTRB(9, 9, 9, 9),
-                splashColor: splashColor,
               ),
             ))
         .toList();
     tempReturnList.add(
       Container(
         margin: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
-        child: RaisedButton(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        child: ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(raisedButtonColor),
+            shadowColor: MaterialStateProperty.all(splashColor),
+            textStyle:
+                MaterialStateProperty.all(TextStyle(color: buttonTextColor)),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -418,10 +426,6 @@ class _NotesPageState extends State<NotesPage> {
                                       MaterialPageRoute(builder: (context) => NotesEditor()),
                                       );*/
           },
-          color: raisedButtonColor,
-          textColor: buttonTextColor,
-          //padding: EdgeInsets.fromLTRB(9, 9, 9, 9),
-          splashColor: splashColor,
         ),
       ),
     );

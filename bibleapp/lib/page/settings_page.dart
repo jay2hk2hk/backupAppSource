@@ -891,11 +891,16 @@ class _SettingsPageState extends State<SettingsPage> {
                                 int.parse(temp[0]));
                           },
                         ),
-                        title: RaisedButton(
-                          color: bottomNavigationColor,
-                          textColor: buttonTextColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
+                        title: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                bottomNavigationColor),
+                            textStyle: MaterialStateProperty.all(
+                                TextStyle(color: buttonTextColor)),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                            )),
                           ),
                           child: Text(
                             titleButtonText + ":" + tempTitle,

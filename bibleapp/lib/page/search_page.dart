@@ -318,11 +318,16 @@ class _SearchPageState extends State<SearchPage> {
                     title: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        RaisedButton(
-                          color: bottomNavigationColor,
-                          textColor: buttonTextColor,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(18.0),
+                        ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(
+                                bottomNavigationColor),
+                            textStyle: MaterialStateProperty.all(
+                                TextStyle(color: buttonTextColor)),
+                            shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(18.0),
+                            )),
                           ),
                           child: Text(
                             titleButtonText + ":" + tempTitle,
@@ -417,11 +422,14 @@ class _SearchPageState extends State<SearchPage> {
     List<Widget> temp = new List<Widget>();
     for (int i = 0; i < saveAllBibleSentence.length; i++) {
       temp.add(
-        RaisedButton(
-          color: bottomNavigationColor,
-          textColor: buttonTextColor,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(bottomNavigationColor),
+            textStyle:
+                MaterialStateProperty.all(TextStyle(color: buttonTextColor)),
+            shape: MaterialStateProperty.all(RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            )),
           ),
           child: Text(
             FlutterI18n.translate(context, "searchButtonList.$i"),
