@@ -947,7 +947,7 @@ class _NotesPageState extends State<NotesPage> {
                       .setSp(fontOfContent, allowFontScalingSelf: true))),
           content: Text(text),
           actions: <Widget>[
-            FlatButton(
+            TextButton(
               child: Text(FlutterI18n.translate(context, "cancelButton"),
                   style: new TextStyle(
                       fontSize: ScreenUtil()
@@ -956,7 +956,7 @@ class _NotesPageState extends State<NotesPage> {
                 Navigator.of(context).pop();
               },
             ),
-            FlatButton(
+            TextButton(
               child: Text(FlutterI18n.translate(context, "okButton"),
                   style: new TextStyle(
                       fontSize: ScreenUtil()
