@@ -185,10 +185,10 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   static String _titleSelection; //save title selection for back button
   static String _bibleListTitle = "";
   var unescape = new HtmlUnescape(); //decode th html chinese word
-  static /*spl.*/ ItemScrollController
-      _scrollController = /*spl.*/ ItemScrollController(); //the scroll controller of jump to
-  static /*spl.*/ ItemScrollController
-      _scrollControllerForTitlePage = /*spl.*/ ItemScrollController(); //the scroll controller of jump to
+  static /*spl.*/ ItemScrollController _scrollController = /*spl.*/
+      ItemScrollController(); //the scroll controller of jump to
+  static /*spl.*/ ItemScrollController _scrollControllerForTitlePage = /*spl.*/
+      ItemScrollController(); //the scroll controller of jump to
   static int listViewInitIndex = 1;
 
   static int bibleTitleOld = 39;
@@ -811,7 +811,6 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
             }
             if(contentNum!="0")
               _contentNum = contentNum;*/
-
           } else {
             List<String> tmepNumMic = queryNumberMic(context);
             for (int x = 0; x < tmepNumMic.length; x++)
@@ -1145,8 +1144,9 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
       if (listSelection[i]) {
         tempText3ForSubString += (i + 1).toString() + ",";
         String tempSubString = tmepBibleList[i]
-            .substring(tmepBibleList[i].indexOf(".") + 1)
-            .replaceAll(" ", "");
+                //.substring(tmepBibleList[i].indexOf(".") + 1)
+                .replaceAll(" ", "") +
+            "\n";
         //copy text no need
         //tempSubString = subStringForBible(tempSubString);
 
@@ -2008,8 +2008,8 @@ void _insert(Map<String, dynamic> row) async {
 
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Padding(
-        padding: /*const EdgeInsets.all(4.0),*/ const EdgeInsets.fromLTRB(
-            4.0, .0, 4.0, 4.0),
+        padding: /*const EdgeInsets.all(4.0),*/
+            const EdgeInsets.fromLTRB(4.0, .0, 4.0, 4.0),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[

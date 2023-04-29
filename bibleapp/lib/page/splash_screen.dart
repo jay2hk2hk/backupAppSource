@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class SplashScreen extends StatefulWidget {
-
   @override
   State<StatefulWidget> createState() {
     return SplashScreenState();
@@ -10,12 +9,10 @@ class SplashScreen extends StatefulWidget {
 }
 
 class SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -23,8 +20,7 @@ class SplashScreenState extends State<SplashScreen> {
       decoration: BoxDecoration(
         image: DecorationImage(
             image: AssetImage('assets/images/CrownBibleIcon.png'),
-            fit: BoxFit.cover
-        ) ,
+            fit: BoxFit.cover),
       ),
       child: Center(
         child: CircularProgressIndicator(

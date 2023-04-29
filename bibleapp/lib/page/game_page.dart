@@ -968,8 +968,8 @@ class _GamePageState extends State<GamePage> {
         theQuestion == "見上節" ||
         theQuestion == "见上节"); //bug checking
 
-    theQuestion = /*FlutterI18n.translate(context, "bibleTitle.$titleIdMC.title")+" "+titleNumMC.toString() + " " +*/ tempBibleList[
-        titleNumCharNumMC];
+    theQuestion = /*FlutterI18n.translate(context, "bibleTitle.$titleIdMC.title")+" "+titleNumMC.toString() + " " +*/
+        tempBibleList[titleNumCharNumMC];
 
     List<String> tempAnswer = [
       FlutterI18n.translate(context, "bibleTitle.$titleIdMC.title") +

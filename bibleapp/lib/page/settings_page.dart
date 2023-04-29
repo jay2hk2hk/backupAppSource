@@ -55,7 +55,8 @@ class _SettingsPageState extends State<SettingsPage> {
 
   bool myInterceptor(bool stopDefaultButtonEvent, RouteInfo info) {
     //print("BACK BUTTON!"); // Do some stuff.
-    if (page == 1 || /*page==2 ||*/ page == 3 ||
+    if (page == 1 || /*page==2 ||*/
+        page == 3 ||
         page == 4 ||
         page == 5 ||
         page == 6 ||

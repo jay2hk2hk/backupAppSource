@@ -11,7 +11,7 @@ description: A new Flutter project.
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 3.28.0+52
+version: 3.29.0+53
 
 environment:
   sdk: ">=2.2.0 <3.0.0"
@@ -73,7 +73,13 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
+
+dependency_overrides:
+  modal_bottom_sheet:
+    git:
+      url: https://github.com/danReynolds/modal_bottom_sheet.git
+      path: modal_bottom_sheet
+
 flutter_icons:
   image_path_android: "assets/images/CrownBibleIconAnd.png"
   image_path_ios: "assets/images/CrownBibleIconIOS.png"
