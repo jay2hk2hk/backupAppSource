@@ -41,14 +41,14 @@ class _HomePageState extends State<HomePage> {
   List<Widget> list = List();
   final dateFormat = new DateFormat('yyyy-MM-dd');
   double fontOfContent = 40.0;
-  //String bannerAdsId = BannerAd.testAdUnitId;
-  //String firebaseAdId = FirebaseAdMob.testAppId;
-  String bannerAdsId = Platform.isAndroid
+  String bannerAdsId = BannerAd.testAdUnitId;
+  String firebaseAdId = BannerAd.testAdUnitId;
+  /*String bannerAdsId = Platform.isAndroid
       ? "ca-app-pub-9860072337130869/5088892533"
       : "ca-app-pub-9860072337130869/8724092620";
   String firebaseAdId = Platform.isAndroid
       ? "ca-app-pub-9860072337130869~8212800236"
-      : "ca-app-pub-9860072337130869~3480731194";
+      : "ca-app-pub-9860072337130869~3480731194";*/
   // TODO: Add a BannerAd instance
   BannerAd _ad;
 

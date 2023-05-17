@@ -232,7 +232,7 @@ class _BibleAppState extends State<BibleApp> with WidgetsBindingObserver {
   static double fontOfTitleButton = 55.0;
   static double fontOfContentMax = 80.0;
   static double fontOfContentMin = 50.0;
-  static double fontOfContent = 60.0;
+  static double fontOfContent = 55.0;
   static double sizeOfIcon = 50.0;
 
   //menu
@@ -2511,7 +2511,7 @@ void _insert(Map<String, dynamic> row) async {
           child: Text(
             temp[i],
             style: new TextStyle(
-              fontSize: ScreenUtil().setSp(fontOfContent,
+              fontSize: ScreenUtil().setSp(fontOfContent - 5,
                   allowFontScalingSelf: true), //color: buttonTextColor
             ),
           ),
@@ -2531,7 +2531,7 @@ void _insert(Map<String, dynamic> row) async {
           child: Text(
             temp[j],
             style: new TextStyle(
-              fontSize: ScreenUtil().setSp(fontOfContent,
+              fontSize: ScreenUtil().setSp(fontOfContent - 5,
                   allowFontScalingSelf: true), //color: buttonTextColor
             ),
           ),
