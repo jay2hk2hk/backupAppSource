@@ -80,16 +80,16 @@ dependency_overrides:
       url: https://github.com/danReynolds/modal_bottom_sheet.git
       path: modal_bottom_sheet
 
-flutter_icons:
-  image_path_android: "assets/images/CrownBibleIconAnd.png"
-  image_path_ios: "assets/images/CrownBibleIconIOS.png"
-  android: true # can specify file name here e.g. "ic_launcher"
-  ios: true # can specify file name here e.g. "My-Launcher-Icon"
-# For information on the generic Dart part of this file, see the
-# following page: https://dart.dev/tools/pub/pubspec
+
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon/icon.png"
+  remove_alpha_ios: true
 
 flutter_native_splash:
-  image: assets/images/CrownBibleIcon.png
+  image: assets/icon/icon.png
   color: "42a5f5"
 
 # The following section is specific to Flutter.
