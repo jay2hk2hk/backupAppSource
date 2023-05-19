@@ -59,8 +59,8 @@ dependencies:
   table_calendar: ^2.3.0
   intl: ^0.17.0
   back_button_interceptor: ^4.3.1
-  flutter_launcher_icons: ^0.13.1
-  flutter_native_splash: ^2.2.19
+  flutter_launcher_icons: ^0.9.0
+  flutter_native_splash: ^1.1.7+1
   catcher: ^0.3.14
   translator: ^0.1.4
   scrollable_positioned_list: ^0.1.8
